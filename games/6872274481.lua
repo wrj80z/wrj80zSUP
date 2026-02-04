@@ -18168,61 +18168,110 @@ end)
 
 Tun(function()
 	if getgenv().TestMode then
+		vape:Remove('KitRender')
 		run(function()
-			local Yuzi
-			Yuzi = vape.Categories.AltFarm:CreateModule({
-				Name = "yuzi",
-				Function = function(callback)
-					if not callback then
-						return
-					end
-					Yuzi:Toggle(false)
-					local originalJumpHeight = lplr.Character.Humanoid.JumpHeight
-					
-					if bedwars.DasherKit and bedwars.DasherKit.canDashAttribute then
-						pcall(function()
-							lplr.Character:SetAttribute(bedwars.DasherKit.canDashAttribute, nil)
-						end)
-					end
-					
-					pcall(function()
-						lplr.Character:SetAttribute('CanDash', 0)
-					end)
-					
-					local lookVector = gameCamera.CFrame.LookVector
-					local origin = lplr.Character.PrimaryPart.Position
-					if bedwars.AbilityController:canUseAbility('dash') then
-						bedwars.AbilityController:useAbility('dash', nil, {
-							direction = lookVector,
-							origin = origin,
-							weapon = store.hand.tool.Name
-						})
-						
-						pcall(function()
-							bedwars.GameAnimationUtil:playAnimation(lplr, bedwars.AnimationType.DAO_DASH)
-						end)
-						
-						pcall(function()
-							local hrp = lplr.Character.HumanoidRootPart
-							local mass = hrp.AssemblyMass or 5
-							hrp:ApplyImpulse(lookVector.Unit * Vector3.new(1, 0, 1) * mass * 400)
-							lplr.Character.Humanoid.JumpHeight = 0.5
-							lplr.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
-						end)
-						
-						task.delay(0.5, function()
-							if lplr.Character and lplr.Character.Humanoid then
-								pcall(function()
-									lplr.Character.Humanoid.JumpHeight = originalJumpHeight
-									if bedwars.JumpHeightController then
-										bedwars.JumpHeightController:setJumpHeight(cloneref(game:GetService("StarterPlayer")).CharacterJumpHeight)
-									end
-								end)
-							end
-						end)
-					end
-				end
-			})
+		    local oldranks = {}
+		    local activeLoops = {}
+		    local updateDebounce = {}
+		    local function clearKitRender()
+		        for key in pairs(activeLoops) do
+		            activeLoops[key] = nil
+		        end
+		        table.clear(updateDebounce)
+		        local app = lplr.PlayerGui:FindFirstChild("MatchDraftApp")
+		        if not app then return end
+		        for _, v in app:GetDescendants() do
+		            if v:GetAttribute("OnyxKitRenderWM") then
+		                if oldranks[v] then
+		                    v.Image = oldranks[v]
+		                end
+		                oldranks[v] = nil
+		                v:SetAttribute("OnyxKitRenderWM", nil)
+		            end
+		            if v.Name == "OnyxKitRenderReplacingRank" and v:IsA("ImageLabel") then
+		                v:Destroy()
+		            end
+		        end
+		    end
+		    local function applyKitRender()
+		        clearKitRender()
+		        task.spawn(function()
+		            task.wait(0.1)
+		            if not KitRender.Enabled then return end
+		            local teams = lplr.PlayerGui:WaitForChild("MatchDraftApp", 30)
+		            if not teams then return end
+		            local function setupKitRender(obj)
+		                if obj.Name ~= "PlayerRender" then return end
+		                if not obj.Parent or not obj.Parent.Parent or not obj.Parent.Parent.Parent or not obj.Parent.Parent.Parent.Parent or not obj.Parent.Parent.Parent.Parent.Parent or obj.Parent.Parent.Parent.Parent.Parent.Name ~= "MatchDraftTeamCardRow" then
+		                    return
+		                end
+		                local rank = obj.Parent:FindFirstChild("3")
+		                if not rank or rank:GetAttribute("OnyxKitRenderWM") then return end
+		                local Rank = rank:Clone()
+		                Rank.Name = "OnyxKitRenderReplacingRank"
+		                Rank.Parent = obj.Parent
+		                local userId = string.match(obj.Image, "id=(%d+)")
+		                if not userId then return end
+		                userId = tonumber(userId)
+		                obj:SetAttribute("OnyxKitRenderUserID", userId)
+		                local plr = playersService:GetPlayerByUserId(userId)
+		                if not plr then return end
+		                local loopKey = plr.UserId
+		                activeLoops[loopKey] = true
+		                if not oldranks[Rank] then
+		                    oldranks[Rank] = Rank.Image
+		                end
+		                local function update()
+		                    if not KitRender.Enabled or not activeLoops[loopKey] then return end
+		                    if not Rank or not Rank.Parent then
+		                        activeLoops[loopKey] = nil
+		                        updateDebounce[loopKey] = nil
+		                        return
+		                    end
+		                    local render = bedwars.BedwarsKitMeta[plr:GetAttribute("PlayingAsKits")] or bedwars.BedwarsKitMeta.none
+		                    Rank.Image = render.renderImage
+		                    Rank:SetAttribute("OnyxKitRenderWM", true)
+		                end
+		                update()
+		                KitRender:Clean(plr:GetAttributeChangedSignal("PlayingAsKits"):Connect(function()
+		                    local t = tick()
+		                    if updateDebounce[loopKey] and (t - updateDebounce[loopKey]) < 0.1 then
+		                        return
+		                    end
+		                    updateDebounce[loopKey] = t
+		                    update()
+		                end))
+		            end
+		            for _, obj in teams:GetDescendants() do
+		                if KitRender.Enabled then
+		                    setupKitRender(obj)
+		                end
+		            end
+		            KitRender:Clean(teams.DescendantAdded:Connect(function(obj)
+		                if KitRender.Enabled then
+		                    setupKitRender(obj)
+		                end
+		            end))
+		        end)
+		    end
+		    KitRender = vape.Categories.Utility:CreateModule({
+		        Name = "KitRender",
+		        Function = function(callback)
+		            if callback then
+		                applyKitRender()
+		                KitRender:Clean(lplr.PlayerGui.ChildAdded:Connect(function(child)
+		                    if child.Name == "MatchDraftApp" and KitRender.Enabled then
+		                        task.wait(0.1)
+		                        applyKitRender()
+		                    end
+		                end))
+		            else
+		                clearKitRender()
+		            end
+		        end,
+		        Tooltip = "Allows you to see everyone's kit during kit phase (squads ranked!)"
+		    })
 		end)
+
 	end
 end)
