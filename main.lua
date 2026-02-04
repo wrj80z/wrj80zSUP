@@ -64,7 +64,7 @@ local function finishLoading()
 	end)
 
 	local teleportedServers
-	if not table.find({'Bunni', 'Potassium'}, ({identifyexecutor()})[1]) then
+	if not table.find({'Bunni'}, ({identifyexecutor()})[1]) then
 		vape:Clean(playersService.LocalPlayer.OnTeleport:Connect(function()
 			if (not teleportedServers) and (not shared.VapeIndependent) then
 				teleportedServers = true
