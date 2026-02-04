@@ -38,7 +38,7 @@ local playersService = cloneref(game:GetService('Players'))
 local function downloadFile(path, func)
 	if not isfile(path) then
 		local suc, res = pcall(function()
-			return game:HttpGet('https://raw.githubusercontent.com/ywggg/TheMagicFlows/'..readfile('ReVape/profiles/commit.txt')..'/'..select(1, path:gsub('ReVape/', '')), true)
+			return game:HttpGet('https://raw.githubusercontent.com/wrj80z/wrj80zSUP/'..readfile('ReVape/profiles/commit.txt')..'/'..select(1, path:gsub('ReVape/', '')), true)
 		end)
 		if not suc or res == '404: Not Found' then
 			error(res)
@@ -73,7 +73,7 @@ local function finishLoading()
 					if shared.VapeDeveloper then
 						loadstring(readfile('ReVape/loader.lua'), 'loader')()
 					else
-						loadstring(game:HttpGet('https://raw.githubusercontent.com/ywggg/TheMagicFlows/'..readfile('ReVape/profiles/commit.txt')..'/loader.lua', true), 'loader')()
+						loadstring(game:HttpGet('https://raw.githubusercontent.com/wrj80z/wrj80zSUP/'..readfile('ReVape/profiles/commit.txt')..'/loader.lua', true), 'loader')()
 					end
 				]]
 				if shared.VapeDeveloper then
@@ -163,7 +163,7 @@ loadstring(downloadFile('ReVape/games/universal.lua'), 'universal')()
 	else
 		if not shared.VapeDeveloper then
 			local suc, res = pcall(function()
-				return game:HttpGet('https://raw.githubusercontent.com/ywggg/TheMagicFlows/'..readfile('ReVape/profiles/commit.txt')..'/games/'..game.PlaceId..'.lua', true)
+				return game:HttpGet('https://raw.githubusercontent.com/wrj80z/wrj80zSUP/'..readfile('ReVape/profiles/commit.txt')..'/games/'..game.PlaceId..'.lua', true)
 			end)
 			if suc and res ~= '404: Not Found' then
 				loadstring(downloadFile('ReVape/games/'..game.PlaceId..'.lua'), tostring(game.PlaceId))(...)
