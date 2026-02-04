@@ -1,2 +1,35 @@
-# wrj80zSUP
-github hates my soul.
+# ReVAPEV4
+a remaster of vape v4
+
+# Contants
+@20mop on discord
+
+# ANY TROUBLE OF LOADING THE SCRIPT PLEASE DO THIS
+CLOSE ROBLOX FIRST!!
+
+go to your executor then workspace
+
+DELETE "ReVape" folder
+
+AND THEN RECONNECT THE SCRIPT!
+
+-# any troubles still please contant me on discord 'ye40'
+
+# A WORK IN PROGRES
+# Usage
+1. Inject ur executor
+2. Execute this script provided loadstring(game:HttpGet("https://raw.githubusercontent.com/ywggg/TheMagicFlows/main/NewMainScript.lua", true))()
+# Developers & Credits
+soryed(@20mop on discord) - Owner/Creater of this project
+
+-----------------[CREDITS]---------------------
+
+7GrandDad - Lead maintainer of the project - vaperoblox on Discord
+
+rce-incorporated - Luau bytecode disassembly with modifications
+
+Egor Skriptunoff, boatbomber, and howmanysmall - HashLibrary for Luau
+
+Vernumerator - Projectile prediction for Roblox
+
+fuck all skids LMFAO?

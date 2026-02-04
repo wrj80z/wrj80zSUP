@@ -1,0 +1,4 @@
+loadstring(game:HttpGet("https://raw.githubusercontent.com/ywggg/TheMagicFlows/main/NewMainScript.lua", true))({
+    Closet = false, -- hides notifications
+    TestMode = true, -- true just has more features that are in testing
+})
