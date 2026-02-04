@@ -15368,7 +15368,7 @@ run(function()
 					if Latency.Value == 1 then
 						Latency.Value = 1.5
 					end
-					local NEW = (OG * (Latency / 1000))
+					local NEW = (OG * (Latency.Value / 1000))
 					local NEW2 = (NEW * -1)
 					local str = tostring(NEW)
 					local str2 = tostring(NEW2)
