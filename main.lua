@@ -1,6 +1,6 @@
 repeat task.wait() until game:IsLoaded()
 if shared.vape then shared.vape:Uninject() end
-local WL = true
+local WL = false
 local UNI = getgenv().DisableUNI
 if UNI == nil then
 	UNI = false
