@@ -18269,7 +18269,7 @@ Tun(function()
 		                clearKitRender()
 		            end
 		        end,
-		        Tooltip = "Allows you to see everyone's kit during kit phase (squads ranked!)"
+		        Tooltip = "Allows you to see everyone's kit during kit phase (squads ranked! testmode)"
 		    })
 		end)
 
