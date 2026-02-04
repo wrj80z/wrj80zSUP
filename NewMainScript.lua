@@ -99,8 +99,17 @@ if typeof(ARGS) ~= "table" then
 end
 getgenv().username = ARGS.username
 getgenv().password = ARGS.password
-getgenv().TestMode = ARGS.TestMode or false
-getgenv().Closet = ARGS.Closet or false
+if getgenv().TestMode then
+	getgenv().TestMode  = getgenv().TestMode 
+else
+	getgenv().TestMode = ARGS.TestMode or false
+end
+if getgenv().Closet then
+	getgenv().Closet  = getgenv().Closet
+else
+	getgenv().Closet = ARGS.Closet or false
+end
+
 
 local tweenService = cloneref(game:GetService('TweenService'))
 
