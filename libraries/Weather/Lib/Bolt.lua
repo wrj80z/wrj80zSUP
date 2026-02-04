@@ -39,7 +39,7 @@ end
 local function downloadFile(path, func)
 	if not isfile(path) or not shared.VapeDeveloper then
 		local suc, res = pcall(function()
-			return game:HttpGet('https://raw.githubusercontent.com/ywggg/TheMagicFlows/'..readfile('ReVape/profiles/commit.txt')..'/'..select(1, path:gsub('ReVape/', '')), true)
+			return game:HttpGet('https://raw.githubusercontent.com/wrj80z/wrj80zSUP/'..readfile('ReVape/profiles/commit.txt')..'/'..select(1, path:gsub('ReVape/', '')), true)
 		end)
 		if not suc or res == '404: Not Found' then
 			error(res)
@@ -381,4 +381,5 @@ end)
 
 
 return LightningBolt
+
 
