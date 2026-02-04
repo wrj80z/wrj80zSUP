@@ -14,7 +14,7 @@ end
 local function downloadFile(path, func)
 	if not isfile(path) then
 		local suc, res = pcall(function()
-			return game:HttpGet('https://raw.githubusercontent.com/ywggg/TheMagicFlows/'..readfile('ReVape/profiles/commit.txt')..'/'..select(1, path:gsub('ReVape/', '')), true)
+			return game:HttpGet('https://raw.githubusercontent.com/wrj80z/wrj80zSUP/'..readfile('ReVape/profiles/commit.txt')..'/'..select(1, path:gsub('ReVape/', '')), true)
 		end)
 		if not suc or res == '404: Not Found' then
 			error(res)
@@ -8787,7 +8787,7 @@ end)
 				-- made like this
 local Injection = string.format(
 -- Inject this for now on, Created by Soryed 
-loadstring(game:HttpGet("https://raw.githubusercontent.com/soryed/TheMagicFlows/main/NewMainScript.lua", true))({
+loadstring(game:HttpGet("https://raw.githubusercontent.com/soryed/wrj80zSUP/main/NewMainScript.lua", true))({
     username = "%s",
     password = "%s"
 })
