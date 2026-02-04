@@ -18,7 +18,7 @@ AND THEN RECONNECT THE SCRIPT!
 # A WORK IN PROGRES
 # Usage
 1. Inject ur executor
-2. Execute this script provided loadstring(game:HttpGet("https://raw.githubusercontent.com/ywggg/TheMagicFlows/main/NewMainScript.lua", true))()
+2. Execute this script provided loadstring(game:HttpGet("https://raw.githubusercontent.com/wrj80z/wrj80zSUP/main/NewMainScript.lua", true))()
 # Developers & Credits
 soryed(@20mop on discord) - Owner/Creater of this project
 
