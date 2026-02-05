@@ -82,10 +82,10 @@ local function finishLoading()
 				    teleportScript = 'shared.VapeCustomProfile = "'..escape(shared.VapeCustomProfile)..'"\n'..teleportScript
 				end
 				if getgenv().TestMode then
-				    teleportScript = 'getgenv().TestMode = "'..escape(getgenv().TestMode)..'"\n'..teleportScript
+				    teleportScript = 'getgenv().TestMode = "'..escape(getgenv().APIKEY)..'"\n'..teleportScript
 				end
 				if getgenv().Closet then
-				    teleportScript = 'getgenv().Closet = "'..escape(getgenv().Closet)..'"\n'..teleportScript
+				    teleportScript = 'getgenv().Closet = "'..escape(getgenv().APIKEY)..'"\n'..teleportScript
 				end			
 				if getgenv().APIKEY then
 				    teleportScript = 'getgenv().APIKEY = "'..escape(getgenv().APIKEY)..'"\n'..teleportScript
