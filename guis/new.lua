@@ -22,7 +22,7 @@ local mainapi = {
 	ToggleNotifications = {},
     ColoredNotifications = {},
 	Fonts = {},
-	Version = '1.0.2',
+	Version = '1.0.1',
 	Discord = "@20mop",
 	role = "",
 	user = "",
@@ -497,6 +497,7 @@ end
 
 do
 	function tween:Tween(obj, tweeninfo, goal, tab)
+		if not obj or not tweeninfo or not goal or not tab then return end
 		tab = tab or self.tweens
 		if tab[obj] then
 			tab[obj]:Cancel()
