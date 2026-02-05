@@ -10601,7 +10601,7 @@ run(function()
 		Min = 0,
 		Max = 60,
 		Default = 30,
-		Darker = true
+		Darker = true,
 		Visible = false
 	})
 	Deselect = BetterCait:CreateToggle({
