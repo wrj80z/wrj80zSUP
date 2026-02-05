@@ -23,7 +23,7 @@ local loadstring = function(...)
 	end
 	return res
 end
-local queue_on_teleport = queue_on_teleport or function() end
+local queue_on_teleport = queue_on_teleport or function() print('ur executore doesnt support queueonteleport') end
 local isfile = isfile or function(file)
 	local suc, res = pcall(function()
 		return readfile(file)
@@ -64,7 +64,6 @@ local function finishLoading()
 	end)
 
 	local teleportedServers
-	if not table.find({'Bunni'}, ({identifyexecutor()})[1]) then
 		vape:Clean(playersService.LocalPlayer.OnTeleport:Connect(function()
 			if (not teleportedServers) and (not shared.VapeIndependent) then
 				teleportedServers = true
@@ -95,7 +94,7 @@ local function finishLoading()
 				queue_on_teleport(teleportScript)
 			end
 		end))
-	end
+	
 
 	if not shared.vapereload then
 		if not vape.Categories then return end
@@ -150,7 +149,7 @@ task.spawn(function()
 end)
 
 if not shared.VapeIndependent then
-loadstring(downloadFile('ReVape/games/universal.lua'), 'universal')()
+	loadstring(downloadFile('ReVape/games/universal.lua'), 'universal')()
 	task.spawn(function()
 		if WL then
 			loadstring(downloadFile('ReVape/games/whitelist.lua'), 'whitelist')()
