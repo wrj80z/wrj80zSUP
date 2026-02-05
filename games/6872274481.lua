@@ -4816,7 +4816,7 @@ run(function()
 		Placeholder = 'player (userid)'
 	})
 	LeaveDetection = StaffDetector:CreateToggle({
-		Name = 'Leave Detection'
+		Name = 'Leave Detection',
 		Tooltip = 'when an impossible/blacklisted/staff detection has happend and when they leave it notifs you.'
 	})
 
