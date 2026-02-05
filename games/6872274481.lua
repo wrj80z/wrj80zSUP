@@ -7703,6 +7703,14 @@ run(function()
         end))
     end
 
+	local function applyKitRender()
+		local gui = lplr.PlayerGui
+		for _, obj in gui:GetDescendants() do
+			bindPlayerRender(obj)
+		end
+	end
+
+
     KitRender = vape.Categories.Utility:CreateModule({
         Name = "KitRender",
         Function = function(callback)
