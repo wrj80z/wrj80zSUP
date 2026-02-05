@@ -3563,7 +3563,7 @@ run(function()
 			end
 	
 			if Equipment.Enabled then
-				for i, v in {'Hand', 'Helmet', 'Chestplate', 'Boots', 'Kit','Rank'} do
+				for i, v in {'Hand', 'Helmet', 'Chestplate', 'Boots', 'Kit'} do
 					local Icon = Instance.new('ImageLabel')
 					Icon.Name = v
 					Icon.Size = UDim2.fromOffset(30, 30)
@@ -3672,7 +3672,7 @@ run(function()
 					nametag.Chestplate.Image = bedwars.getIcon(inventory.armor[2] or {itemType = ''}, true)
 					nametag.Boots.Image = bedwars.getIcon(inventory.armor[3] or {itemType = ''}, true)
 					nametag.Kit.Image = bedwars.BedwarsKitMeta[kit].renderImage or bedwars.BedwarsKitMeta.none.renderImage
-					local FetchRank = bedwars.Client:Get("FetchRanks"):CallServerAsync({ent.Player.UserId}):andThen(function(self)
+					--[[local FetchRank = bedwars.Client:Get("FetchRanks"):CallServerAsync({ent.Player.UserId}):andThen(function(self)
 						self = self[1]
 						local division = -1
 						if self.rankDivision then
@@ -3698,7 +3698,7 @@ run(function()
 						end
 						local image = require(replicatedStorage.TS.image['image-id']).BedwarsImageId
 						nametag.Rank.Image = image[CurrentRank]
-					end)
+					end)--]]
 					
 				end
 	
