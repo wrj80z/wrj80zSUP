@@ -3915,7 +3915,7 @@ run(function()
 	})
 	Equipment = NameTags:CreateToggle({
 		Name = 'Equipment',
-		Default = true,
+		Default = false,
 		Function = function()
 			if NameTags.Enabled then
 				NameTags:Toggle()
