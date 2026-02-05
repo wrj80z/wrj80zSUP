@@ -3672,34 +3672,6 @@ run(function()
 					nametag.Chestplate.Image = bedwars.getIcon(inventory.armor[2] or {itemType = ''}, true)
 					nametag.Boots.Image = bedwars.getIcon(inventory.armor[3] or {itemType = ''}, true)
 					nametag.Kit.Image = bedwars.BedwarsKitMeta[kit].renderImage or bedwars.BedwarsKitMeta.none.renderImage
-					--[[local FetchRank = bedwars.Client:Get("FetchRanks"):CallServerAsync({ent.Player.UserId}):andThen(function(self)
-						self = self[1]
-						local division = -1
-						if self.rankDivision then
-							division = self.rankDivision
-						end
-						local CurrentRank = 'RANDOM_KIT_RENDER'
-						if division >= 0 and division <= 3 then
-							CurrentRank = 'BRONZE_RANK'
-						elseif division >= 4 and division <= 7 then
-							CurrentRank = 'SILVER_RANK'
-						elseif division >= 8 and division <= 11 then
-							CurrentRank = 'GOLD_RANK'
-						elseif division >= 12 and division <= 15 then
-							CurrentRank = 'PLATINUM_RANK'
-						elseif division >= 16 and division <= 19 then
-							CurrentRank = 'DIAMOND_RANK'
-						elseif division >= 20 and division <= 23 then
-							CurrentRank = 'EMERALD_RANK'
-						elseif division == 24 then
-							CurrentRank = 'NIGHTMARE_RANK'
-						else
-							CurrentRank = 'RANDOM_KIT_RENDER'
-						end
-						local image = require(replicatedStorage.TS.image['image-id']).BedwarsImageId
-						nametag.Rank.Image = image[CurrentRank]
-					end)--]]
-					
 				end
 	
 				local size = getfontsize(removeTags(Strings[ent]), nametag.TextSize, nametag.FontFace, Vector2.new(100000, 100000))
@@ -3816,38 +3788,47 @@ run(function()
 				methodused = DrawingToggle.Enabled and 'Drawing' or 'Normal'
 				if Removed[methodused] then
 					NameTags:Clean(entitylib.Events.EntityRemoved:Connect(function(ent)
+						task.wait(0.02335)
 						Removed[methodused](ent)
 					end))
 				end
 				if Added[methodused] then
 					for _, v in entitylib.List do
 						if Reference[v] then
+							task.wait(0.02335)
 							Removed[methodused](v)
 						end
+						task.wait(0.02335)
 						Added[methodused](v)
 					end
 					NameTags:Clean(entitylib.Events.EntityAdded:Connect(function(ent)
+						task.wait(0.02335)
 						if Reference[ent] then
 							Removed[methodused](ent)
 						end
+						task.wait(0.02335)
 						Added[methodused](ent)
 					end))
 				end
 				if Updated[methodused] then
 					NameTags:Clean(entitylib.Events.EntityUpdated:Connect(function(ent)
+						task.wait(0.02335)
 						Updated[methodused](ent)
 					end))
 					for _, v in entitylib.List do
+						task.wait(0.02335)
 						Updated[methodused](v)
 					end
 				end
 				if ColorFunc[methodused] then
 					NameTags:Clean(vape.Categories.Friends.ColorUpdate.Event:Connect(function()
+						task.wait(0.02335)
 						ColorFunc[methodused](Color.Hue, Color.Sat, Color.Value)
 					end))
 				end
 				if Loop[methodused] then
 					NameTags:Clean(runService.RenderStepped:Connect(function()
+						task.wait(0.02335)
 						Loop[methodused]()
 					end))
 				end
