@@ -18169,6 +18169,308 @@ end)
 Tun(function()
 	if getgenv().TestMode then
 		vape:Remove('KitRender')
+		vape:Remove('ProjectileAimbot')
+	run(function()
+	local ProjectileAimbot	
+	local TargetPart
+	local Blacklist
+	local rand = Random.new()
+	local HitChance
+	local Targets
+	local FOV
+	local OtherProjectiles
+	local Slowdown
+	local AutoCharge
+	local ChargePercent
+	local BA
+	local Ping
+	local rayCheck = RaycastParams.new()
+	rayCheck.FilterType = Enum.RaycastFilterType.Include
+	rayCheck.FilterDescendantsInstances = {workspace:FindFirstChild('Map')}
+	local old
+	ProjectileAimbot = vape.Categories.Combat:CreateModule({
+		Name = 'ProjectileAimbot',
+		Function = function(callback)
+			if callback then
+				old = bedwars.ProjectileController.calculateImportantLaunchValues
+				bedwars.ProjectileController.calculateImportantLaunchValues = function(...)
+					local self, projmeta, worldmeta, origin, shootpos = ...
+					local plr = entitylib.EntityMouse({
+						Part = 'RootPart',
+						Range = FOV.Value,
+						Players = Targets.Players.Enabled,
+						NPCs = Targets.NPCs.Enabled,
+						Wallcheck = Targets.Walls.Enabled,
+						Origin = entitylib.isAlive and (shootpos or entitylib.character.RootPart.Position) or Vector3.zero
+					})
+	
+					if plr then
+						local pos = shootpos or self:getLaunchPosition(origin)
+						if not pos then
+							return old(...)
+						end
+	
+						if (not OtherProjectiles.Enabled) and not projmeta.projectile:find('arrow') then
+							return old(...)
+						end
+
+						
+						if table.find(Blacklist.ListEnabled, projmeta.projectile) then
+							return old(...)
+						end
+	
+						local meta = projmeta:getProjectileMeta()
+						local lifetime = (worldmeta and meta.predictionLifetimeSec or meta.lifetimeSec or 3)
+						local gravity = (meta.gravitationalAcceleration or 196.2) * projmeta.gravityMultiplier
+						local projSpeed = (meta.launchVelocity or 100)
+						local offsetpos = pos + (projmeta.projectile == 'owl_projectile' and Vector3.zero or projmeta.fromPositionOffset)
+						local balloons = plr.Character:GetAttribute('InflatedBalloons')
+						local playerGravity = workspace.Gravity
+	
+						if balloons and balloons > 0 then
+							playerGravity = (workspace.Gravity * (1 - ((balloons >= 4 and 1.2 or balloons >= 3 and 1 or 0.975))))
+						end
+	
+						if plr.Character.PrimaryPart:FindFirstChild('rbxassetid://8200754399') then
+							playerGravity = 6
+						end
+	
+						if plr.Player:GetAttribute('IsOwlTarget') then
+							for _, owl in collectionService:GetTagged('Owl') do
+								if owl:GetAttribute('Target') == plr.Player.UserId and owl:GetAttribute('Status') == 2 then
+									playerGravity = 0
+								end
+							end
+						end
+	
+							local turrent = projmeta.projectile:find('turret') or false
+							if store.hand and store.hand.tool then
+								if store.hand.tool.Name:find("spellbook") then
+									local targetPos = plr.RootPart.Position
+									local selfPos = lplr.Character.PrimaryPart.Position
+									local expectedTime = (selfPos - targetPos).Magnitude / 160
+									targetPos = targetPos + (plr.RootPart.Velocity * expectedTime)
+									targetinfo.Targets[plr] = tick() + 1
+									return {
+										initialVelocity = (targetPos - selfPos).Unit * 160,
+										positionFrom = offsetpos,
+										deltaT = 2,
+										gravitationalAcceleration = 1,
+										drawDurationSeconds = 5
+									}
+								elseif turrent then
+									local targetPos = plr.RootPart.Position
+									local targetVelocity = plr.RootPart.Velocity
+									local expectedTime = (targetPos - offsetpos).Magnitude
+									local ReachV = expectedTime / projSpeed
+									local newPos = targetPos + (targetVelocity * ReachV)
+									local Comp = 0.5 * gravity * (ReachV * ReachV)
+									newPos = newPos + Vector3.new(0, Comp, 0)
+									local newlook = CFrame.new(offsetpos, newPos)
+									targetinfo.Targets[plr] = tick() + 1
+									return {
+										initialVelocity = newlook.LookVector * projSpeed,
+										positionFrom = offsetpos,
+										deltaT = 1,
+										gravitationalAcceleration = gravity,
+										drawDurationSeconds = 5
+									}
+								elseif store.hand.tool.Name:find("lasso") then
+									local targetPos = plr.RootPart.Position
+									local Velo = plr.RootPart.Velocity
+									local expectedTime = (targetPos - offsetpos).Magnitude
+									local ReachV = expectedTime / projSpeed
+									local newPos = targetPos + (Velo * ReachV)
+									local horizontalOffset = Vector3.new(newPos.X - targetPos.X, 0, newPos.Z - targetPos.Z)
+									if horizontalOffset.Magnitude > 10 then
+										horizontalOffset = horizontalOffset.Unit * 10
+										newPos = Vector3.new(targetPos.X + horizontalOffset.X,newPos.Y,targetPos.Z + horizontalOffset.Z)
+									end
+									local Comp = 0.34 * gravity * (ReachV * ReachV)
+									local Muti = math.min(expectedTime / 50, 2.5)  
+									local Final = Comp * Muti
+									newPos = newPos + Vector3.new(0, Final, 0)
+									local newPOSS = CFrame.new(offsetpos, newPos)
+									targetinfo.Targets[plr] = tick() + 1
+									return {
+										initialVelocity = newPOSS.LookVector * projSpeed,
+										positionFrom = offsetpos,
+										deltaT = 0.8,
+										gravitationalAcceleration = gravity,
+										drawDurationSeconds = 5
+									}
+								elseif store.hand.tool.Name:find("frost_staff_1") then
+									local targetPos = plr.RootPart.Position
+									local selfPos = lplr.Character.PrimaryPart.Position
+									local expectedTime = (selfPos - targetPos).Magnitude / 180
+									targetPos = targetPos + (plr.RootPart.Velocity * expectedTime)
+									local customDrawDuration = 0.2
+									local chargePercent = 100
+									customDrawDuration = customDrawDuration * (chargePercent / 100)
+									targetinfo.Targets[plr] = tick() + 1
+									return {
+										initialVelocity = (targetPos - selfPos).Unit * 180,
+										positionFrom = offsetpos,
+										deltaT = 2,
+										gravitationalAcceleration = gravity,
+										drawDurationSeconds = customDrawDuration
+									}
+								elseif store.hand.tool.Name:find("frost_staff_2") then
+									local targetPos = plr.RootPart.Position
+									local selfPos = lplr.Character.PrimaryPart.Position
+									local expectedTime = (selfPos - targetPos).Magnitude / 190
+									targetPos = targetPos + (plr.RootPart.Velocity * expectedTime)
+									local customDrawDuration =  0.18
+									local chargePercent = 100
+									customDrawDuration = customDrawDuration * (chargePercent / 100)
+									targetinfo.Targets[plr] = tick() + 1
+									return {
+										initialVelocity = (targetPos - selfPos).Unit * 190,
+										positionFrom = offsetpos,
+										deltaT = 2,
+										gravitationalAcceleration = gravity,
+										drawDurationSeconds = customDrawDuration
+									}
+								elseif store.hand.tool.Name:find("frost_staff_3") then
+									local targetPos = plr.RootPart.Position
+									local selfPos = lplr.Character.PrimaryPart.Position
+									local expectedTime = (selfPos - targetPos).Magnitude / 200
+									targetPos = targetPos + (plr.RootPart.Velocity * expectedTime)
+									local customDrawDuration = 0.16
+									local chargePercent = 100
+									customDrawDuration = customDrawDuration * (chargePercent / 100)
+									targetinfo.Targets[plr] = tick() + 1
+									return {
+										initialVelocity = (targetPos - selfPos).Unit * 200,
+										positionFrom = offsetpos,
+										deltaT = 2,
+										gravitationalAcceleration = gravity,
+										drawDurationSeconds = customDrawDuration
+									}																		
+								elseif store.hand.tool.Name:find("chakram") then
+									local targetPos = plr.RootPart.Position
+									local selfPos = lplr.Character.PrimaryPart.Position
+									local expectedTime = (selfPos - targetPos).Magnitude / 80
+									targetPos = targetPos + (plr.RootPart.Velocity * expectedTime)
+									targetinfo.Targets[plr] = tick() + 1
+									return {
+										initialVelocity = (targetPos - selfPos).Unit * 80 ,
+										positionFrom = offsetpos,
+										deltaT = 2,
+										gravitationalAcceleration = 1,
+										drawDurationSeconds = 5
+									}									
+								end
+							end
+		
+							local newlook = CFrame.new(offsetpos, plr[TargetPart.Value].Position) * CFrame.new(projmeta.projectile == 'owl_projectile' and Vector3.zero or Vector3.new(bedwars.BowConstantsTable.RelX, bedwars.BowConstantsTable.RelY, bedwars.BowConstantsTable.RelZ))
+							local calc = nil
+							if BA.Enabled then
+								if Ping.Enabled then
+									calc = prediction.SolveTrajectory(newlook.p, projSpeed, gravity, plr[TargetPart.Value].Position, projmeta.projectile == 'telepearl' and Vector3.zero or plr[TargetPart.Value].Velocity, playerGravity, plr.HipHeight, plr.Jumping and 42.6 or nil, rayCheck, plr, plr[TargetPart.Value])
+								else
+									calc = prediction.SolveTrajectory(newlook.p, projSpeed, gravity, plr[TargetPart.Value].Position, projmeta.projectile == 'telepearl' and Vector3.zero or plr[TargetPart.Value].Velocity, playerGravity, plr.HipHeight, plr.Jumping and 42.6 or nil, rayCheck)
+								end
+							else
+								calc = oldpred.SolveTrajectory(newlook.p, projSpeed, gravity, plr[TargetPart.Value].Position, projmeta.projectile == 'telepearl' and Vector3.zero or plr[TargetPart.Value].Velocity, playerGravity, plr.HipHeight, plr.Jumping and 42.6 or nil, rayCheck)
+							end
+							local DDS = 5
+							if AutoCharge.Enabled then
+								DDS = (ChargePercent.Value / 100) * 0.58
+							else
+								DDS = 5
+							end
+							if calc then
+								targetinfo.Targets[plr] = tick() + 1
+								hovering = false
+								local HC = 0
+								if  HitChance.Value >= 100 then
+									HC = 0
+								else
+									HC = (HitChance.Value / 500)
+									HC = HC + math.random()
+								end
+								return {
+									initialVelocity = CFrame.new(newlook.Position, calc).LookVector * projSpeed ,
+									positionFrom = offsetpos,
+									deltaT = lifetime - HC,
+									gravitationalAcceleration = gravity,
+									drawDurationSeconds = DDS
+								}
+							end
+					end
+	
+					return old(...)
+				end
+			else
+				bedwars.ProjectileController.calculateImportantLaunchValues = old
+			end
+		end,
+		Tooltip = 'Silently adjusts your aim towards the enemy'
+	})
+	Ping = ProjectileAimbot:CreateToggle({
+		Name = 'Ping Compensation',
+		Default = true,
+		Darker = true,
+	})
+	BA = ProjectileAimbot:CreateToggle({
+		Name = 'Better Predictions',
+		Default = true,
+		Tooltip = "enables = uses my predictions which is better!\ndisabled = uses xylex/7Granddad predicitions which is the old and good pa!",
+		Function = function(v)
+			Ping.Object.Visible = v
+		end
+	})
+	Targets = ProjectileAimbot:CreateTargets({
+		Players = true,
+		Walls = true
+	})
+	TargetPart = ProjectileAimbot:CreateDropdown({
+		Name = 'Part',
+		List = {'RootPart', 'Head'}
+	})
+	FOV = ProjectileAimbot:CreateSlider({
+		Name = 'FOV',
+		Min = 1,
+		Max = 1000,
+		Default = 1000
+	})
+	OtherProjectiles = ProjectileAimbot:CreateToggle({
+		Name = 'Other Projectiles',
+		Default = true
+	})
+	Blacklist = ProjectileAimbot:CreateTextList({
+		Name = 'Blacklist',
+		Darker = true,
+		Default = {'telepearl', 'glue_projectile'}
+	})
+	HitChance = ProjectileAimbot:CreateSlider({
+		Name = 'Hit Chance',
+		Min = 0,
+		Max = 100,
+		Default = 100,
+	})
+	ChargePercent = ProjectileAimbot:CreateSlider({
+		Name = 'Charge Percent',
+		Min = 0,
+		Max = 100,
+		Default = 100,
+		Suffix = "%",
+		Visible = false,
+		Darker = true
+	})
+	AutoCharge = ProjectileAimbot:CreateToggle({
+		Name = 'Auto Charge',
+		Default = false,
+		Function = function(cb)
+			ChargePercent.Object.Visible = cb
+		end
+	})	
+	Slowdown = ProjectileAimbot:CreateToggle({
+		Name = 'Slowdown',
+		Default = false,
+	})
+end)
 		run(function()
 		    local oldranks = {}
 		    local activeLoops = {}
