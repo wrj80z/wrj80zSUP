@@ -7975,7 +7975,7 @@ run(function()
 	})
 end)
 
---[[run(function()
+run(function()
     local oldranks = {}
     local activeLoops = {}
     local updateDebounce = {}
@@ -8112,7 +8112,7 @@ end)
         end,
         Tooltip = "Allows you to see everyone's kit during kit phase (squads ranked!)"
     })
-end)--]]
+end)
 
 run(function()
     local aim = 0.158
