@@ -4651,9 +4651,6 @@ run(function()
 	
 		notif('StaffDetector', 'Staff Detected ('..checktype..'): '..plr.Name..' ('..plr.UserId..')', 60, 'alert')
 		whitelist.customtags[plr.Name] = {{text = 'GAME STAFF', color = Color3.new(1, 0, 0)}}
-		if LeaveDetection.Enabled then
-			ImpossibleJoinsTBL[plr] = true
-		end
 		if Party.Enabled and not checktype:find('clan') then
 			bedwars.PartyController:leaveParty()
 		end
@@ -4686,14 +4683,6 @@ run(function()
 				end
 			end
 		end
-		StaffDetector:Clean(playersService.PlayerRemoving:Connect(function(p)
-			if LeaveDetection.Enabled then
-				if ImpossibleJoinsTBL[p] then
-					ImpossibleJoinsTBL[p] = nil
-					notif('StaffDetector', `Staff {p.Name} ({checktype}) has just left.`, 10,'warning')
-				end
-			end
-		end))
 	end
 	
 	local function checkFriends(list)
