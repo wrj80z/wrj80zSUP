@@ -497,7 +497,7 @@ end
 
 do
 	function tween:Tween(obj, tweeninfo, goal, tab)
-		if not obj or not tweeninfo or not goal or not tab then return end
+		print(obj,tweeninfo,goal,tab)
 		tab = tab or self.tweens
 		if tab[obj] then
 			tab[obj]:Cancel()
