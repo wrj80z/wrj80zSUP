@@ -7984,6 +7984,9 @@ run(function()
         Name = "KitRender",
         Function = function(callback)   
             if callback then
+				repeat
+					task.wait(0.0085)
+				until isrbxactive()
                 task.spawn(function()
                     local teams = lplr.PlayerGui:FindFirstChild("MatchDraftApp")
                     if not teams then
@@ -8075,9 +8078,7 @@ run(function()
                             KitRender:Clean(connection)
                         end
                     end
-                    
-                    task.wait(0.05)
-                    
+                                        
                     for _, obj in teams:GetDescendants() do
                         if KitRender.Enabled then
                             task.spawn(function()
@@ -8088,10 +8089,18 @@ run(function()
                     
                     KitRender:Clean(teams.DescendantAdded:Connect(function(obj)
                         if KitRender.Enabled then
-                            task.wait(0.05)
                             setupKitRender(obj)
                         end
                     end))
+					KitRender:Clean(playersService.PlayerAdded:Connect(function(plr)
+	                    for _, obj in teams:GetDescendants() do
+	                        if KitRender.Enabled then
+	                            task.spawn(function()
+	                                setupKitRender(obj)
+	                            end)
+	                        end
+	                    end
+					end))
                 end)
             else
                 for key, connection in pairs(activeConnections) do
