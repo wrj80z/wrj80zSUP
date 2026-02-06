@@ -8076,7 +8076,7 @@ run(function()
                         end
                     end
                     
-                    task.wait(0.5)
+                    task.wait(0.05)
                     
                     for _, obj in teams:GetDescendants() do
                         if KitRender.Enabled then
@@ -8088,7 +8088,7 @@ run(function()
                     
                     KitRender:Clean(teams.DescendantAdded:Connect(function(obj)
                         if KitRender.Enabled then
-                            task.wait(0.1)
+                            task.wait(0.05)
                             setupKitRender(obj)
                         end
                     end))
