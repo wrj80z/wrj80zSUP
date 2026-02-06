@@ -7981,7 +7981,7 @@ run(function()
     local updateDebounce = {}
     
     KitRender = vape.Categories.Utility:CreateModule({
-        Name = "KitRender (squads)",
+        Name = "KitRender",
         Function = function(callback)   
             if callback then
                 task.spawn(function()
