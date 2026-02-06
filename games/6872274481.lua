@@ -8014,11 +8014,11 @@ run(function()
         local parent = obj.Parent
         if not parent then return end
 
-        local root = parent
-        for _ = 1, 5 do
-            root = root and root.Parent
-        end
-        if not root or root.Name ~= "MatchDraftTeamCardRow" then return end
+		local root = parent
+		while root and root.Name ~= "MatchDraftTeamCardRow" do
+		    root = root.Parent
+		end
+		if not root then return end
 
         obj:SetAttribute("OnyxKitRenderBound", true)
 
