@@ -17538,7 +17538,7 @@ run(function()
             local resources = {
                 {name = 'iron', color = Color3.fromRGB(200, 200, 200), icon = 'iron', xOffset = 35},
                 {name = 'diamond', color = Color3.fromRGB(85, 200, 255), icon = 'diamond', xOffset = 85},
-                {name = 'emerald', color = Color3.fromRGB(0, 255, 100), icon = 'emerald', xOffset = 135}
+                {name = 'emerald', color = Color3.fromRGB(0, 255, 100), icon = 'emerald', xOffset = 135},
                 {name = 'gold', color = Color3.fromRGB(212, 175, 55), icon = 'gold', xOffset = 92}
 
             }
