@@ -17963,6 +17963,10 @@ run(function()
 	AutoNoelle = vape.Categories.Kits:CreateModule({
 		Name = "AutoNoelle",
 		Function = function(callback)
+			if store.equippedKit ~= "slime_tamer" then
+				vape:CreateNotification("AutoNoelle","Kit required only!",8,"warning")
+				return
+			end
 			if callback then
 				task.spawn(function()
 					AutoNoelle:Clean(playersService.PlayerAdded:Connect(function()
