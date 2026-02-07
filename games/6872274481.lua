@@ -12306,8 +12306,6 @@ run(function()
 			if callback then
 				if store.equippedKit == "davey" then
 					task.spawn(function()
-						local Sound = ''
-						local cannon = ''
 						if Victorious.Value == "Gold" then
 							Sound = 'CANNON_FIRE_VICTORIOUS_GOLD'
 							cannon = 'cannon_gold_victorious'
