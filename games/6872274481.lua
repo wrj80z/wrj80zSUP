@@ -12306,21 +12306,297 @@ run(function()
 			if callback then
 				if store.equippedKit == "davey" then
 					task.spawn(function()
+						local Sound = ''
+						local cannon = ''
 						if Victorious.Value == "Gold" then
 							Sound = 'CANNON_FIRE_VICTORIOUS_GOLD'
+							cannon = 'cannon_gold_victorious'
 						end
 						if Victorious.Value == "Platinum" then
 							Sound = 'CANNON_FIRE_VICTORIOUS_PLATINUM'
+							cannon = 'cannon_platinum_victorious'
 						end
 						if Victorious.Value == "Diamond" then
 							Sound = 'CANNON_FIRE_VICTORIOUS_DIAMOND'
+							cannon = 'cannon_diamond_victorious'
 						end
 						if Victorious.Value == "Emerald" then
 							Sound = 'CANNON_FIRE_VICTORIOUS_EMERALD'
+							cannon = 'cannon_emerald_victorious'
 						end
 						if Victorious.Value == "Nightmare" then
 							Sound = 'CANNON_FIRE_VICTORIOUS_NIGHTMARE'
+							cannon = 'cannon_nightmare_victorious'
 						end
+						local RESKIN_SOURCE = game.ReplicatedStorage:WaitForChild("Assets"):WaitForChild("Blocks"):WaitForChild(cannon)
+						local TARGET_NAME = "cannon"
+						local OFFSET_HELD = CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(0))
+						local OFFSET_PLACED = CFrame.new(0, -2.0, 0) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(0))
+						local tagged = setmetatable({}, { __mode = "k" })
+						local function firstBasePart(root: Instance)
+							for _, d in ipairs(root:GetDescendants()) do
+								if d:IsA("BasePart") then
+									return d
+								end
+							end
+							return nil
+						end
+						local function makeLocalInvisible(root: Instance)
+							for _, d in ipairs(root:GetDescendants()) do
+								if d:IsA("BasePart") then
+									d.LocalTransparencyModifier = 1
+									d.Transparency = 1       
+								elseif d:IsA("Decal") or d:IsA("Texture") then
+									d.Transparency = 1
+								end
+							end
+						end
+						local function setNoCollide(model: Instance)
+							for _, d in ipairs(model:GetDescendants()) do
+								if d:IsA("BasePart") then
+									d.CanCollide = false
+									d.CanTouch = false
+									d.CanQuery = false
+									d.Massless = true
+									d.Anchored = false
+								end
+							end
+						end
+						local function weldAllToPrimary(model: Model)
+							local primary = model.PrimaryPart
+							if not primary then return end
+
+							for _, d in ipairs(model:GetDescendants()) do
+								if d:IsA("BasePart") and d ~= primary then
+									local wc = Instance.new("WeldConstraint")
+									wc.Part0 = primary
+									wc.Part1 = d
+									wc.Parent = primary
+								end
+							end
+						end
+						local function weldModelToPart(model: Model, targetPart: BasePart)
+							if not model.PrimaryPart then
+								local p = firstBasePart(model)
+								if p then
+									pcall(function() model.PrimaryPart = p end)
+								end
+							end
+							if not model.PrimaryPart then return false end
+
+							setNoCollide(model)
+
+							pcall(function()
+								model:PivotTo(targetPart.CFrame * OFFSET_HELD)
+							end)
+
+							weldAllToPrimary(model)
+
+							local wc = Instance.new("WeldConstraint")
+							wc.Part0 = targetPart
+							wc.Part1 = model.PrimaryPart
+							wc.Parent = model.PrimaryPart
+
+							return true
+						end
+						local function attachReskinTo(targetRoot: Instance, offset: CFrame)
+							if not targetRoot or tagged[targetRoot] then return end
+							tagged[targetRoot] = true
+
+							local targetPart = targetRoot:FindFirstChild("Handle")
+							if not (targetPart and targetPart:IsA("BasePart")) then
+								targetPart = firstBasePart(targetRoot)
+							end
+							if not targetPart then
+								tagged[targetRoot] = nil
+								return
+							end
+							makeLocalInvisible(targetRoot)
+							local clone = RESKIN_SOURCE:Clone()
+							clone.Name = "LOCAL_CANNON_RESKIN"
+							if clone:IsA("Model") then
+								if not clone.PrimaryPart then
+									local p = firstBasePart(clone)
+									if p then
+										pcall(function() clone.PrimaryPart = p end)
+									end
+								end
+								if not clone.PrimaryPart then
+									clone:Destroy()
+									tagged[targetRoot] = nil
+									return
+								end
+
+								setNoCollide(clone)
+								clone.Parent = targetRoot
+
+								pcall(function()
+									clone:PivotTo(targetPart.CFrame * offset)
+								end)
+
+								weldAllToPrimary(clone)
+
+								local wcMain = Instance.new("WeldConstraint")
+								wcMain.Part0 = targetPart
+								wcMain.Part1 = clone.PrimaryPart
+								wcMain.Parent = clone.PrimaryPart
+							else
+								clone.Parent = targetRoot
+							end
+						end
+						local function hookViewmodel()
+							local cam = workspace.CurrentCamera
+							if not cam then return end
+
+							local function hookVM(vm: Instance)
+								for _, child in ipairs(vm:GetChildren()) do
+									if child.Name == TARGET_NAME then
+										attachReskinTo(child, OFFSET_HELD)
+									end
+								end
+
+								vm.ChildAdded:Connect(function(child)
+									if child.Name == TARGET_NAME then
+										task.wait()
+										attachReskinTo(child, OFFSET_HELD)
+									end
+								end)
+							end
+
+							local vm = cam:FindFirstChild("Viewmodel")
+							if vm then hookVM(vm) end
+
+							cam.ChildAdded:Connect(function(child)
+								if child.Name == "Viewmodel" then
+									task.wait()
+									hookVM(child)
+								end
+							end)
+						end
+						local function hookThirdPersonInHand(character: Model)
+							local function onChildAdded(child)
+								if child:IsA("Tool") and child.Name == TARGET_NAME then
+									task.wait()
+
+									local handle = child:FindFirstChild("Handle")
+									if not (handle and handle:IsA("BasePart")) then
+										handle = firstBasePart(child)
+									end
+									if not handle then return end
+									local existing = child:FindFirstChild("LOCAL_CANNON_RESKIN")
+									if existing then
+										existing:Destroy()
+									end
+
+									local reskin = RESKIN_SOURCE:Clone()
+									reskin.Name = "LOCAL_CANNON_RESKIN"
+									reskin.Parent = child
+
+									if reskin:IsA("Model") then
+										weldModelToPart(reskin, handle)
+									end
+									local start = time()
+									local conn
+									conn = runService.RenderStepped:Connect(function()
+										if not child.Parent then
+											conn:Disconnect()
+											return
+										end
+
+										makeLocalInvisible(child)
+
+										if reskin and reskin.Parent and reskin:IsA("Model") and reskin.PrimaryPart then
+											pcall(function()
+												reskin:PivotTo(handle.CFrame * OFFSET_HELD)
+											end)
+										end
+
+										if time() - start > 2 then
+											conn:Disconnect()
+										end
+									end)
+								end
+							end
+
+							for _, c in ipairs(character:GetChildren()) do
+								onChildAdded(c)
+							end
+
+							character.ChildAdded:Connect(onChildAdded)
+						end
+						local function hookTools(container: Instance)
+							for _, child in ipairs(container:GetChildren()) do
+								if child:IsA("Tool") and child.Name == TARGET_NAME then
+									attachReskinTo(child, OFFSET_HELD)
+								end
+							end
+
+							ClientEffects:Clean(container.ChildAdded:Connect(function(child)
+								if child:IsA("Tool") and child.Name == TARGET_NAME then
+									task.wait()
+									attachReskinTo(child, OFFSET_HELD)
+								end
+							end))
+						end
+						local function hookBlocksFolder(blocksFolder: Instance)
+							for _, child in ipairs(blocksFolder:GetChildren()) do
+								if child.Name == TARGET_NAME then
+									attachReskinTo(child, OFFSET_PLACED)
+								end
+							end
+
+							ClientEffects:Clean(blocksFolder.ChildAdded:Connect(function(child)
+								if child.Name == TARGET_NAME then
+									task.wait()
+									attachReskinTo(child, OFFSET_PLACED)
+									task.wait()
+									child:SetAttribute('ItemSkin',cannon)
+									local skin = child:FindFirstChild("LOCAL_CANNON_RESKIN")
+									if not (skin and skin:IsA("Model") and skin.PrimaryPart) then return end
+									local baseCF = skin.PrimaryPart.CFrame
+									local y = baseCF.Position.Y
+									local snappedY = math.floor(y)
+									local KUSH = snappedY - 1
+									local New = KUSH + 0.99
+									skin:PivotTo(CFrame.new(Vector3.new(baseCF.Position.X,New,baseCF.Position.Z)))
+								end
+							end))
+						end
+						local function hookAllWorldBlocks()
+							local map = workspace:FindFirstChild("Map")
+							if not map then return end
+
+							local worlds = map:FindFirstChild("Worlds")
+							if not worlds then return end
+
+							for _, world in ipairs(worlds:GetChildren()) do
+								local blocks = world:FindFirstChild("Blocks")
+								if blocks then
+									hookBlocksFolder(blocks)
+								end
+							end
+
+							ClientEffects:Clean(worlds.ChildAdded:Connect(function(world)
+								task.wait()
+								local blocks = world:FindFirstChild("Blocks")
+								if blocks then
+									hookBlocksFolder(blocks)
+								end
+							end))
+						end
+						hookViewmodel()
+						hookAllWorldBlocks()
+						local function onCharacterAdded(character: Model)
+							task.wait(0.2)
+							hookTools(lplr.Backpack)
+							hookTools(character)
+							hookThirdPersonInHand(character)
+						end
+						if lplr.Character then
+							onCharacterAdded(lplr.Character)
+						end
+						ClientEffects:Clean(lplr.CharacterAdded:Connect(onCharacterAdded))
+
 						old = bedwars.CannonHandController.launchSelf
 						old2 = bedwars.CannonHandController.fireCannon
 					end)
