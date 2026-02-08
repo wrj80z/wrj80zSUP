@@ -12387,23 +12387,18 @@ run(function()
 end)
 
 run(function()
-	local ClientEffects
-	local Victorious
-	local old
-	local old2
-						local Sound = ''
-						local cannon = ''
+	local hooked = false
+	local oldFire
+	local oldLaunch
+
 	ClientEffects = vape.Categories.Render:CreateModule({
 		Name = "ClientEffects",
-		Tooltip = "allows you to use victorious sound sfx for some kits",
 		Function = function(callback)
-   			if role ~= "owner" and role ~= "coowner" and role ~= "admin" and role ~= "friend" and role ~= 'premium'  then
-				vape:CreateNotification("Onyx", "You don’t have access to this.", 10, "alert")
-				return
-			end
 			if callback then
-				if store.equippedKit == "davey" then
-
+				if hooked then return end
+				hooked = true
+						local Sound = ''
+						local cannon = ''
 						if Victorious.Value == "Gold" then
 							Sound = 'CANNON_FIRE_VICTORIOUS_GOLD'
 							cannon = 'cannon_gold_victorious'
@@ -12695,48 +12690,45 @@ run(function()
 						end
 						ClientEffects:Clean(lplr.CharacterAdded:Connect(onCharacterAdded))
 
-						old = bedwars.CannonHandController.launchSelf
-						old2 = bedwars.CannonHandController.fireCannon
 					end)
-					bedwars.CannonHandController.fireCannon = function(...)
-						for _, v in workspace:FindFirstChild('SoundPool'):GetChildren() do
-							if v:IsA('Sound') then
-								if v.SoundId == "rbxassetid://7121064180" then
-									v:Destroy()
-								end
-							end
+
+				oldFire = bedwars.CannonHandController.fireCannon
+				oldLaunch = bedwars.CannonHandController.launchSelf
+
+				bedwars.CannonHandController.fireCannon = function(...)
+					for _, v in ipairs(workspace.SoundPool:GetChildren()) do
+						if v:IsA("Sound") and v.SoundId == "rbxassetid://7121064180" then
+							v:Destroy()
 						end
-						bedwars.SoundManager:playSound(bedwars.SoundList[Sound])
-						return old2(...)
 					end
-					bedwars.CannonHandController.launchSelf = function(...)
-						for _, v in workspace:FindFirstChild('SoundPool'):GetChildren() do
-							if v:IsA('Sound') then
-								if v.SoundId == "rbxassetid://7121064180" then
-									v:Destroy()
-								end
-							end
-						end
-						bedwars.SoundManager:playSound(bedwars.SoundList[Sound])
-						return old(...)
-					end
-				end
-			else
-				if store.equippedKit == "davey" then
-					bedwars.CannonHandController.launchSelf = old
-					bedwars.CannonHandController.fireCannon = old2
-					old = nil
-					old2 = nil
+
+					bedwars.SoundManager:playSound(bedwars.SoundList[Sound])
+					return oldFire(...)
 				end
 
+				bedwars.CannonHandController.launchSelf = function(...)
+					for _, v in ipairs(workspace.SoundPool:GetChildren()) do
+						if v:IsA("Sound") and v.SoundId == "rbxassetid://7121064180" then
+							v:Destroy()
+						end
+					end
+
+					bedwars.SoundManager:playSound(bedwars.SoundList[Sound])
+					return oldLaunch(...)
+				end
+			else
+				if hooked then
+					bedwars.CannonHandController.fireCannon = oldFire
+					bedwars.CannonHandController.launchSelf = oldLaunch
+					oldFire = nil
+					oldLaunch = nil
+					hooked = false
+				end
 			end
 		end
 	})
-	Victorious = ClientEffects:CreateDropdown({
-		Name = "Victorious",
-		List = {'Nightmare','Emerald','Diamond','Platinum','Gold'}
-	})
 end)
+
 
 run(function()
 	local BetterLani
@@ -13261,7 +13253,7 @@ run(function()
 	end
 
 	BetterWarden = vape.Categories.Kits:CreateModule({
-		Name = "BetterWarden",
+		Name = "AutoWarden",
 		Tooltip = tip,
 		Function = function(callback)
 	   		if role ~= "owner" and role ~= "coowner" and role ~= "admin" and role ~= "friend" and role ~= 'premium' and role ~= 'user' then
@@ -13269,7 +13261,7 @@ run(function()
 				return
 			end
 			if store.equippedKit ~= "jailor" then
-				vape:CreateNotification("BetterWarden","Kit required only!",8,"warning")
+				vape:CreateNotification("AutoWarden","Kit required only!",8,"warning")
 				return
 			end
 			if callback then
@@ -13489,11 +13481,11 @@ run(function()
 	end
 	
 	BetterUma = vape.Categories.Kits:CreateModule({
-		Name = 'BetterUma',
+		Name = 'AutoUma',
 		Function = function(callback)
 			if callback then
 				if store.equippedKit ~= 'spirit_summoner' then
-					vape:CreateNotification("BetterUma","Kit required only!",8,"warning")
+					vape:CreateNotification("AutoUma","Kit required only!",8,"warning")
 					return
 				end
 				old = bedwars.ProjectileController.calculateImportantLaunchValues
@@ -13814,7 +13806,7 @@ run(function()
 	}	
 
 	BetterFisher = vape.Categories.Kits:CreateModule({
-		Name = "BetterFisher",
+		Name = "AutoFisher",
 		Tooltip = 'thanks to render for making this script',
 		Function = function(callback)
 			if role ~= "owner" and role ~= "coowner" and role ~= "admin" and role ~= "friend" and role ~= "premium"and role ~= "user"then
@@ -13822,7 +13814,7 @@ run(function()
 				return
 			end
 			if store.equippedKit ~= "fisherman" then
-				vape:CreateNotification("BetterFisher", "Kit required only!", 6, "warning")
+				vape:CreateNotification("AutoFisher", "Kit required only!", 6, "warning")
 				return
 			end
 			if callback then
@@ -14303,12 +14295,12 @@ run(function()
 	local UpdateRate
 	local Health
 	BetterMelody = vape.Categories.Kits:CreateModule({
-		Name = "BetterMelody",
+		Name = "AutoMelody",
 		Tooltip = 'makes u godtier at melody boi',
 		Function = function(callback)
 			if callback then
 				if store.equippedKit ~= 'melody' then
-					notify('BetterMelody', 'Kit required only!', 6, 'warning')
+					notify('AutoMelody', 'Kit required only!', 6, 'warning')
 					return
 				end
 				repeat
