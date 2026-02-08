@@ -9739,13 +9739,11 @@ run(function()
 	BCR:CreateButton({
 		Name = "Reset CPS",
 		Function = function()
-			if BCR.Enabled then
-				if old then
-					bedwars.SharedConstants.CpsConstants['BLOCK_PLACE_CPS'] = old
-					old = nil				
-				end
-				vape.Modules.BlockCPSRemover.api.CPS:SetValue(12)
+			if old then
+				bedwars.SharedConstants.CpsConstants['BLOCK_PLACE_CPS'] = old
+				old = nil				
 			end
+			vape.Modules.BlockCPSRemover.api.Value:SetValue(12)
 		end
 	})
 end)
