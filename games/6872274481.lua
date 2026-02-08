@@ -3144,7 +3144,8 @@ run(function()
 						drawDurationSeconds = DDS
 					}
 				end
-				bedwars.CooldownController.setOnCooldown = function(self, cooldownId, duration, options, ...)
+				bedwars.CooldownController.setOnCooldown = function(...)
+					local duration = select(2,...)
 					if FireRate.Enabled and (tostring(cooldownId):find("proj-source") or tostring(cooldownId):find("bow") or tostring(cooldownId):find("crossbow")) then
 						duration = Rate.Value
 						for _, item in pairs(bedwars.ItemMeta) do
@@ -3155,7 +3156,7 @@ run(function()
 						end
 						
 					end
-					return oldFireRates.old(self, cooldownId, duration, options, ...)
+					return oldFireRates.old(...)
 				end
 			else
 				bedwars.ProjectileController.calculateImportantLaunchValues = old
