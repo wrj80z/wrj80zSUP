@@ -12365,6 +12365,8 @@ run(function()
 	local Victorious
 	local old
 	local old2
+						local Sound = ''
+						local cannon = ''
 	ClientEffects = vape.Categories.Render:CreateModule({
 		Name = "ClientEffects",
 		Tooltip = "allows you to use victorious sound sfx for some kits",
@@ -12375,8 +12377,7 @@ run(function()
 			end
 			if callback then
 				if store.equippedKit == "davey" then
-						local Sound = ''
-						local cannon = ''
+
 						if Victorious.Value == "Gold" then
 							Sound = 'CANNON_FIRE_VICTORIOUS_GOLD'
 							cannon = 'cannon_gold_victorious'
