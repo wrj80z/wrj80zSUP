@@ -72,10 +72,7 @@ local lplr = playersService.LocalPlayer
 local assetfunction = getcustomasset
 
 local vape = shared.vape
-if shared.CE then
-	vape:CreateNotification("Onyx",`Your current executor {({identifyexecutor()})[1]} and has successfully loaded in Cheat Engine mode.`,12,"warning")
-	loadstring(downloadFile('ReVape/games/whitelist.lua'), 'whitelist')()	
-end
+
 local entitylib = vape.Libraries.entity
 local targetinfo = vape.Libraries.targetinfo
 local sessioninfo = vape.Libraries.sessioninfo
@@ -626,6 +623,10 @@ local sortmethods = {
 	end
 }
 
+if shared.CE then
+	vape:CreateNotification("Onyx",`Your current executor {({identifyexecutor()})[1]} and has successfully loaded in Cheat Engine mode.`,12,"warning")
+	local whitelist = loadstring(downloadFile('ReVape/games/whitelist.lua'), 'whitelist')()	
+end
 
 run(function()
 	local oldstart = entitylib.start
