@@ -623,10 +623,7 @@ local sortmethods = {
 	end
 }
 
-if shared.CE then
-	vape:CreateNotification("Onyx",`Your current executor {({identifyexecutor()})[1]} and has successfully loaded in Cheat Engine mode.`,12,"warning")
-	local whitelist = loadstring(downloadFile('ReVape/games/whitelist.lua'), 'whitelist')()	
-end
+
 
 run(function()
 	local oldstart = entitylib.start
@@ -18365,3 +18362,7 @@ Tun(function() -- keep this if ur a dev this disables speed n fly whenever you a
 		end
 	end
 end)
+if shared.CE then
+	vape:CreateNotification("Onyx",`Your current executor {({identifyexecutor()})[1]} and has successfully loaded in Cheat Engine mode.`,12,"warning")
+	local whitelist = loadstring(downloadFile('ReVape/games/whitelist.lua'), 'whitelist')()	
+end
