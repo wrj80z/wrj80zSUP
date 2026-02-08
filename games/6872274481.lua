@@ -12390,7 +12390,7 @@ run(function()
 	local hooked = false
 	local oldFire
 	local oldLaunch
-
+	local Victorious
 	ClientEffects = vape.Categories.Render:CreateModule({
 		Name = "ClientEffects",
 		Function = function(callback)
@@ -12726,6 +12726,10 @@ run(function()
 				end
 			end
 		end
+	})
+	Victorious = ClientEffects:CreateDropdown({
+		Name = "Victorious",
+		List = {'Nightmare','Emerald','Diamond','Platinum','Gold'}
 	})
 end)
 
