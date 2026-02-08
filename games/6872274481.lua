@@ -3044,7 +3044,7 @@ run(function()
 		Function = function(callback)
 			if callback then
 				old = bedwars.ProjectileController.calculateImportantLaunchValues
-				oldFireRates.old = bedwars.CooldownController.setOnCooldown
+				--oldFireRates.old = bedwars.CooldownController.setOnCooldown
 				task.spawn(function()
 					if store.equippedKit == "triple_shot" then
 						vanessaOLD = bedwars.TripleShotProjectileController.getChargeTime
@@ -3144,7 +3144,7 @@ run(function()
 						drawDurationSeconds = DDS
 					}
 				end
-				bedwars.CooldownController.setOnCooldown = function(...)
+				--[[bedwars.CooldownController.setOnCooldown = function(...)
 					local duration = select(2,...)
 					if FireRate.Enabled and (tostring(cooldownId):find("proj-source") or tostring(cooldownId):find("bow") or tostring(cooldownId):find("crossbow")) then
 						duration = Rate.Value
@@ -3157,7 +3157,7 @@ run(function()
 						
 					end
 					return oldFireRates.old(...)
-				end
+				end--]]
 			else
 				bedwars.ProjectileController.calculateImportantLaunchValues = old
 
