@@ -15296,6 +15296,12 @@ run(function()
 	    	until not AutoKit.Enabled		
 		end,
 		drill = function()
+			AutoKit:Clean(workspace.DescendantAdded:Connect(function(obj)
+				if not AutoKit.Enabled then return end
+				if obj.Name == "Drill" then
+					table.insert(drills, obj)
+				end
+			end))
 			repeat
 				if not entitylib.isAlive then task.wait(0.3); continue end
 				local root = entitylib.character.RootPart
