@@ -7842,6 +7842,7 @@ run(function()
 							else
 								bedwars.breakBlock(child)
 								bedwars.breakBlock(child)
+								print(child)
 							end
 							if AJ.Enabled then
 								if humanoid:GetState() ~= Enum.HumanoidStateType.Jumping then
