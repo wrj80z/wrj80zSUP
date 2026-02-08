@@ -9743,7 +9743,7 @@ run(function()
 				bedwars.SharedConstants.CpsConstants['BLOCK_PLACE_CPS'] = old
 				old = nil				
 			end
-			vape.Modules.BlockCPSRemover.api.Value:SetValue(12)
+			Value:SetValue(12)
 		end
 	})
 end)
