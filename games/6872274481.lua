@@ -18183,6 +18183,9 @@ run(function()
 							return true
 						end
 						local function attachReskinTo(targetRoot: Instance, offset: CFrame)
+							if targetRoot:GetAttribute('PlacedByUserId') ~= lplr.UserId then
+								return
+							end
 							if not targetRoot or tagged[targetRoot] then return end
 							tagged[targetRoot] = true
 
