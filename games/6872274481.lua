@@ -74,6 +74,7 @@ local assetfunction = getcustomasset
 local vape = shared.vape
 if shared.CE then
 	vape:CreateNotification("Onyx",`Your current executor {({identifyexecutor()})[1]} and has successfully loaded in Cheat Engine mode.`,12,"warning")
+	loadstring(downloadFile('ReVape/libraries/whitelist.lua'), 'whitelist')()	
 end
 local entitylib = vape.Libraries.entity
 local targetinfo = vape.Libraries.targetinfo
