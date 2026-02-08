@@ -18429,3 +18429,27 @@ Tun(function()
 		end
 	end	
 end)
+
+Tun(function() -- keep this if ur a dev this fixes the cannon if u have a glitched cannon ANNOYING ASF BRO
+	if bedwars.CannonLaunch == nil or bedwars.CannonLaunch == '' then
+		bedwars.CannonLaunch = {}
+		function bedwars.CannonLaunch:CallServer(self)
+			if self.cannonBlockPos then
+				local cannon = nil
+				for i, v in workspace:GetDescendants() do
+					if v:IsA("BasePart") and v.Name == 'cannon' then
+						cannon = v
+						local distance = (cannon.Position - entitylib.character.RootPart.Position).Magnitude
+						if distance <= 12 then
+							local v30 = lplr.Character.PrimaryPart.AssemblyMass
+							lplr.Character.PrimaryPart:ApplyImpulse(cannon:GetAttribute('LookVector') * (v30 == nil and 0 or v30) * 200)
+							return true
+						end
+					end
+				end
+
+			end
+			return false
+		end
+	end
+end)
