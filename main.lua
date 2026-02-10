@@ -100,7 +100,7 @@ local function finishLoading()
 		if not vape.Categories then return end
 		if vape.Categories.Main.Options['GUI bind indicator'].Enabled then
 			if getgenv().WLUSER then
-				vape:CreateNotification(`wsg {getgenv().WLUSER} you are currently whitelisted. Finished Loading`, vape.VapeButton and 'Press the button in the top right to open GUI' or 'Press '..table.concat(vape.Keybind, ' + '):upper()..' to open GUI', 5)
+				vape:CreateNotification('Finished Loading', `wsg {getgenv().WLUSER} you are currently whitelisted. `..(vape.VapeButton and 'Press the button in the top right to open GUI' or 'Press '..table.concat(vape.Keybind, ' + '):upper()..' to open GUI'), 5)
 			else
 				vape:CreateNotification('Finished Loading', vape.VapeButton and 'Press the button in the top right to open GUI' or 'Press '..table.concat(vape.Keybind, ' + '):upper()..' to open GUI', 5)
 			end
