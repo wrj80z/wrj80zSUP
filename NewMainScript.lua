@@ -99,6 +99,8 @@ if typeof(ARGS) ~= "table" then
 end
 getgenv().username = ARGS.username
 getgenv().password = ARGS.password
+getgenv().WLUSER = ARGS.User
+
 if getgenv().TestMode then
 	getgenv().TestMode  = getgenv().TestMode 
 else
