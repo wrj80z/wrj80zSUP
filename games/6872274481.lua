@@ -7140,7 +7140,6 @@ run(function()
 end)
 
 run(function()
-	local Speed
 	local Mode
 	local Value
 	local WallCheck
