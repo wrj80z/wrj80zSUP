@@ -6706,8 +6706,6 @@ end)
 
 
 run(function()
-	local Breaker
-	local Delay
 	local AutoAim
 	local AimSpeed	
 	local Range
@@ -17724,7 +17722,7 @@ run(function()
 	HightlightOption = BedAlarm:CreateToggle({
 		Name = "Hightlight players",
 		Default = true,
-		Function = function(va)
+		Function = function(callback)
 			if Color.Object then Color.Object.Visible = callback end
 		end
 	})
