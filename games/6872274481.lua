@@ -14677,7 +14677,7 @@ run(function()
 			else
 				r = 10
 			end
-			kitCollection('entity', function(v)
+			kitCollection('HarvestableCrop', function(v)
 				if bedwars.Client:Get('CropHarvest'):CallServer({position = bedwars.BlockController:getBlockPosition(v.Position)}) then
 					if Legit.Enabled then
 						bedwars.GameAnimationUtil:playAnimation(lplr.Character, bedwars.AnimationType.PUNCH)
