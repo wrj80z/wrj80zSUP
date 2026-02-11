@@ -112,6 +112,7 @@ local store = {
 	queueType = 'bedwars_test',
 	tools = {}
 }
+getgenv().store = store
 local Reach = {}
 local HitBoxes = {}
 local InfiniteFly
@@ -970,6 +971,7 @@ run(function()
 		end
 	})
 
+	getgenv().BWStore = bedwars.Store:getState()
 
 	local remoteNames = {
 		AfkStatus = safeGetProto(Knit.Controllers.AfkController.KnitStart, 1),
@@ -3045,7 +3047,6 @@ run(function()
 		Function = function(callback)
 			if callback then
 				old = bedwars.ProjectileController.calculateImportantLaunchValues
-				--oldFireRates.old = bedwars.CooldownController.setOnCooldown
 				task.spawn(function()
 					if store.equippedKit == "triple_shot" then
 						vanessaOLD = bedwars.TripleShotProjectileController.getChargeTime
@@ -3145,20 +3146,6 @@ run(function()
 						drawDurationSeconds = DDS
 					}
 				end
-				--[[bedwars.CooldownController.setOnCooldown = function(...)
-					local duration = select(2,...)
-					if FireRate.Enabled and (tostring(cooldownId):find("proj-source") or tostring(cooldownId):find("bow") or tostring(cooldownId):find("crossbow")) then
-						duration = Rate.Value
-						for _, item in pairs(bedwars.ItemMeta) do
-							if item.projectileSource then
-								oldFireRates.fireRate[item] = item.projectileSource.fireDelaySec
-								item.projectileSource.fireDelaySec = duration
-							end
-						end
-						
-					end
-					return oldFireRates.old(...)
-				end--]]
 			else
 				bedwars.ProjectileController.calculateImportantLaunchValues = old
 
@@ -3173,7 +3160,7 @@ run(function()
 				end
 
 				if oldFireRates.old then
-					bedwars.CooldownController.setOnCooldown = oldFireRates.old
+					
 					for _, item in pairs(bedwars.ItemMeta) do
 						if item.projectileSource and oldFireRates.fireRate[item] then
 							local originalDelay = oldFireRates.fireRate[item]
@@ -3969,6 +3956,8 @@ end)
 	
 run(function()
 	local StorageESP
+	local Amount
+	local TeamCheck
 	local Notify
 	local List
 	local Background
@@ -3976,7 +3965,8 @@ run(function()
 	local Reference = {}
 	local Folder = Instance.new('Folder')
 	Folder.Parent = vape.gui
-	
+	local BlockImages = {}
+
 	local function nearStorageItem(item)
 		for _, v in List.ListEnabled do
 			if item:find(v) then return v end
@@ -4009,16 +3999,38 @@ run(function()
 				blockimage.BackgroundTransparency = 1
 				blockimage.Image = bedwars.getIcon({itemType = item.Name}, true)
 				blockimage.Parent = v.Frame
+				BlockImages[item] = blockimage
+			end
+			if Amount.Enabled then
+				if not BlockImages[item] then return end
+				local amount = item:GetAttribute('Amount') or 0
+				if amount > 1 then
+					local countLabel = Instance.new('TextLabel')
+					countLabel.Size = UDim2.fromScale(1, 1)
+					countLabel.BackgroundTransparency = 1
+					countLabel.Text = tostring(amount)
+					countLabel.TextColor3 = Color3.new(1, 1, 1)
+					countLabel.TextStrokeTransparency = 0
+					countLabel.TextScaled = true
+					countLabel.Font = Enum.Font.GothamBold
+					countLabel.Parent = BlockImages[item]
+				end
 			end
 		end
 		table.clear(chestitems)
 	end
 	
 	local function Added(v)
-
 		local chest = v:WaitForChild('ChestFolderValue', 3)
 		if not (chest and StorageESP.Enabled) then return end
 		chest = chest.Value
+		if TeamCheck.Enabled then
+			local currentTeam = v:GetAttribute('Team') or 0
+			local lplrTeam = lplr.Character:GetAttribute('Team') or -1
+			if currentTeam == lplrTeam then
+				return
+			end
+		end		
 		local billboard = Instance.new('BillboardGui')
 		billboard.Parent = Folder
 		billboard.Name = 'chest'
@@ -4069,10 +4081,13 @@ run(function()
 			if callback then
 				StorageESP:Clean(collectionService:GetInstanceAddedSignal('chest'):Connect(Added))
 				for _, v in collectionService:GetTagged('chest') do
+
+
 					task.spawn(Added, v)
 				end
 			else
 				table.clear(Reference)
+				table.clear(BlockImages)
 				Folder:ClearAllChildren()
 			end
 		end,
@@ -4082,6 +4097,17 @@ run(function()
 		Name = "Notify",
 		Default = false
 	})
+
+	TeamCheck = StorageESP:CreateToggle({
+		Name = "Team Check",
+		Default = false
+	})
+
+	Amount = StorageESP:CreateToggle({
+		Name = "Amount",
+		Default = true
+	})	
+
 	List = StorageESP:CreateTextList({
 		Name = 'Item',
 		Function = function()
@@ -4113,6 +4139,11 @@ run(function()
 		end,
 		Darker = true
 	})
+	Loot = StorageESP:CreateToggle({
+		Name = "Loot",
+		Default = false,
+		Tooltip = 'this shows how much loot is in iron or diamonds'
+	})	
 end)
 	
 run(function()
@@ -6695,15 +6726,27 @@ run(function()
 	local LimitItem
 	local TelasCoils
 	local BeeHive
+	local BS
+	local BM
 	local customlist, parts = {}, {}
-	
+	local hit = 0
+	local targetting = nil
+	local mouse = cloneref(lplr:GetMouse())
+	local function getBlockHealth(block)
+		return block:GetAttribute("Health") or block:GetAttribute("BlockHealth") or math.huge
+	end
+	local function getBreakOrigin(localPosition)
+		if BM.Value == "Mouse" then
+			return mouse.Hit and mouse.Hit.Position or localPosition
+		end
+		return localPosition
+	end
 	local function customHealthbar(self, blockRef, health, maxHealth, changeHealth, block)
 		pcall(function()
 			if block:GetAttribute('NoHealthbar') then return end
 			if not self.healthbarPart or not self.healthbarBlockRef or self.healthbarBlockRef.blockPosition ~= blockRef.blockPosition then
 				self.healthbarMaid:DoCleaning()
 				self.healthbarBlockRef = blockRef
-				local create = bedwars.Roact.createElement
 				local percent = math.clamp(health / maxHealth, 0, 1)
 				local cleanCheck = true
 				local part = Instance.new('Part')
@@ -6714,67 +6757,50 @@ run(function()
 				part.CanCollide = false
 				part.Parent = workspace
 				self.healthbarPart = part
-				bedwars.QueryUtil:setQueryIgnored(self.healthbarPart, true)
-		
-				local mounted = bedwars.Roact.mount(create('BillboardGui', {
-					Size = UDim2.fromOffset(249, 102),
-					StudsOffset = Vector3.new(0, 2.5, 0),
-					Adornee = part,
-					MaxDistance = 40,
-					AlwaysOnTop = true
-				}, {
-					create('Frame', {
-						Size = UDim2.fromOffset(160, 50),
-						Position = UDim2.fromOffset(44, 32),
-						BackgroundColor3 = Color3.new(),
-						BackgroundTransparency = 0.5
+				bedwars.QueryUtil:setQueryIgnored(part, true)
+				local mounted = bedwars.Roact.mount(
+					bedwars.Roact.createElement("BillboardGui", {
+						Size = UDim2.fromOffset(249, 102),
+						StudsOffset = Vector3.new(0, 2.5, 0),
+						Adornee = part,
+						MaxDistance = 40,
+						AlwaysOnTop = true
 					}, {
-						create('UICorner', {CornerRadius = UDim.new(0, 5)}),
-						create('ImageLabel', {
-							Size = UDim2.new(1, 89, 1, 52),
-							Position = UDim2.fromOffset(-48, -31),
-							BackgroundTransparency = 1,
-							Image = getcustomasset('catrewrite/assets/new/blur.png'),
-							ScaleType = Enum.ScaleType.Slice,
-							SliceCenter = Rect.new(52, 31, 261, 502)
-						}),
-						create('TextLabel', {
-							Size = UDim2.fromOffset(145, 14),
-							Position = UDim2.fromOffset(13, 12),
-							BackgroundTransparency = 1,
-							Text = bedwars.ItemMeta[block.Name].displayName or block.Name,
-							TextXAlignment = Enum.TextXAlignment.Left,
-							TextYAlignment = Enum.TextYAlignment.Top,
-							TextColor3 = Color3.new(),
-							TextScaled = true,
-							Font = Enum.Font.Arial
-						}),
-						create('TextLabel', {
-							Size = UDim2.fromOffset(145, 14),
-							Position = UDim2.fromOffset(12, 11),
-							BackgroundTransparency = 1,
-							Text = bedwars.ItemMeta[block.Name].displayName or block.Name,
-							TextXAlignment = Enum.TextXAlignment.Left,
-							TextYAlignment = Enum.TextYAlignment.Top,
-							TextColor3 = color.Dark(uipallet.Text, 0.16),
-							TextScaled = true,
-							Font = Enum.Font.Arial
-						}),
-						create('Frame', {
-							Size = UDim2.fromOffset(138, 4),
-							Position = UDim2.fromOffset(12, 32),
-							BackgroundColor3 = uipallet.Main
+						bedwars.Roact.createElement("Frame", {
+							Size = UDim2.fromOffset(160, 50),
+							Position = UDim2.fromOffset(44, 32),
+							BackgroundColor3 = Color3.new(),
+							BackgroundTransparency = 0.5
 						}, {
-							create('UICorner', {CornerRadius = UDim.new(1, 0)}),
-							create('Frame', {
-								[bedwars.Roact.Ref] = self.healthbarProgressRef,
-								Size = UDim2.fromScale(percent, 1),
-								BackgroundColor3 = Color3.fromHSV(math.clamp(percent / 2.5, 0, 1), 0.89, 0.75)
-							}, {create('UICorner', {CornerRadius = UDim.new(1, 0)})})
+							bedwars.Roact.createElement("UICorner", { CornerRadius = UDim.new(0, 5) }),
+							bedwars.Roact.createElement("TextLabel", {
+								Size = UDim2.fromOffset(145, 14),
+								Position = UDim2.fromOffset(13, 12),
+								BackgroundTransparency = 1,
+								Text = bedwars.ItemMeta[block.Name].displayName or block.Name,
+								TextXAlignment = Enum.TextXAlignment.Left,
+								TextScaled = true,
+								TextColor3 = Color3.new(),
+								Font = Enum.Font.Arial
+							}),
+							bedwars.Roact.createElement("Frame", {
+								Size = UDim2.fromOffset(138, 4),
+								Position = UDim2.fromOffset(12, 32),
+								BackgroundColor3 = uipallet.Main
+							}, {
+								bedwars.Roact.createElement("UICorner", { CornerRadius = UDim.new(1, 0) }),
+								bedwars.Roact.createElement("Frame", {
+									[bedwars.Roact.Ref] = self.healthbarProgressRef,
+									Size = UDim2.fromScale(percent, 1),
+									BackgroundColor3 = Color3.fromHSV(percent / 2.5, 0.89, 0.75)
+								}, {
+									bedwars.Roact.createElement("UICorner", { CornerRadius = UDim.new(1, 0) })
+								})
+							})
 						})
-					})
-				}), part)
-		
+					}),
+					part
+				)
 				self.healthbarMaid:GiveTask(function()
 					cleanCheck = false
 					self.healthbarBlockRef = nil
@@ -6784,226 +6810,231 @@ run(function()
 					end
 					self.healthbarPart = nil
 				end)
-		
 				bedwars.RuntimeLib.Promise.delay(5):andThen(function()
 					if cleanCheck then
 						self.healthbarMaid:DoCleaning()
 					end
 				end)
 			end
-		
 			local newpercent = math.clamp((health - changeHealth) / maxHealth, 0, 1)
-			tweenService:Create(self.healthbarProgressRef:getValue(), TweenInfo.new(0.3), {
-				Size = UDim2.fromScale(newpercent, 1), BackgroundColor3 = Color3.fromHSV(math.clamp(newpercent / 2.5, 0, 1), 0.89, 0.75)
-			}):Play()
+			tweenService:Create(self.healthbarProgressRef:getValue(),TweenInfo.new(0.3),
+				{
+					Size = UDim2.fromScale(newpercent, 1),
+					BackgroundColor3 = Color3.fromHSV(newpercent / 2.5, 0.89, 0.75)
+				}
+			):Play()
 		end)
 	end
-	
-	local hit = 0
-	local targetting = nil
-	
 	local function attemptBreak(tab, localPosition)
 		if not tab then return end
-		table.sort(tab, function(a, b)
-			return (a.Position - localPosition).Magnitude >= (b.Position - localPosition).Magnitude
-		end)
+		local origin = getBreakOrigin(localPosition)
+		if BS.Value == "Nearest" then
+			table.sort(tab, function(a, b)
+				return (a.Position - origin).Magnitude < (b.Position - origin).Magnitude
+			end)
+		else
+			table.sort(tab, function(a, b)
+				return getBlockHealth(a) < getBlockHealth(b)
+			end)
+		end
 		for _, v in tab do
-			if (v.Position - localPosition).Magnitude < Range.Value and bedwars.BlockController:isBlockBreakable({blockPosition = v.Position / 3}, lplr) then
-				if not SelfBreak.Enabled and v:GetAttribute('PlacedByUserId') == lplr.UserId then continue end
-				if (v:GetAttribute('BedShieldEndTime') or 0) > workspace:GetServerTimeNow() then continue end
+			if (v.Position - origin).Magnitude < Range.Value
+				and bedwars.BlockController:isBlockBreakable({ blockPosition = v.Position / 3 }, lplr) then
+				if not SelfBreak.Enabled and v:GetAttribute("PlacedByUserId") == lplr.UserId then continue end
+				local blockTeam = v:GetAttribute("Team") or 0
+				local myTeam = lplr.Character:GetAttribute("Team") or -1
+				if not SelfBreak.Enabled and blockTeam == myTeam then continue end
+				if (v:GetAttribute("BedShieldEndTime") or 0) > workspace:GetServerTimeNow() then continue end
 				if LimitItem.Enabled and not (store.hand.tool and bedwars.ItemMeta[store.hand.tool.Name].breakBlock) then continue end
-	
 				hit += 1
-				local target, path, endpos = bedwars.breakBlock(v, Effect.Enabled, Animation.Enabled, CustomHealth.Enabled and customHealthbar or nil, AutoTool.Enabled, WallCheck.Enabled, Cache.Enabled)
+				local target, path, endpos = bedwars.breakBlock(v,Effect.Enabled,Animation.Enabled,CustomHealth.Enabled and customHealthbar or nil,AutoTool.Enabled,WallCheck.Enabled,Cache.Enabled)
 				if path then
 					local currentnode = target
-					if currentnode then
-						targetting = currentnode
-					end
+					targetting = currentnode
 					for _, part in parts do
 						part.Position = currentnode or Vector3.zero
 						if currentnode then
-							part.BoxHandleAdornment.Color3 = currentnode == endpos and Color3.new(1, 0.2, 0.2) or currentnode == target and Color3.new(0.2, 0.2, 1) or Color3.new(0.2, 1, 0.2)
+							part.BoxHandleAdornment.Color3 =
+								currentnode == endpos and Color3.new(1, 0.2, 0.2)
+								or currentnode == target and Color3.new(0.2, 0.2, 1)
+								or Color3.new(0.2, 1, 0.2)
 						end
 						currentnode = path[currentnode]
 					end
 				end
-	
-				task.wait(Delay.Value)
 
+				task.wait(Delay.Value)
 				targetting = nil
-	
 				return true
 			end
 		end
-	
 		return false
 	end
-	
 	Breaker = vape.Categories.Utility:CreateModule({
-		Name = 'Nuker',
+		Name = "Nuker",
+		Tooltip = "Break blocks around you automatically",
 		Function = function(callback)
 			if callback then
-				repeat task.wait(0.1) until store.equippedKit ~= '' and store.matchState ~= 0 or (not Breaker.Enabled)
+				local CheckExecutor = ({identifyexecutor()})[1]
+				if CheckExecutor == nil or CheckExecutor == '' then
+					CheckExecutor = 'shitsploit'
+				end
+				if CheckExecutor ~= 'Potassium' and CheckExecutor ~= 'shitsploit' then
+					repeat task.wait() until store.matchState ~= 0 or not Breaker.Enabled
+				end
 				for _ = 1, 30 do
-					local part = Instance.new('Part')
+					local part = Instance.new("Part")
 					part.Anchored = true
-					part.CanQuery = false
 					part.CanCollide = false
 					part.Transparency = 1
 					part.Parent = gameCamera
-					local highlight = Instance.new('BoxHandleAdornment')
-					highlight.Size = Vector3.one
-					highlight.AlwaysOnTop = true
-					highlight.ZIndex = 1
-					highlight.Transparency = 0.5
-					highlight.Adornee = part
-					highlight.Parent = part
+
+					local box = Instance.new("BoxHandleAdornment")
+					box.Size = Vector3.one
+					box.AlwaysOnTop = true
+					box.Transparency = 0.5
+					box.Adornee = part
+					box.Parent = part
+
 					table.insert(parts, part)
 				end
-	
-				local beds = collection('bed', Breaker)
-				local luckyblock = collection('LuckyBlock', Breaker)
-				local ironores = collection('iron-ore', Breaker)
-				local bees = collection('beehive', Breaker)
-				local coils = collection('tesla-trap', Breaker)
-				customlist = collection('block', Breaker, function(tab, obj)
+
+				local beds = collection("bed", Breaker)
+				local luckyblock = collection("LuckyBlock", Breaker)
+				local ironores = collection("iron-ore", Breaker)
+				local bees = collection("beehive", Breaker)
+				local coils = collection("tesla-trap", Breaker)
+
+				customlist = collection("block", Breaker, function(tab, obj)
 					if table.find(Custom.ListEnabled, obj.Name) then
 						table.insert(tab, obj)
 					end
 				end)
-	
+
 				Breaker:Clean(runService.PreSimulation:Connect(function(dt)
 					if AutoAim.Enabled and targetting then
-						gameCamera.CFrame = gameCamera.CFrame:Lerp(CFrame.lookAt(gameCamera.CFrame.p, targetting), AimSpeed.Value * dt)
+						gameCamera.CFrame =
+							gameCamera.CFrame:Lerp(
+								CFrame.lookAt(gameCamera.CFrame.Position, targetting),
+								AimSpeed.Value * dt
+							)
 					end
 				end))
 
 				repeat
 					task.wait(1 / UpdateRate.Value)
-					if not Breaker.Enabled then break end
 					if entitylib.isAlive then
-						local localPosition = entitylib.character.RootPart.Position
-	
-						if attemptBreak(Bed.Enabled and beds, localPosition) then continue end
-						if attemptBreak(customlist, localPosition) then continue end
-						if attemptBreak(LuckyBlock.Enabled and luckyblock, localPosition) then continue end
-						if attemptBreak(IronOre.Enabled and ironores, localPosition) then continue end
-						if attemptBreak(TelasCoils.Enabled and coils, localPosition) then continue end
-						if attemptBreak(BeeHive.Enabled and bees, localPosition) then continue end
-
-
-
-						for _, v in parts do
-							v.Position = Vector3.zero
-						end
+						local pos = entitylib.character.RootPart.Position
+						if attemptBreak(Bed.Enabled and beds, pos) then continue end
+						if attemptBreak(customlist, pos) then continue end
+						if attemptBreak(LuckyBlock.Enabled and luckyblock, pos) then continue end
+						if attemptBreak(IronOre.Enabled and ironores, pos) then continue end
+						if attemptBreak(TelasCoils.Enabled and coils, pos) then continue end
+						if attemptBreak(BeeHive.Enabled and bees, pos) then continue end
 					end
 				until not Breaker.Enabled
 			else
 				for _, v in parts do
-					v:ClearAllChildren()
 					v:Destroy()
 				end
 				table.clear(parts)
 			end
-		end,
-		Tooltip = 'Break blocks around you automatically'
-	})
-	Range = Breaker:CreateSlider({
-		Name = 'Break range',
-		Min = 1,
-		Max = 30,
-		Default = 30,
-		Suffix = function(val)
-			return val == 1 and 'stud' or 'studs'
 		end
 	})
-	Delay = Breaker:CreateSlider({
-		Name = 'Break Delay',
-		Min = 0,
-		Max = 0.3,
-		Default = 0.25,
-		Decimal = 5,
-		Suffix = function(val)
-			return 's'
-		end
+	BS = Breaker:CreateDropdown({
+		Name = "Break Sorting",
+		List = {"Nearest", "Health"},
+		Default = "Health"
 	})
-	AimSpeed = Breaker:CreateSlider({
-		Name = 'Aim Speed',
-		Min = 1,
-		Max = 20,
-		Default = 20
+	BM = Breaker:CreateDropdown({
+		Name = "Break Mode",
+		List = {"Position", "Mouse"},
+		Default = "Position"
+	})
+	Range = Breaker:CreateSlider({ 
+		Name = "Break range", 
+		Min = 1, 
+		ax = 30, 
+		Default = 30 
+	})
+	Delay = Breaker:CreateSlider({ 
+		Name = "Break Delay", 
+		Min = 0, 
+		Max = 0.3, 
+		Default = 0.25, 
+		Decimal = 5 
+	})
+	AimSpeed = Breaker:CreateSlider({ 
+		Name = "Aim Speed", 
+		Min = 1, 
+		Max = 20, 
+		Default = 20 
 	})
 	AimSpeed.Object.Visible = false
-	UpdateRate = Breaker:CreateSlider({
-		Name = 'Update rate',
-		Min = 1,
-		Max = 120,
-		Default = 60,
-		Suffix = 'hz'
+	UpdateRate = Breaker:CreateSlider({ 
+		Name = "Update rate", 
+		Min = 1, 
+		Max = 120, 
+		Default = 60, 
+		Suffix = "hz" 
 	})
-	Custom = Breaker:CreateTextList({
-		Name = 'Custom',
-		Function = function()
-			if not customlist then return end
-			table.clear(customlist)
-			for _, obj in store.blocks do
-				if table.find(Custom.ListEnabled, obj.Name) then
-					table.insert(customlist, obj)
-				end
-			end
-		end
+	Custom = Breaker:CreateTextList({ 
+		Name = "Custom" 
 	})
-	Bed = Breaker:CreateToggle({
-		Name = 'Break Bed',
-		Default = true
+	Bed = Breaker:CreateToggle({ 
+		Name = "Break Bed", 
+		Default = true 
 	})
 	AutoAim = Breaker:CreateToggle({
-		Name = 'Auto Aim',
-		Function = function(call)
-			AimSpeed.Object.Visible = call
+		Name = "Auto Aim",
+		Function = function(v) 
+			AimSpeed.Object.Visible = v 
 		end
 	})
-	LuckyBlock = Breaker:CreateToggle({
-		Name = 'Break Lucky Block',
-		Default = true
+	LuckyBlock = Breaker:CreateToggle({ 
+		Name = "Break Lucky Block", 
+		Default = true 
 	})
-	IronOre = Breaker:CreateToggle({
-		Name = 'Break Iron Ore',
-		Default = true
+	IronOre = Breaker:CreateToggle({ 
+		Name = "Break Iron Ore", 
+		Default = true 
 	})
-	BeeHive = Breaker:CreateToggle({
-		Name = 'Break Bee Hives',
-		Default = false
+	BeeHive = Breaker:CreateToggle({ 
+		Name = "Break Bee Hives" 
 	})
-	TelasCoils = Breaker:CreateToggle({
-		Name = 'Break Telas Coils',
-		Default = true
-	})	
-	Effect = Breaker:CreateToggle({
-		Name = 'Show Healthbar & Effects',
-		Function = function(callback)
-			if CustomHealth.Object then
-				CustomHealth.Object.Visible = callback
-			end
-		end,
-		Default = true
+	TelasCoils = Breaker:CreateToggle({ 
+		Name = "Break Telas Coils", 
+		Default = true 
 	})
-	CustomHealth = Breaker:CreateToggle({
-		Name = 'Custom Healthbar',
+	Effect = Breaker:CreateToggle({ 
+		Name = "Show Healthbar & Effects", 
+		Default = true 
+	})
+	CustomHealth = Breaker:CreateToggle({ 
+		Name = "Custom Healthbar",
 		Default = true,
-		Darker = true
+		Darker = true 
 	})
-	Animation = Breaker:CreateToggle({Name = 'Animation'})
-	SelfBreak = Breaker:CreateToggle({Name = 'Self Break'})
-	WallCheck = Breaker:CreateToggle({Name = 'Wall Check'})
-	Cache = Breaker:CreateToggle({Name = 'Break through block'})
-	AutoTool = Breaker:CreateToggle({Name = 'Auto Tool'})
-	LimitItem = Breaker:CreateToggle({
-		Name = 'Limit to items',
-		Tooltip = 'Only breaks when tools are held'
+	Animation = Breaker:CreateToggle({ 
+		Name = "Animation" 
+	})
+	SelfBreak = Breaker:CreateToggle({
+		 Name = "Self Break" 
+	})
+	WallCheck = Breaker:CreateToggle({ 
+		Name = "Wall Check" 
+	})
+	Cache = Breaker:CreateToggle({ 
+		Name = "Break through block" 
+	})
+	AutoTool = Breaker:CreateToggle({ 
+		Name = "Auto Tool" 
+	})
+	LimitItem = Breaker:CreateToggle({ 
+		Name = "Limit to items" 
 	})
 end)
+
 
 run(function()
 	local Viewmodel
@@ -7111,6 +7142,8 @@ run(function()
 end)
 
 run(function()
+	local Speed
+	local Mode
 	local Value
 	local WallCheck
 	local AutoJump
@@ -7121,47 +7154,57 @@ run(function()
 	Speed = vape.Categories.Blatant:CreateModule({
 		Name = 'Speed',
 		Function = function(callback)
-			if role ~= "owner" and role ~= "coowner" and role ~= "admin" and role ~= "friend" and role ~= "premium"and role ~= "user"then
-				vape:CreateNotification("Onyx", "You don’t have access to this.", 10, "alert")
-				return
-			end    																																																							
 			frictionTable.Speed = callback or nil
 			updateVelocity()
-
+			pcall(function()
+				debug.setconstant(bedwars.WindWalkerController.updateSpeed, 7, callback and 'constantSpeedMultiplier' or 'moveSpeedMultiplier')
+			end)
 	
 			if callback then
 				Speed:Clean(runService.PreSimulation:Connect(function(dt)
 					bedwars.StatefulEntityKnockbackController.lastImpulseTime = callback and math.huge or time()
-					if entitylib.isAlive and not Fly.Enabled and not InfiniteFly.Enabled and not LongJump.Enabled and isnetworkowner(entitylib.character.RootPart) then
-						local state = entitylib.character.Humanoid:GetState()
-						if state == Enum.HumanoidStateType.Climbing then return end
-	
-						local root, velo = entitylib.character.RootPart, getSpeed()
-						local moveDirection = AntiFallDirection or entitylib.character.Humanoid.MoveDirection
-						local destination = (moveDirection * math.max(Value.Value - velo, 0) * dt)
-	
-						if WallCheck.Enabled then
-							rayCheck.FilterDescendantsInstances = {lplr.Character, gameCamera}
-							rayCheck.CollisionGroup = root.CollisionGroup
-							local ray = workspace:Raycast(root.Position, destination, rayCheck)
-							if ray then
-								destination = ((ray.Position + ray.Normal) - root.Position)
+					if entitylib.isAlive then
+						if not Fly.Enabled and not (InfiniteFly or {}).Enabled and not LongJump.Enabled then
+							bedwars.SprintController:setSpeed(Value.Value)
+							if Mode.Value == 'CFrame' then
+								local state = entitylib.character.Humanoid:GetState()
+								if state == Enum.HumanoidStateType.Climbing then return end
+			
+								local root, velo = entitylib.character.RootPart, getSpeed()
+								local moveDirection = AntiFallDirection or entitylib.character.Humanoid.MoveDirection
+								local destination = (moveDirection * math.max(Value.Value - velo, 0) * dt)
+			
+								if WallCheck.Enabled then
+									rayCheck.FilterDescendantsInstances = {lplr.Character, gameCamera}
+									rayCheck.CollisionGroup = root.CollisionGroup
+									local ray = workspace:Raycast(root.Position, destination, rayCheck)
+									if ray then
+										destination = ((ray.Position + ray.Normal) - root.Position)
+									end
+								end
+			
+								root.CFrame += destination
+								root.AssemblyLinearVelocity = (moveDirection * velo) + Vector3.new(0, root.AssemblyLinearVelocity.Y, 0)
+								if AutoJump.Enabled and (state == Enum.HumanoidStateType.Running or state == Enum.HumanoidStateType.Landed) and moveDirection ~= Vector3.zero and (Attacking or AlwaysJump.Enabled) then
+									entitylib.character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+								end
 							end
-						end
-	
-						root.CFrame += destination
-						root.AssemblyLinearVelocity = (moveDirection * velo) + Vector3.new(0, root.AssemblyLinearVelocity.Y, 0)
-						if AutoJump.Enabled and (state == Enum.HumanoidStateType.Running or state == Enum.HumanoidStateType.Landed) and moveDirection ~= Vector3.zero and (Attacking or AlwaysJump.Enabled) then
-							entitylib.character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
 						end
 					end
 				end))
+			else
+				bedwars.SprintController:setSpeed(bedwars.SprintController:isSprinting() and 20 or 14)
 			end
 		end,
 		ExtraText = function()
 			return 'Heatseeker'
 		end,
-		Tooltip = 'Increases your movement with various methods. (higher than 23 will cause major anti-cheat)'
+		Tooltip = 'Increases your movement with various methods.'
+	})
+	Mode = Speed:CreateDropdown({
+		Name = 'Mode',
+		List = {'Bedwars', 'CFrame'},
+		Default = 'CFrame'
 	})
 	Value = Speed:CreateSlider({
 		Name = 'Speed',
@@ -7623,7 +7666,7 @@ run(function()
     local retryThread = nil
     
     KitRender = vape.Categories.Utility:CreateModule({
-        Name = "KitRender",
+        Name = "KitRender ",
         Function = function(callback)   
             if callback then
                 local function setupSquadsRender()
@@ -7779,7 +7822,6 @@ run(function()
     })
 end)
 
-
 run(function()
     local aim = 0.158
     local tnt = 0.0045
@@ -7863,12 +7905,12 @@ run(function()
 							if AS.Enabled then
 								local pickaxe = getPickaxeSlot()
 								if hotbarSwitch(pickaxe) or store.hand.tool.Name:lower():find("pickaxe") then
-									bedwars.breakBlock(child,false,false,false,false,false,false)
-									bedwars.breakBlock(child,false,false,false,false,false,false)
+									bedwars.breakBlock(child)
+									bedwars.breakBlock(child)
 								end
 							else
-								bedwars.breakBlock(child,false,false,false,false,false,false)
-								bedwars.breakBlock(child,false,false,false,false,false,false)
+								bedwars.breakBlock(child)
+								bedwars.breakBlock(child)
 							end
 							if AJ.Enabled then
 								if humanoid:GetState() ~= Enum.HumanoidStateType.Jumping then
@@ -12387,6 +12429,352 @@ run(function()
 	})
 end)
 
+run(function()
+	local hooked = false
+	local oldFire
+	local oldLaunch
+	local Victorious
+	ClientEffects = vape.Categories.Render:CreateModule({
+		Name = "ClientEffects",
+		Function = function(callback)
+			if callback then
+				if hooked then return end
+				hooked = true
+						local Sound = ''
+						local cannon = ''
+						if Victorious.Value == "Gold" then
+							Sound = 'CANNON_FIRE_VICTORIOUS_GOLD'
+							cannon = 'cannon_gold_victorious'
+						end
+						if Victorious.Value == "Platinum" then
+							Sound = 'CANNON_FIRE_VICTORIOUS_PLATINUM'
+							cannon = 'cannon_platinum_victorious'
+						end
+						if Victorious.Value == "Diamond" then
+							Sound = 'CANNON_FIRE_VICTORIOUS_DIAMOND'
+							cannon = 'cannon_diamond_victorious'
+						end
+						if Victorious.Value == "Emerald" then
+							Sound = 'CANNON_FIRE_VICTORIOUS_EMERALD'
+							cannon = 'cannon_emerald_victorious'
+						end
+						if Victorious.Value == "Nightmare" then
+							Sound = 'CANNON_FIRE_VICTORIOUS_NIGHTMARE'
+							cannon = 'cannon_nightmare_victorious'
+						end
+					task.spawn(function()
+
+						local RESKIN_SOURCE = game.ReplicatedStorage:WaitForChild("Assets"):WaitForChild("Blocks"):WaitForChild(cannon)
+						local TARGET_NAME = "cannon"
+						local OFFSET_HELD = CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(0))
+						local OFFSET_PLACED = CFrame.new(0, -2.0, 0) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(0))
+						local tagged = setmetatable({}, { __mode = "k" })
+						local function firstBasePart(root: Instance)
+							for _, d in ipairs(root:GetDescendants()) do
+								if d:IsA("BasePart") then
+									return d
+								end
+							end
+							return nil
+						end
+						local function makeLocalInvisible(root: Instance)
+							for _, d in ipairs(root:GetDescendants()) do
+								if d:IsA("BasePart") then
+									d.LocalTransparencyModifier = 1
+									d.Transparency = 1       
+								elseif d:IsA("Decal") or d:IsA("Texture") then
+									d.Transparency = 1
+								end
+							end
+						end
+						local function setNoCollide(model: Instance)
+							for _, d in ipairs(model:GetDescendants()) do
+								if d:IsA("BasePart") then
+									d.CanCollide = false
+									d.CanTouch = false
+									d.CanQuery = false
+									d.Massless = true
+									d.Anchored = false
+								end
+							end
+						end
+						local function weldAllToPrimary(model: Model)
+							local primary = model.PrimaryPart
+							if not primary then return end
+
+							for _, d in ipairs(model:GetDescendants()) do
+								if d:IsA("BasePart") and d ~= primary then
+									local wc = Instance.new("WeldConstraint")
+									wc.Part0 = primary
+									wc.Part1 = d
+									wc.Parent = primary
+								end
+							end
+						end
+						local function weldModelToPart(model: Model, targetPart: BasePart)
+							if not model.PrimaryPart then
+								local p = firstBasePart(model)
+								if p then
+									pcall(function() model.PrimaryPart = p end)
+								end
+							end
+							if not model.PrimaryPart then return false end
+
+							setNoCollide(model)
+
+							pcall(function()
+								model:PivotTo(targetPart.CFrame * OFFSET_HELD)
+							end)
+
+							weldAllToPrimary(model)
+
+							local wc = Instance.new("WeldConstraint")
+							wc.Part0 = targetPart
+							wc.Part1 = model.PrimaryPart
+							wc.Parent = model.PrimaryPart
+
+							return true
+						end
+						local function attachReskinTo(targetRoot: Instance, offset: CFrame)
+							if not targetRoot or tagged[targetRoot] then return end
+							tagged[targetRoot] = true
+
+							local targetPart = targetRoot:FindFirstChild("Handle")
+							if not (targetPart and targetPart:IsA("BasePart")) then
+								targetPart = firstBasePart(targetRoot)
+							end
+							if not targetPart then
+								tagged[targetRoot] = nil
+								return
+							end
+							makeLocalInvisible(targetRoot)
+							local clone = RESKIN_SOURCE:Clone()
+							clone.Name = "LOCAL_CANNON_RESKIN"
+							if clone:IsA("Model") then
+								if not clone.PrimaryPart then
+									local p = firstBasePart(clone)
+									if p then
+										pcall(function() clone.PrimaryPart = p end)
+									end
+								end
+								if not clone.PrimaryPart then
+									clone:Destroy()
+									tagged[targetRoot] = nil
+									return
+								end
+
+								setNoCollide(clone)
+								clone.Parent = targetRoot
+
+								pcall(function()
+									clone:PivotTo(targetPart.CFrame * offset)
+								end)
+
+								weldAllToPrimary(clone)
+
+								local wcMain = Instance.new("WeldConstraint")
+								wcMain.Part0 = targetPart
+								wcMain.Part1 = clone.PrimaryPart
+								wcMain.Parent = clone.PrimaryPart
+							else
+								clone.Parent = targetRoot
+							end
+						end
+						local function hookViewmodel()
+							local cam = workspace.CurrentCamera
+							if not cam then return end
+
+							local function hookVM(vm: Instance)
+								for _, child in ipairs(vm:GetChildren()) do
+									if child.Name == TARGET_NAME then
+										attachReskinTo(child, OFFSET_HELD)
+									end
+								end
+
+								vm.ChildAdded:Connect(function(child)
+									if child.Name == TARGET_NAME then
+										task.wait()
+										attachReskinTo(child, OFFSET_HELD)
+									end
+								end)
+							end
+
+							local vm = cam:FindFirstChild("Viewmodel")
+							if vm then hookVM(vm) end
+
+							cam.ChildAdded:Connect(function(child)
+								if child.Name == "Viewmodel" then
+									task.wait()
+									hookVM(child)
+								end
+							end)
+						end
+						local function hookThirdPersonInHand(character: Model)
+							local function onChildAdded(child)
+								if child:IsA("Tool") and child.Name == TARGET_NAME then
+									task.wait()
+
+									local handle = child:FindFirstChild("Handle")
+									if not (handle and handle:IsA("BasePart")) then
+										handle = firstBasePart(child)
+									end
+									if not handle then return end
+									local existing = child:FindFirstChild("LOCAL_CANNON_RESKIN")
+									if existing then
+										existing:Destroy()
+									end
+
+									local reskin = RESKIN_SOURCE:Clone()
+									reskin.Name = "LOCAL_CANNON_RESKIN"
+									reskin.Parent = child
+
+									if reskin:IsA("Model") then
+										weldModelToPart(reskin, handle)
+									end
+									local start = time()
+									local conn
+									conn = runService.RenderStepped:Connect(function()
+										if not child.Parent then
+											conn:Disconnect()
+											return
+										end
+
+										makeLocalInvisible(child)
+
+										if reskin and reskin.Parent and reskin:IsA("Model") and reskin.PrimaryPart then
+											pcall(function()
+												reskin:PivotTo(handle.CFrame * OFFSET_HELD)
+											end)
+										end
+
+										if time() - start > 2 then
+											conn:Disconnect()
+										end
+									end)
+								end
+							end
+
+							for _, c in ipairs(character:GetChildren()) do
+								onChildAdded(c)
+							end
+
+							character.ChildAdded:Connect(onChildAdded)
+						end
+						local function hookTools(container: Instance)
+							for _, child in ipairs(container:GetChildren()) do
+								if child:IsA("Tool") and child.Name == TARGET_NAME then
+									attachReskinTo(child, OFFSET_HELD)
+								end
+							end
+
+							ClientEffects:Clean(container.ChildAdded:Connect(function(child)
+								if child:IsA("Tool") and child.Name == TARGET_NAME then
+									task.wait()
+									attachReskinTo(child, OFFSET_HELD)
+								end
+							end))
+						end
+						local function hookBlocksFolder(blocksFolder: Instance)
+							for _, child in ipairs(blocksFolder:GetChildren()) do
+								if child.Name == TARGET_NAME then
+									attachReskinTo(child, OFFSET_PLACED)
+								end
+							end
+
+							ClientEffects:Clean(blocksFolder.ChildAdded:Connect(function(child)
+								if child.Name == TARGET_NAME then
+									task.wait()
+									attachReskinTo(child, OFFSET_PLACED)
+									task.wait()
+									child:SetAttribute('ItemSkin',cannon)
+									local skin = child:FindFirstChild("LOCAL_CANNON_RESKIN")
+									if not (skin and skin:IsA("Model") and skin.PrimaryPart) then return end
+									local baseCF = skin.PrimaryPart.CFrame
+									local y = baseCF.Position.Y
+									local snappedY = math.floor(y)
+									local KUSH = snappedY - 1
+									local New = KUSH + 0.99
+									skin:PivotTo(CFrame.new(Vector3.new(baseCF.Position.X,New,baseCF.Position.Z)))
+								end
+							end))
+						end
+						local function hookAllWorldBlocks()
+							local map = workspace:FindFirstChild("Map")
+							if not map then return end
+
+							local worlds = map:FindFirstChild("Worlds")
+							if not worlds then return end
+
+							for _, world in ipairs(worlds:GetChildren()) do
+								local blocks = world:FindFirstChild("Blocks")
+								if blocks then
+									hookBlocksFolder(blocks)
+								end
+							end
+
+							ClientEffects:Clean(worlds.ChildAdded:Connect(function(world)
+								task.wait()
+								local blocks = world:FindFirstChild("Blocks")
+								if blocks then
+									hookBlocksFolder(blocks)
+								end
+							end))
+						end
+						hookViewmodel()
+						hookAllWorldBlocks()
+						local function onCharacterAdded(character: Model)
+							task.wait(0.2)
+							hookTools(lplr.Backpack)
+							hookTools(character)
+							hookThirdPersonInHand(character)
+						end
+						if lplr.Character then
+							onCharacterAdded(lplr.Character)
+						end
+						ClientEffects:Clean(lplr.CharacterAdded:Connect(onCharacterAdded))
+
+					end)
+
+				oldFire = bedwars.CannonHandController.fireCannon
+				oldLaunch = bedwars.CannonHandController.launchSelf
+
+				bedwars.CannonHandController.fireCannon = function(...)
+					for _, v in ipairs(workspace.SoundPool:GetChildren()) do
+						if v:IsA("Sound") and v.SoundId == "rbxassetid://7121064180" then
+							v:Destroy()
+						end
+					end
+
+					bedwars.SoundManager:playSound(bedwars.SoundList[Sound])
+					return oldFire(...)
+				end
+
+				bedwars.CannonHandController.launchSelf = function(...)
+					for _, v in ipairs(workspace.SoundPool:GetChildren()) do
+						if v:IsA("Sound") and v.SoundId == "rbxassetid://7121064180" then
+							v:Destroy()
+						end
+					end
+
+					bedwars.SoundManager:playSound(bedwars.SoundList[Sound])
+					return oldLaunch(...)
+				end
+			else
+				if hooked then
+					bedwars.CannonHandController.fireCannon = oldFire
+					bedwars.CannonHandController.launchSelf = oldLaunch
+					oldFire = nil
+					oldLaunch = nil
+					hooked = false
+				end
+			end
+		end
+	})
+	Victorious = ClientEffects:CreateDropdown({
+		Name = "Victorious",
+		List = {'Nightmare','Emerald','Diamond','Platinum','Gold'}
+	})
+end)
 
 
 run(function()
@@ -12912,7 +13300,7 @@ run(function()
 	end
 
 	BetterWarden = vape.Categories.Kits:CreateModule({
-		Name = "AutoWarden",
+		Name = "BetterWarden",
 		Tooltip = tip,
 		Function = function(callback)
 	   		if role ~= "owner" and role ~= "coowner" and role ~= "admin" and role ~= "friend" and role ~= 'premium' and role ~= 'user' then
@@ -12920,7 +13308,7 @@ run(function()
 				return
 			end
 			if store.equippedKit ~= "jailor" then
-				vape:CreateNotification("AutoWarden","Kit required only!",8,"warning")
+				vape:CreateNotification("BetterWarden","Kit required only!",8,"warning")
 				return
 			end
 			if callback then
@@ -13140,11 +13528,11 @@ run(function()
 	end
 	
 	BetterUma = vape.Categories.Kits:CreateModule({
-		Name = 'AutoUma',
+		Name = 'BetterUma',
 		Function = function(callback)
 			if callback then
 				if store.equippedKit ~= 'spirit_summoner' then
-					vape:CreateNotification("AutoUma","Kit required only!",8,"warning")
+					vape:CreateNotification("BetterUma","Kit required only!",8,"warning")
 					return
 				end
 				old = bedwars.ProjectileController.calculateImportantLaunchValues
@@ -13487,7 +13875,7 @@ run(function()
 						if not Data.fishModel then
 							return old.Minigame(self,Data,results)
 						end
-						vape:CreateNotification("BetterFisher", `You caught an {FishNames[Data.fishModel]} and u will receive {Data.drops[1].itemType} with {Data.drops[1].amount} amount`, 8)
+						vape:CreateNotification("AutoFisher", `You caught an {FishNames[Data.fishModel]} and u will receive {Data.drops[1].itemType} with {Data.drops[1].amount} amount`, 8)
 						local pull = bedwars.GameAnimationUtil:playAnimation(lplr, bedwars.AnimationType.FISHING_ROD_PULLING)
 						local Duration = (Duration.Value / 2.25 + math.random())
 						task.wait(Duration)
@@ -13954,12 +14342,12 @@ run(function()
 	local UpdateRate
 	local Health
 	BetterMelody = vape.Categories.Kits:CreateModule({
-		Name = "AutoMelody",
+		Name = "BetterMelody",
 		Tooltip = 'makes u godtier at melody boi',
 		Function = function(callback)
 			if callback then
 				if store.equippedKit ~= 'melody' then
-					notify('AutoMelody', 'Kit required only!', 6, 'warning')
+					notify('BetterMelody', 'Kit required only!', 6, 'warning')
 					return
 				end
 				repeat
@@ -14673,16 +15061,16 @@ run(function()
 		taliyah = function()
 			local r = 0
 			if Legit.Enabled then
-				r = 8
-			else
 				r = 10
+			else
+				r = 12
 			end
 			kitCollection('HarvestableCrop', function(v)
 				if bedwars.Client:Get('CropHarvest'):CallServer({position = bedwars.BlockController:getBlockPosition(v.Position)}) then
 					if Legit.Enabled then
 						bedwars.GameAnimationUtil:playAnimation(lplr.Character, bedwars.AnimationType.PUNCH)
 						bedwars.ViewmodelController:playAnimation(bedwars.AnimationType.FP_USE_ITEM)
-						bedwars.SoundManager:playSound(bedwars.SoundList.CROP_HARVEST)
+						bedwars.SoundManager:playSound(bedwars.SoundList.CHICKEN_ATTACK_1)
 					end
 				end
 			end, r, false)
@@ -14885,8 +15273,7 @@ run(function()
 				r = 16
 			end
 			kitCollection('sheep', function(v)
-				local args = {[1] = v}
-				replicatedStorage:WaitForChild("rbxts_include"):WaitForChild("node_modules"):WaitForChild('@rbxts'):WaitForChild('net'):WaitForChild('out'):WaitForChild('_NetManaged'):WaitForChild('SheepHerder/TameSheep'):FireServer(unpack(args))
+				bedwars.SheepHerderKitController.tameSheep(bedwars.SheepHerderKitController,v)
 			end, r, false)
 		end,
 		regent = function()
@@ -17220,6 +17607,12 @@ end)
 
 run(function()
 	local BedAlarm
+	local Range
+	local Tick
+	local Volume
+	local HightlightOption
+	local Color
+
 
 	local function getBed()
 		if entitylib.isAlive then
@@ -17239,7 +17632,7 @@ run(function()
 		Function = function(callback)
 			if callback then
 				local Notifytick = os.clock()
-
+				local highlighted = {}
 				repeat
 					local bed, localpos = getBed(), nil
 					if bed then
@@ -17249,27 +17642,99 @@ run(function()
 					if localpos then
 						local entity = localpos and entitylib.EntityPosition({
 							Origin = localpos,
-							Range = 65,
+							Range = Range.Value,
 							Part = 'RootPart',
 							Players = true
 						})
 
-						if entity and os.clock() > Notifytick then
-							Notifytick = os.clock() + 3.05
-							bedwars.NotificationController:sendInfoNotification({
-								message = '[Bed Alarm]: An intruder is near your bed!',
-							})
-							bedwars.SoundManager:playSound(bedwars.SoundList.BED_ALARM, {
-								volumeMultiplier = 1.4
-							})
+						if os.clock() > Notifytick then
+							if entity then
+								Notifytick = os.clock() + Tick.Value
+								bedwars.NotificationController:sendInfoNotification({
+									message = '[Bed Alarm]: An intruder is near your bed!',
+								})
+								bedwars.SoundManager:playSound(bedwars.SoundList.BED_ALARM, {
+									volumeMultiplier = Volume.Value
+								})
+								if HightlightOption.Enabled then
+									pcall(function()
+										local plr = playersService:GetPlayerFromCharacter(entity.character)
+										for i, v in plr:GetDescendants() do
+											if v:IsA("BasePart") then
+												local Hightlight = Instance.new("Highlight")
+												Hightlight.Adornee = v
+												Hightlight.Parent = v
+												Hightlight.FillTransparency = 0.3
+												Hightlight.OutlineTransparency = 0
+												Hightlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+												local color = Color3.fromHSV(Color.Hue, Color.Sat, Color.Value)
+												Hightlight.FillColor = color
+												Hightlight.OutlineColor = color
+												highlighted[plr] = Hightlight
+											end
+										end
+									end)
+								end
+							else
+								if HightlightOption.Enabled then
+									pcall(function()
+										for plr, hl in highlighted do
+											if hl then hl:Destroy() end
+											highlighted[plr] = nil
+										end
+									end)
+								end
+							end
 						end
 					end
-					task.wait(0.1)
+					task.wait(1/60)
 				until not BedAlarm.Enabled
+				table.clear(highlighted)
 			end
 		end,
 		Tooltip = 'Notifies when theres an enemy near bed'
 	})
+	Range = BedAlarm:CreateSlider({
+		Name = "Distance",
+		Min = 1,
+		Max = 100,
+		Default = 64,
+		Suffix = function(v)
+			if v == 1 then
+				return 'stud'
+			end
+			return 'studs'
+		end
+	})
+	Tick = BedAlarm:CreateSlider({
+		Name = "Ticks",
+		Min = 0,
+		Max = 12,
+		Decimal = 5,
+		Default = 3.05,
+		Suffix = 'hz'
+	})
+	Volume = BedAlarm:CreateSlider({
+		Name = "Volume Mutipler",
+		Min = 0.1,
+		Max = 2,
+		Default = 1.5,
+		Decimal = 5,
+	})
+	HightlightOption = BedAlarm:CreateToggle({
+		Name = "Hightlight players",
+		Default = true,
+		Function = function(va)
+			if Color.Object then Color.Object.Visible = callback end
+		end
+	})
+	Color = BedAlarm:CreateColorSlider({
+		Name = 'Background Color',
+		DefaultValue = 0,
+		DefaultOpacity = 0.5,
+		Darker = true
+	})
+
 end)
 
 run(function()
@@ -17306,13 +17771,7 @@ run(function()
             displayName = 'Emerald',
             isTeamGen = false
         },
-		gold = {
-            keywords = {'gold'},
-            color = Color3.fromRGB(212, 175, 55),
-            icon = 'gold',
-            displayName = 'gold',
-            isTeamGen = false
-		}
+
     }
     
     local function getMyTeamId()
@@ -17582,8 +18041,6 @@ run(function()
                 {name = 'iron', color = Color3.fromRGB(200, 200, 200), icon = 'iron', xOffset = 35},
                 {name = 'diamond', color = Color3.fromRGB(85, 200, 255), icon = 'diamond', xOffset = 85},
                 {name = 'emerald', color = Color3.fromRGB(0, 255, 100), icon = 'emerald', xOffset = 135},
-                {name = 'gold', color = Color3.fromRGB(212, 175, 55), icon = 'gold', xOffset = 92}
-
             }
             
             local resourceLabels = {}
@@ -18081,1328 +18538,6 @@ run(function()
 
 end)
 
-
-run(function()
-	local hooked = false
-	local oldFire
-	local oldLaunch
-	local Victorious
-	ClientEffects = vape.Categories.Render:CreateModule({
-		Name = "ClientEffects",
-		Function = function(callback)
-			if callback then
-				if hooked then return end
-				hooked = true
-						local Sound = ''
-						local cannon = ''
-						if Victorious.Value == "Gold" then
-							Sound = 'CANNON_FIRE_VICTORIOUS_GOLD'
-							cannon = 'cannon_gold_victorious'
-						end
-						if Victorious.Value == "Platinum" then
-							Sound = 'CANNON_FIRE_VICTORIOUS_PLATINUM'
-							cannon = 'cannon_platinum_victorious'
-						end
-						if Victorious.Value == "Diamond" then
-							Sound = 'CANNON_FIRE_VICTORIOUS_DIAMOND'
-							cannon = 'cannon_diamond_victorious'
-						end
-						if Victorious.Value == "Emerald" then
-							Sound = 'CANNON_FIRE_VICTORIOUS_EMERALD'
-							cannon = 'cannon_emerald_victorious'
-						end
-						if Victorious.Value == "Nightmare" then
-							Sound = 'CANNON_FIRE_VICTORIOUS_NIGHTMARE'
-							cannon = 'cannon_nightmare_victorious'
-						end
-					task.spawn(function()
-
-						local RESKIN_SOURCE = game.ReplicatedStorage:WaitForChild("Assets"):WaitForChild("Blocks"):WaitForChild(cannon)
-						local TARGET_NAME = "cannon"
-						local OFFSET_HELD = CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(0))
-						local OFFSET_PLACED = CFrame.new(0, -2.0, 0) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(0))
-						local tagged = setmetatable({}, { __mode = "k" })
-						local function firstBasePart(root: Instance)
-							for _, d in ipairs(root:GetDescendants()) do
-								if d:IsA("BasePart") then
-									return d
-								end
-							end
-							return nil
-						end
-						local function makeLocalInvisible(root: Instance)
-							for _, d in ipairs(root:GetDescendants()) do
-								if d:IsA("BasePart") then
-									d.LocalTransparencyModifier = 1
-									d.Transparency = 1       
-								elseif d:IsA("Decal") or d:IsA("Texture") then
-									d.Transparency = 1
-								end
-							end
-						end
-						local function setNoCollide(model: Instance)
-							for _, d in ipairs(model:GetDescendants()) do
-								if d:IsA("BasePart") then
-									d.CanCollide = false
-									d.CanTouch = false
-									d.CanQuery = false
-									d.Massless = true
-									d.Anchored = false
-								end
-							end
-						end
-						local function weldAllToPrimary(model: Model)
-							local primary = model.PrimaryPart
-							if not primary then return end
-
-							for _, d in ipairs(model:GetDescendants()) do
-								if d:IsA("BasePart") and d ~= primary then
-									local wc = Instance.new("WeldConstraint")
-									wc.Part0 = primary
-									wc.Part1 = d
-									wc.Parent = primary
-								end
-							end
-						end
-						local function weldModelToPart(model: Model, targetPart: BasePart)
-							if not model.PrimaryPart then
-								local p = firstBasePart(model)
-								if p then
-									pcall(function() model.PrimaryPart = p end)
-								end
-							end
-							if not model.PrimaryPart then return false end
-
-							setNoCollide(model)
-
-							pcall(function()
-								model:PivotTo(targetPart.CFrame * OFFSET_HELD)
-							end)
-
-							weldAllToPrimary(model)
-
-							local wc = Instance.new("WeldConstraint")
-							wc.Part0 = targetPart
-							wc.Part1 = model.PrimaryPart
-							wc.Parent = model.PrimaryPart
-
-							return true
-						end
-						local function attachReskinTo(targetRoot: Instance, offset: CFrame)
-							if targetRoot:GetAttribute('PlacedByUserId') ~= lplr.UserId then
-								return
-							end
-							if not targetRoot or tagged[targetRoot] then return end
-							tagged[targetRoot] = true
-
-							local targetPart = targetRoot:FindFirstChild("Handle")
-							if not (targetPart and targetPart:IsA("BasePart")) then
-								targetPart = firstBasePart(targetRoot)
-							end
-							if not targetPart then
-								tagged[targetRoot] = nil
-								return
-							end
-							makeLocalInvisible(targetRoot)
-							local clone = RESKIN_SOURCE:Clone()
-							clone.Name = "LOCAL_CANNON_RESKIN"
-							if clone:IsA("Model") then
-								if not clone.PrimaryPart then
-									local p = firstBasePart(clone)
-									if p then
-										pcall(function() clone.PrimaryPart = p end)
-									end
-								end
-								if not clone.PrimaryPart then
-									clone:Destroy()
-									tagged[targetRoot] = nil
-									return
-								end
-
-								setNoCollide(clone)
-								clone.Parent = targetRoot
-
-								pcall(function()
-									clone:PivotTo(targetPart.CFrame * offset)
-								end)
-
-								weldAllToPrimary(clone)
-
-								local wcMain = Instance.new("WeldConstraint")
-								wcMain.Part0 = targetPart
-								wcMain.Part1 = clone.PrimaryPart
-								wcMain.Parent = clone.PrimaryPart
-							else
-								clone.Parent = targetRoot
-							end
-						end
-						local function hookViewmodel()
-							local cam = workspace.CurrentCamera
-							if not cam then return end
-
-							local function hookVM(vm: Instance)
-								for _, child in ipairs(vm:GetChildren()) do
-									if child.Name == TARGET_NAME then
-										attachReskinTo(child, OFFSET_HELD)
-									end
-								end
-
-								vm.ChildAdded:Connect(function(child)
-									if child.Name == TARGET_NAME then
-										task.wait()
-										attachReskinTo(child, OFFSET_HELD)
-									end
-								end)
-							end
-
-							local vm = cam:FindFirstChild("Viewmodel")
-							if vm then hookVM(vm) end
-
-							cam.ChildAdded:Connect(function(child)
-								if child.Name == "Viewmodel" then
-									task.wait()
-									hookVM(child)
-								end
-							end)
-						end
-						local function hookThirdPersonInHand(character: Model)
-							local function onChildAdded(child)
-								if child:IsA("Tool") and child.Name == TARGET_NAME then
-									task.wait()
-
-									local handle = child:FindFirstChild("Handle")
-									if not (handle and handle:IsA("BasePart")) then
-										handle = firstBasePart(child)
-									end
-									if not handle then return end
-									local existing = child:FindFirstChild("LOCAL_CANNON_RESKIN")
-									if existing then
-										existing:Destroy()
-									end
-
-									local reskin = RESKIN_SOURCE:Clone()
-									reskin.Name = "LOCAL_CANNON_RESKIN"
-									reskin.Parent = child
-
-									if reskin:IsA("Model") then
-										weldModelToPart(reskin, handle)
-									end
-									local start = time()
-									local conn
-									conn = runService.RenderStepped:Connect(function()
-										if not child.Parent then
-											conn:Disconnect()
-											return
-										end
-
-										makeLocalInvisible(child)
-
-										if reskin and reskin.Parent and reskin:IsA("Model") and reskin.PrimaryPart then
-											pcall(function()
-												reskin:PivotTo(handle.CFrame * OFFSET_HELD)
-											end)
-										end
-
-										if time() - start > 2 then
-											conn:Disconnect()
-										end
-									end)
-								end
-							end
-
-							for _, c in ipairs(character:GetChildren()) do
-								onChildAdded(c)
-							end
-
-							character.ChildAdded:Connect(onChildAdded)
-						end
-						local function hookTools(container: Instance)
-							for _, child in ipairs(container:GetChildren()) do
-								if child:IsA("Tool") and child.Name == TARGET_NAME then
-									attachReskinTo(child, OFFSET_HELD)
-								end
-							end
-
-							ClientEffects:Clean(container.ChildAdded:Connect(function(child)
-								if child:IsA("Tool") and child.Name == TARGET_NAME then
-									task.wait()
-									attachReskinTo(child, OFFSET_HELD)
-								end
-							end))
-						end
-						local function hookBlocksFolder(blocksFolder: Instance)
-							for _, child in ipairs(blocksFolder:GetChildren()) do
-								if child.Name == TARGET_NAME then
-									attachReskinTo(child, OFFSET_PLACED)
-								end
-							end
-
-							ClientEffects:Clean(blocksFolder.ChildAdded:Connect(function(child)
-								if child.Name == TARGET_NAME then
-									task.wait()
-									attachReskinTo(child, OFFSET_PLACED)
-									task.wait()
-									child:SetAttribute('ItemSkin',cannon)
-									local skin = child:FindFirstChild("LOCAL_CANNON_RESKIN")
-									if not (skin and skin:IsA("Model") and skin.PrimaryPart) then return end
-									local baseCF = skin.PrimaryPart.CFrame
-									local y = baseCF.Position.Y
-									local snappedY = math.floor(y)
-									local KUSH = snappedY - 1
-									local New = KUSH + 0.99
-									skin:PivotTo(CFrame.new(Vector3.new(baseCF.Position.X,New,baseCF.Position.Z)))
-								end
-							end))
-						end
-						local function hookAllWorldBlocks()
-							local map = workspace:FindFirstChild("Map")
-							if not map then return end
-
-							local worlds = map:FindFirstChild("Worlds")
-							if not worlds then return end
-
-							for _, world in ipairs(worlds:GetChildren()) do
-								local blocks = world:FindFirstChild("Blocks")
-								if blocks then
-									hookBlocksFolder(blocks)
-								end
-							end
-
-							ClientEffects:Clean(worlds.ChildAdded:Connect(function(world)
-								task.wait()
-								local blocks = world:FindFirstChild("Blocks")
-								if blocks then
-									hookBlocksFolder(blocks)
-								end
-							end))
-						end
-						hookViewmodel()
-						hookAllWorldBlocks()
-						local function onCharacterAdded(character: Model)
-							task.wait(0.2)
-							hookTools(lplr.Backpack)
-							hookTools(character)
-							hookThirdPersonInHand(character)
-						end
-						if lplr.Character then
-							onCharacterAdded(lplr.Character)
-						end
-						ClientEffects:Clean(lplr.CharacterAdded:Connect(onCharacterAdded))
-
-					end)
-
-				oldFire = bedwars.CannonHandController.fireCannon
-				oldLaunch = bedwars.CannonHandController.launchSelf
-
-				bedwars.CannonHandController.fireCannon = function(...)
-					for _, v in ipairs(workspace.SoundPool:GetChildren()) do
-						if v:IsA("Sound") and v.SoundId == "rbxassetid://7121064180" then
-							v:Destroy()
-						end
-					end
-
-					bedwars.SoundManager:playSound(bedwars.SoundList[Sound])
-					return oldFire(...)
-				end
-
-				bedwars.CannonHandController.launchSelf = function(...)
-					for _, v in ipairs(workspace.SoundPool:GetChildren()) do
-						if v:IsA("Sound") and v.SoundId == "rbxassetid://7121064180" then
-							v:Destroy()
-						end
-					end
-
-					bedwars.SoundManager:playSound(bedwars.SoundList[Sound])
-					return oldLaunch(...)
-				end
-			else
-				if hooked then
-					bedwars.CannonHandController.fireCannon = oldFire
-					bedwars.CannonHandController.launchSelf = oldLaunch
-					oldFire = nil
-					oldLaunch = nil
-					hooked = false
-				end
-			end
-		end
-	})
-	Victorious = ClientEffects:CreateDropdown({
-		Name = "Victorious",
-		List = {'Nightmare','Emerald','Diamond','Platinum','Gold'}
-	})
-end)
-
-run(function()
-	local BedProtector
-	
-	local function getBedNear()
-		local localPosition = entitylib.isAlive and entitylib.character.RootPart.Position or Vector3.zero
-		for _, v in collectionService:GetTagged('bed') do
-			if (localPosition - v.Position).Magnitude < 20 and v:GetAttribute('Team'..(lplr:GetAttribute('Team') or -1)..'NoBreak') then
-				return v
-			end
-		end
-	end
-	
-	local function getBlocks()
-		local blocks = {}
-		for _, item in store.inventory.inventory.items do
-			local block = bedwars.ItemMeta[item.itemType].block
-			if block then
-				table.insert(blocks, {item.itemType, block.health})
-			end
-		end
-		table.sort(blocks, function(a, b) 
-			return a[2] > b[2]
-		end)
-		return blocks
-	end
-	
-	local function getPyramid(size, grid)
-		local positions = {}
-		for h = size, 0, -1 do
-			for w = h, 0, -1 do
-				table.insert(positions, Vector3.new(w, (size - h), ((h + 1) - w)) * grid)
-				table.insert(positions, Vector3.new(w * -1, (size - h), ((h + 1) - w)) * grid)
-				table.insert(positions, Vector3.new(w, (size - h), (h - w) * -1) * grid)
-				table.insert(positions, Vector3.new(w * -1, (size - h), (h - w) * -1) * grid)
-			end
-		end
-		return positions
-	end
-	
-	BedProtector = vape.Categories.World:CreateModule({
-		Name = 'BedProtector',
-		Function = function(callback)
-			if callback then
-				local bed = getBedNear()
-				bed = bed and bed.Position or nil
-				if bed then
-					for i, block in getBlocks() do
-						for _, pos in getPyramid(i, 3) do
-							if not BedProtector.Enabled then break end
-							if getPlacedBlock(bed + pos) then continue end
-							bedwars.placeBlock(bed + pos, block[1], false)
-						end
-					end
-					if BedProtector.Enabled then 
-						BedProtector:Toggle() 
-					end
-				else
-					notif('BedProtector', 'Unable to locate bed', 5)
-					BedProtector:Toggle()
-				end
-			end
-		end,
-		Tooltip = 'Automatically places strong blocks around the bed.'
-	})
-end)
-
-
-run(function()
-    local NewAutoWin
-	local Methods 
-	local hiding = true
-	local gui
-	local beds,currentbedpos,Dashes = {}, nil, {Value  =2}
-	local function create(Name,values)
-		local obj = Instance.new(Name)
-		for i, v in values do
-			obj[i] = v
-		end
-		return obj
-	end
-	local function Reset()
-		NewAutoWin:Clean(TeleportService:Teleport(game.PlaceId, lplr, TeleportService:GetLocalPlayerTeleportData()))
-	end
-	local function AllbedPOS()
-		if workspace:FindFirstChild("MapCFrames") then
-			for _, obj in ipairs(workspace:FindFirstChild("MapCFrames"):GetChildren()) do
-				if string.match(obj.Name, "_bed$") then
-					table.insert(beds, obj.Value.Position)
-				end
-			end
-		end
-	end
-	local function UpdateCurrentBedPOS()
-		if workspace:FindFirstChild("MapCFrames") then
-			local currentTeam =  lplr.Character:GetAttribute("Team")
-			if workspace:FindFirstChild("MapCFrames") then
-				local CFRameName = tostring(currentTeam).."_bed"
-				currentbedpos = workspace:FindFirstChild("MapCFrames"):FindFirstChild(CFRameName).Value.Position
-			end
-		end
-	end
-	local function closestBed(origin)
-		local closest, dist
-		for _, pos in ipairs(beds) do
-			if pos ~= currentbedpos then
-				local d = (pos - origin).Magnitude
-				if not dist or d < dist then
-					dist, closest = d, pos
-				end
-			end
-		end
-		return closest
-	end
-	local function tweenToBED(pos)
-		if entitylib.isAlive then
-			local oldpos = pos
-			pos = pos + Vector3.new(0, 5, 0)
-			local currentPosition = entitylib.character.RootPart.Position
-			if (pos - currentPosition).Magnitude > 0.5 then
-				if lplr.Character then
-					lplr:SetAttribute('LastTeleported', 0)
-				end
-				local info = TweenInfo.new(0.72,Enum.EasingStyle.Linear,Enum.EasingDirection.Out)
-				local tween = tweenService:Create(entitylib.character.RootPart,info,{CFrame = CFrame.new(pos)})
-				local tween2 = tweenService:Create(entitylib.character.RootPart,info,{CFrame = CFrame.new(pos)})
-				task.spawn(function() tween:Play() end)
-				task.spawn(function()
-					if Dashes.Value == 1 then
-						task.wait(0.36)
-						if bedwars.AbilityController:canUseAbility("ELECTRIC_DASH") then
-							vape:CreateNotification("AutoWin", "Dashing to bypass anti cheat!", 1)
-							bedwars.AbilityController:useAbility('ELECTRIC_DASH')
-						end
-					elseif Dashes.Value == 2 then
-						task.wait(0.36)
-						if bedwars.AbilityController:canUseAbility("ELECTRIC_DASH") then
-							vape:CreateNotification("AutoWin", "Dashing to bypass anti cheat!", 1)
-							bedwars.AbilityController:useAbility('ELECTRIC_DASH')
-						end
-						task.wait(0.54)
-						if bedwars.AbilityController:canUseAbility("ELECTRIC_DASH") then
-							vape:CreateNotification("AutoWin", "Dashing to bypass anti cheat!", 1)
-							bedwars.AbilityController:useAbility('ELECTRIC_DASH')
-						end
-					else
-						task.wait(0.54)
-						if bedwars.AbilityController:canUseAbility("ELECTRIC_DASH") then
-							vape:CreateNotification("AutoWin", "Dashing to bypass anti cheat!", 1)
-							bedwars.AbilityController:useAbility('ELECTRIC_DASH')
-							end				
-						end
-				end)
-				task.spawn(function()
-					tween.Completed:Wait()
-					lplr:SetAttribute('LastTeleported', os.time())
-				end)
-				lplr:SetAttribute('LastTeleported', os.time())
-				task.wait(0.25)
-				if lplr.Character then
-					task.wait(0.1235)
-					lplr:SetAttribute('LastTeleported', os.time())
-				end
-				task.wait(1.45)
-				vape:CreateNotification("AutoWin", "Fixing position!", 1)
-				task.spawn(function() tween2:Play() end)
-				task.spawn(function()
-					tween.Completed:Wait()
-					lplr:SetAttribute('LastTeleported', os.time())
-				end)
-				lplr:SetAttribute('LastTeleported', os.time())
-				task.wait(0.25)
-				if lplr.Character then
-					task.wait(0.1235)
-					lplr:SetAttribute('LastTeleported', os.time())
-				end
-				task.wait(0.85)
-				vape:CreateNotification("AutoWin",'nuking bed...',2)
-				if not Breaker.Enabled then
-					Breaker:Toggle(true)
-					
-				end
-				NewAutoWin:Clean(lplr.PlayerGui.ChildAdded:Connect(function(obj)
-					if obj.Name == "WinningTeam" then
-						lplr:Kick("Don't disconnect, this will auto teleport you!")
-						vape:CreateNotification("AutoWin",'Match ended you won... Teleporting you to a empty game.',3)
-						task.wait(1.5)
-						Reset()
-					end
-				end))
-			end
-		end
-	end
-	local function tweenToBED2(pos,msg,oppositeTeam)
-		if entitylib.isAlive then
-			local oldpos = pos
-			pos = pos + Vector3.new(0, 5, 0)
-			local currentPosition = entitylib.character.RootPart.Position
-			if (pos - currentPosition).Magnitude > 0.5 then
-				if lplr.Character then
-					lplr:SetAttribute('LastTeleported', 0)
-				end
-				local info = TweenInfo.new(0.72,Enum.EasingStyle.Linear,Enum.EasingDirection.Out)
-				local tween = tweenService:Create(entitylib.character.RootPart,info,{CFrame = CFrame.new(pos)})
-				local tween2 = tweenService:Create(entitylib.character.RootPart,info,{CFrame = CFrame.new(pos)})
-				task.spawn(function() tween:Play() end)
-				task.spawn(function()
-					if Dashes.Value == 1 then
-						msg.Text = "Dashing to bypass Anti-Cheat. (0.36s)"
-						task.wait(0.36)
-						if bedwars.AbilityController:canUseAbility("ELECTRIC_DASH") then
-							bedwars.AbilityController:useAbility('ELECTRIC_DASH')
-						end
-					elseif Dashes.Value == 2 then
-						msg.Text = "Dashing to bypass Anti-Cheat. (0.36s)"
-						task.wait(0.36)
-						if bedwars.AbilityController:canUseAbility("ELECTRIC_DASH") then
-							bedwars.AbilityController:useAbility('ELECTRIC_DASH')
-						end
-						msg.Text = "Dashing to bypass Anti-Cheat. (0.54s)"
-						task.wait(0.54)
-						if bedwars.AbilityController:canUseAbility("ELECTRIC_DASH") then
-							bedwars.AbilityController:useAbility('ELECTRIC_DASH')
-						end
-					else
-						msg.Text = "Dashing to bypass Anti-Cheat. (0.54s)"
-						task.wait(0.54)
-						if bedwars.AbilityController:canUseAbility("ELECTRIC_DASH") then
-							bedwars.AbilityController:useAbility('ELECTRIC_DASH')
-							end				
-						end
-				end)
-				task.spawn(function()
-					tween.Completed:Wait()
-					lplr:SetAttribute('LastTeleported', os.time())
-				end)
-				lplr:SetAttribute('LastTeleported', os.time())
-				task.wait(0.25)
-				if lplr.Character then
-					task.wait(0.1235)
-					lplr:SetAttribute('LastTeleported', os.time())
-				end
-				msg.Text = `Fixing current positon {bedwars.BlockController:getBlockPosition(entitylib.character.RootPart.Position)} to {pos}. (1.45s)`
-				task.wait(1.45)
-				task.spawn(function() tween2:Play() end)
-				task.spawn(function()
-					tween.Completed:Wait()
-					lplr:SetAttribute('LastTeleported', os.time())
-				end)
-				lplr:SetAttribute('LastTeleported', os.time())
-				task.wait(0.25)
-				if lplr.Character then
-					task.wait(0.1235)
-					lplr:SetAttribute('LastTeleported', os.time())
-				end
-				msg.Text = `Nuking {oppositeTeam} bed.. (0.85s)`
-				task.wait(0.85)
-				if not Breaker.Enabled then
-					Breaker:Toggle(true)
-				end
-				NewAutoWin:Clean(lplr.PlayerGui.ChildAdded:Connect(function(obj)
-					msg.Text = `Your current Player Level is {lplr:GetAttribute("PlayerLevel")}. (0.85s)`
-					task.wait(0.85)
-					msg.Text = 'Match ended. ReTeleporting to another Empty Game... (1.5s)'
-					task.wait(0.5)
-					if obj.Name == "WinningTeam" then
-						lplr:Kick("Don't disconnect, this will auto teleport you!")
-						task.wait(1)
-						Reset()
-					end
-				end))
-			end
-		end
-	end
-	local function tweenToBED3(pos,msg,oppositeTeam,Percent)
-		if entitylib.isAlive then
-			local oldpos = pos
-			pos = pos + Vector3.new(0, 5, 0)
-			local currentPosition = entitylib.character.RootPart.Position
-			if (pos - currentPosition).Magnitude > 0.5 then
-				if lplr.Character then
-					lplr:SetAttribute('LastTeleported', 0)
-				end
-				local info = TweenInfo.new(0.72,Enum.EasingStyle.Linear,Enum.EasingDirection.Out)
-				local tween = tweenService:Create(entitylib.character.RootPart,info,{CFrame = CFrame.new(pos)})
-				local tween2 = tweenService:Create(entitylib.character.RootPart,info,{CFrame = CFrame.new(pos)})
-				task.spawn(function() tween:Play() end)
-				task.spawn(function()
-					if Dashes.Value == 1 then
-						Percent:SetAttribute("Percent",62)
-						msg.Text = "Dashing to bypass Anti-Cheat.. (1)"
-						task.wait(0.36)
-						if bedwars.AbilityController:canUseAbility("ELECTRIC_DASH") then
-							bedwars.AbilityController:useAbility('ELECTRIC_DASH')
-						end
-					elseif Dashes.Value == 2 then
-						Percent:SetAttribute("Percent",62)
-						msg.Text = "Dashing to bypass Anti-Cheat.. (1)"
-						task.wait(0.36)
-						if bedwars.AbilityController:canUseAbility("ELECTRIC_DASH") then
-							bedwars.AbilityController:useAbility('ELECTRIC_DASH')
-						end
-						Percent:SetAttribute("Percent",72)
-						msg.Text = "Dashing to bypass Anti-Cheat.. (2)"
-						task.wait(0.54)
-						if bedwars.AbilityController:canUseAbility("ELECTRIC_DASH") then
-							bedwars.AbilityController:useAbility('ELECTRIC_DASH')
-						end
-					else
-						Percent:SetAttribute("Percent",72)
-						msg.Text = "Dashing to bypass Anti-Cheat.. (1)"
-						task.wait(0.54)
-						if bedwars.AbilityController:canUseAbility("ELECTRIC_DASH") then
-							bedwars.AbilityController:useAbility('ELECTRIC_DASH')
-							end				
-						end
-				end)
-				task.spawn(function()
-					tween.Completed:Wait()
-					lplr:SetAttribute('LastTeleported', os.time())
-				end)
-				lplr:SetAttribute('LastTeleported', os.time())
-				task.wait(0.25)
-				if lplr.Character then
-					task.wait(0.1235)
-					lplr:SetAttribute('LastTeleported', os.time())
-				end
-				Percent:SetAttribute("Percent",83)
-				msg.Text = `Fixing current positon {bedwars.BlockController:getBlockPosition(entitylib.character.RootPart.Position)} to {pos}.`
-				task.wait(1.45)
-				task.spawn(function() tween2:Play() end)
-				task.spawn(function()
-					tween.Completed:Wait()
-					lplr:SetAttribute('LastTeleported', os.time())
-				end)
-				lplr:SetAttribute('LastTeleported', os.time())
-				task.wait(0.25)
-				if lplr.Character then
-					task.wait(0.1235)
-					lplr:SetAttribute('LastTeleported', os.time())
-				end
-				Percent:SetAttribute("Percent",99)
-				msg.Text = `Nuking {oppositeTeam} bed.. `
-				task.wait(0.85)
-				if not Breaker.Enabled then
-					Breaker:Toggle(true)
-				end
-				NewAutoWin:Clean(lplr.PlayerGui.NotificationApp.ChildAdded:Connect(function(obj)
-					obj:Destroy()
-				end))
-				NewAutoWin:Clean(lplr.PlayerGui.ChildAdded:Connect(function(obj)
-					
-					Percent:SetAttribute("Percent",100)
-					msg.Text = 'Match ended. ReTeleporting to another Empty Game...'
-					task.wait(0.5)
-					if obj.Name == "WinningTeam" then
-						lplr:Kick("Don't disconnect, this will auto teleport you!")
-						task.wait(1)
-						Reset()
-					end
-				end))
-			end
-		end
-	end
-
-	local function MethodOne()
-		vape:CreateNotification("AutoWin",'finding all bed positions!',1.85)
-		AllbedPOS()
-		task.wait(0.958)
-		vape:CreateNotification("AutoWin",'Founded my own bed position!',3.85)
-		UpdateCurrentBedPOS()
-		if currentbedpos then
-			task.wait(2.125)
-			vape:CreateNotification("AutoWin",'Finding the other team bed!',3.85)
-			task.wait(2)
-			bedpos = closestBed(entitylib.character.RootPart.Position)
-			if bedpos then
-				local bp = tostring(bedpos)
-				if lplr.Team.Name == "Blue" then
-						vape:CreateNotification("AutoWin",`Founded Orange's bed at {bp}`,4.85)
-						tweenToBED(bedpos)
-					else
-						vape:CreateNotification("AutoWin",`Founded Blue's bed at {bp}`,4.85)
-						tweenToBED(bedpos)
-					end
-				else
-				if lplr.Team.Name == "Blue" then
-					vape:CreateNotification("AutoWin",'Couldnt find Orange\'s bed position? ReTeleporting...','warning',10.85)
-					lplr:Kick("Don't disconnect, this will auto teleport you!")
-					task.wait(0.5)
-					Reset()
-				else
-					vape:CreateNotification("AutoWin",'Couldnt find Blue\'s bed position? ReTeleporting...','warning',10.85)
-					lplr:Kick("Don't disconnect, this will auto teleport you!")
-					task.wait(0.5)
-					Reset()
-				end
-			end
-		else
-			vape:CreateNotification("AutoWin",'Couldnt find my bed position? ReTeleporting...','warning',10.85)
-			lplr:Kick("Don't disconnect, this will auto teleport you!")
-			task.wait(0.5)
-			Reset()
-		end
-	end
-	
-	local function MethodTwo(TooltipText)
-		TooltipText.Text = 'Finding all current beds positions near me! (0.235s)'
-		AllbedPOS()
-		task.wait(0.2345)
-		TooltipText.Text = 'Founded my team\'s bed position! (0.35s)'
-		UpdateCurrentBedPOS()
-		if currentbedpos then
-			task.wait(0.35)
-			TooltipText.Text = 'Finding other team\'s bed! (0.5s)'
-			task.wait(.5)
-			bedpos = closestBed(entitylib.character.RootPart.Position)
-			if bedpos then
-				local bp = tostring(bedpos)
-				if lplr.Team.Name == "Blue" then
-						TooltipText.Text = `Founded Orange's bed at {bp} (2s)`
-						tweenToBED2(bedpos,TooltipText,'Orange')
-					else
-						TooltipText.Text = `Founded Blue's bed at {bp} (2s)`
-						tweenToBED2(bedpos,TooltipText,'Blue')
-					end
-				else
-				if lplr.Team.Name == "Blue" then
-					TooltipText.Text = 'Couldn\'t find my Orange\'s bed position? ReTeleporting... (0.5s)'
-					lplr:Kick("Don't disconnect, this will auto teleport you!")
-					task.wait(0.5)
-					Reset()
-				else
-					TooltipText.Text = 'Couldn\'t find my Blue\'s bed position? ReTeleporting... (0.5s)'
-					lplr:Kick("Don't disconnect, this will auto teleport you!")
-					task.wait(0.5)
-					Reset()
-				end
-			end
-		else
-			TooltipText.Text = 'Couldn\'t find my bed position? ReTeleporting... (0.5s)'
-			lplr:Kick("Don't disconnect, this will auto teleport you!")
-			task.wait(0.5)
-			Reset()
-		end
-		task.spawn(function()
-			NewAutoWin:Clean(playersService.PlayerAdded:Connect(function(playerToBlock)
-				local NewFoundedPlayersName = playerToBlock.Name
-				if playersService:FindFirstChild(NewFoundedPlayersName) then
-
-					local RobloxGui = coreGui:WaitForChild("RobloxGui")
-					local CoreGuiModules = RobloxGui:WaitForChild("Modules")
-					local PlayerDropDownModule = require(CoreGuiModules:WaitForChild("PlayerDropDown"))
-					PlayerDropDownModule:InitBlockListAsync()
-					local BlockingUtility = PlayerDropDownModule:CreateBlockingUtility()
-
-					
-					if BlockingUtility:IsPlayerBlockedByUserId(playerToBlock.UserId) then
-						return
-					end
-					local successfullyBlocked = BlockingUtility:BlockPlayerAsync(playerToBlock)
-					if successfullyBlocked then
-						TooltipText.Text = string.format("Successfully blocked %s! lobbying... (1s)",NewFoundedPlayersName)
-						writefile('ReVape/profiles/BlockedUsers.txt', isfile('ReVape/profiles/BlockedUsers.txt') and readfile('ReVape/profiles/BlockedUsers.txt') or "" ~= "" and (isfile('ReVape/profiles/BlockedUsers.txt') and readfile('ReVape/profiles/BlockedUsers.txt') or "" .. "\n" .. NewFoundedPlayersName) or NewFoundedPlayersName)
-						task.wait(1.015)
-					end
-					lobby()
-				end
-			end))
-		end)
-	end
-	
-	local function MethodThree(TooltipText,Percent)
-		Percent:SetAttribute("Percent",5)
-		TooltipText.Text = 'Finding all current beds positions near me...'
-		task.wait(0.015825)
-		AllbedPOS()
-		Percent:SetAttribute("Percent",15)
-		task.wait(0.1345)
-		Percent:SetAttribute("Percent",35)
-		TooltipText.Text = 'Founded my team\'s bed position...'
-		UpdateCurrentBedPOS()
-		if currentbedpos then
-			task.wait(0.15)
-			Percent:SetAttribute("Percent",48)
-			TooltipText.Text = 'Finding other team\'s bed...'
-			task.wait(.485)
-			bedpos = closestBed(entitylib.character.RootPart.Position)
-			if bedpos then
-				Percent:SetAttribute("Percent",54)
-				local bp = tostring(bedpos)
-				if lplr.Team.Name == "Blue" then
-						TooltipText.Text = `Founded Orange's bed at {bp}`
-						tweenToBED3(bedpos,TooltipText,'Orange',Percent)
-					else
-						TooltipText.Text = `Founded Blue's bed at {bp}`
-						tweenToBED3(bedpos,TooltipText,'Blue',Percent)
-					end
-				else
-				if lplr.Team.Name == "Blue" then
-					TooltipText.Text = 'Couldn\'t find my Orange\'s bed position? ReTeleporting...'
-					lplr:Kick("Don't disconnect, this will auto teleport you!")
-					task.wait(0.5)
-					Reset()
-				else
-					TooltipText.Text = 'Couldn\'t find my Blue\'s bed position? ReTeleporting...'
-					lplr:Kick("Don't disconnect, this will auto teleport you!")
-					task.wait(0.5)
-					Reset()
-				end
-			end
-		else
-			TooltipText.Text = 'Couldn\'t find my bed position? ReTeleporting...'
-			lplr:Kick("Don't disconnect, this will auto teleport you!")
-			task.wait(0.5)
-			Reset()
-		end
-		task.spawn(function()
-			NewAutoWin:Clean(playersService.PlayerAdded:Connect(function(playerToBlock)
-				local NewFoundedPlayersName = playerToBlock.Name
-				if playersService:FindFirstChild(NewFoundedPlayersName) then
-
-					local RobloxGui = coreGui:WaitForChild("RobloxGui")
-					local CoreGuiModules = RobloxGui:WaitForChild("Modules")
-					local PlayerDropDownModule = require(CoreGuiModules:WaitForChild("PlayerDropDown"))
-					PlayerDropDownModule:InitBlockListAsync()
-					local BlockingUtility = PlayerDropDownModule:CreateBlockingUtility()
-
-					
-					if BlockingUtility:IsPlayerBlockedByUserId(playerToBlock.UserId) then
-						return
-					end
-					local successfullyBlocked = BlockingUtility:BlockPlayerAsync(playerToBlock)
-					if successfullyBlocked then
-						TooltipText.Text = string.format("Successfully blocked %s! lobbying... ",NewFoundedPlayersName)
-						task.wait(0.125)
-					end
-					lobby()
-				end
-			end))
-		end)
-	end
-	
-	if role ~= "owner" and  role ~= "coowner" and user ~= "generalcyan" and user ~= "kev" and user ~= "yorender" and user ~= 'synioxzz'  then
-		return 
-	end
-    NewAutoWin = vape.Categories.AltFarm:CreateModule({
-		Name = "NewElektraAutoWin",
-		Tooltip = 'must have elektra to use this',
-		Function = function(callback) 
-			if callback then
-				if Methods.Value == "Method 1" then
-					local ScreenGui = create("ScreenGui",{Parent = lplr.PlayerGui,ResetOnSpawn=false,IgnoreGuiInset=true,DisplayOrder =999,Name='AutowinUI'})
-					local MainFrame = create("Frame",{Visible=gui.Enabled,Name='AutowinFrame',Parent=ScreenGui,BackgroundColor3=Color3.new(0,0,0),BackgroundTransparency=0.05,Size=UDim2.fromScale(1,1)})
-					local SecondaryFrame = create("Frame",{Name='SecondaryFrame',Parent=MainFrame,BackgroundColor3=Color3.fromRGB(28,25,27),BackgroundTransparency=0.1,Size=UDim2.fromScale(1,1)})
-					local ShowUserBtn = create("TextButton",{Name='UsernameButton',Parent=SecondaryFrame,Position=UDim2.fromScale(0.393,0.788),Size=UDim2.fromOffset(399,97),FontFace=Font.new('rbxasset://fonts/families/Arimo.json',Enum.FontWeight.SemiBold),Text='SHOW USERNAME',TextColor3=Color3.fromRGB(65,65,65),TextSize=32,TextTransparency=0.2,BackgroundColor3=Color3.fromHSV(vape.GUIColor.Hue,vape.GUIColor.Sat,vape.GUIColor.Value)})
-					create("UICorner",{CornerRadius=UDim.new(0,6),Parent=ShowUserBtn})
-					create("UIStroke",{ApplyStrokeMode='Border',Color=Color3.new(0,0,0),Thickness=5,Parent=ShowUserBtn})
-					create("UIStroke",{ApplyStrokeMode='Contextual',Color=Color3.new(0,0,0),Thickness=1,Parent=ShowUserBtn})
-					local MainIcon = create("ImageLabel",{Parent=SecondaryFrame,Name='AltFarmIcon',BackgroundTransparency=1,Image=getcustomasset('ReVape/assets/new/af.png'),ImageTransparency=0.63,ImageColor3=Color3.new(0,0,0),Position=UDim2.fromScale(0.388,0.193),Size=UDim2.fromOffset(346,341)})
-					local SecondaryIcon = create("ImageLabel",{Parent=MainIcon,Name='MainIconAltFarm',BackgroundTransparency=1,Image=getcustomasset('ReVape/assets/new/af.png'),ImageTransparency=0.24,Position=UDim2.fromScale(0.069,0.053),Size=UDim2.fromOffset(297,305)})
-					local Levels = create("TextButton",{Name='LevelText',Parent=SecondaryFrame,BackgroundTransparency=1,Position=UDim2.fromScale(0.435,0.596),Size=UDim2.fromOffset(200,50),FontFace=Font.new('rbxasset://fonts/families/Arimo.json',Enum.FontWeight.SemiBold,Enum.FontStyle.Italic),Text="Level: 0",TextSize=32})
-					create("UIStroke",{ApplyStrokeMode='Contextual',Color=Color3.fromHSV(vape.GUIColor.Hue,vape.GUIColor.Sat,vape.GUIColor.Value),Thickness=2.1,Transparency=0.22,Parent=Levels})
-					--local Wins = create("TextButton",{Name='WinsText',Parent=SecondaryFrame,BackgroundTransparency=1,Position=UDim2.fromScale(0.435,0.684),Size=UDim2.fromOffset(200,50),FontFace=Font.new('rbxasset://fonts/families/Arimo.json',Enum.FontWeight.SemiBold,Enum.FontStyle.Italic),Text="Wins: 0",TextSize=32})
-					--create("UIStroke",{ApplyStrokeMode='Contextual',Color=Color3.fromHSV(vape.GUIColor.Hue,vape.GUIColor.Sat,vape.GUIColor.Value),Thickness=2.1,Transparency=0.22,Parent=Wins})
-					local Username = create("TextButton",{Name='WinsText',Parent=SecondaryFrame,BackgroundTransparency=1,Position=UDim2.fromScale(0.365,0),Size=UDim2.fromOffset(425,89),FontFace=Font.new('rbxasset://fonts/families/Arimo.json',Enum.FontWeight.SemiBold,Enum.FontStyle.Italic),Text="Username: [HIDDEN]",TextSize=32})
-					create("UIStroke",{ApplyStrokeMode='Contextual',Color=Color3.fromHSV(vape.GUIColor.Hue,vape.GUIColor.Sat,vape.GUIColor.Value),Thickness=2.1,Transparency=0.22,Parent=Username})
-					task.spawn(function()
-						repeat
-							Levels.Text = "Level: "..tostring(lplr:GetAttribute("PlayerLevel")) or "0"
-							task.wait(0.1)
-						until not NewAutoWin.Enabled
-					end)
-
-					ShowUserBtn.Activated:Connect(function()
-						if hiding then
-							Username.Text = "Username: ["..lplr.Name.."]"
-							MainIcon.Image = playersService:GetUserThumbnailAsync(lplr.UserId,Enum.ThumbnailType.HeadShot,Enum.ThumbnailSize.Size420x420)
-							SecondaryIcon.Image = playersService:GetUserThumbnailAsync(lplr.UserId,Enum.ThumbnailType.HeadShot,Enum.ThumbnailSize.Size420x420)
-						else
-							Username.Text = "Username: [HIDDEN]"
-							MainIcon.Image =getcustomasset('ReVape/assets/new/af.png')
-							SecondaryIcon.Image = getcustomasset('ReVape/assets/new/af.png')
-						end
-						hiding = not hiding
-					end)
-					
-					vape:CreateNotification("AutoWin",'checking if in empty game...',3)
-					task.wait((3 / 1.85))
-					if #playersService:GetChildren() ~= 1 then
-						lplr:Kick("Don't disconnect, this will auto teleport you!")
-						vape:CreateNotification("AutoWin",'players found! teleporting to a empty game!',6)
-						task.wait((6 / 3.335))
-						Reset()
-					else
-						repeat task.wait(0.1) until store.equippedKit ~= '' and store.matchState ~= 0 or (not NewAutoWin.Enabled)
-						MethodOne()
-					end
-				elseif Methods.Value == "Method 2" then
-					local AutoFarmUI = create("ScreenGui",{Name='AutowinUI',Parent=lplr.PlayerGui,IgnoreGuiInset=true,ResetOnSpawn=false,DisplayOrder=999})
-					local AutoFarmFrame = create("Frame",{Name='AutoFarmFrame',BackgroundColor3=Color3.fromRGB(15,15,15),Size=UDim2.fromScale(1,1),Parent=AutoFarmUI})
-					local Title = create("TextLabel",{TextColor3=Color3.fromHSV(vape.GUIColor.Hue,vape.GUIColor.Sat,vape.GUIColor.Value),Parent=AutoFarmFrame,BackgroundTransparency=1,Position=UDim2.fromScale(0.396,0.264),Size=UDim2.fromOffset(322,125),Text='AUTOWIN',FontFace=Font.new('rbxasset://fonts/families/Arimo.json',Enum.FontWeight.SemiBold,Enum.FontStyle.Italic),TextSize=32,TextScaled=true})
-					local TooltipText = create("TextLabel",{TextColor3=Color3.fromHSV(vape.GUIColor.Hue,vape.GUIColor.Sat,vape.GUIColor.Value),Parent=AutoFarmFrame,BackgroundTransparency=1,Position=UDim2.fromScale(0.435,0.596),Size=UDim2.fromOffset(200,50),Text='...',FontFace=Font.new('rbxasset://fonts/families/Arimo.json',Enum.FontWeight.Medium,Enum.FontStyle.Italic),TextSize=48})
-					create("UIStroke",{Color=Color3.fromRGB(56,56,56),Thickness=2.1,Transparency=0.22,Parent=Title})
-					create("UIStroke",{Color=Color3.fromRGB(56,56,56),Thickness=2.1,Transparency=0.22,Parent=TooltipText})
-					local num = math.floor((3 / 1.85))
-					TooltipText.Text = `checking if in empty game... ({num}s)`
-					task.wait((3 / 1.85))
-					if #playersService:GetChildren() ~= 1 then
-						num = math.floor((6 / 3.335))
-						TooltipText.Text = `player's found. Teleporting to a Empty Game.. ({num}s)`
-						lplr:Kick("Don't disconnect, this will auto teleport you!")
-						task.wait((6 / 3.335))
-						Reset()
-					else
-						repeat task.wait(0.1) until store.equippedKit ~= '' and store.matchState ~= 0 or (not NewAutoWin.Enabled)
-						MethodTwo(TooltipText)
-					end
-					
-				elseif Methods.Value == 'Method 3' then
-					local tips = {
-						"you can always be afk while you farm...",
-						"this is a tip lol...",
-						'you can always sleep while afk farming...',
-						'you have 2 other methods for auto farm...',
-						'this is the most undetected farming and best method out here...',
-						'note to bedwars dev/mods FUCK YOU...'
-					}
-					local lastTip
-					local prefix = "tip: "
-					local typeSpeed = 0.085
-					local eraseSpeed = 0.04
-					local waitBetween = 2
-					local hidden = true
-					local function AccAgeHook(txt)
-						task.spawn(function()
-							local daysTotal = math.max(lplr.AccountAge, 1)
-
-							local YEARS = 365
-							local MONTHS = 30
-							local HOURS_IN_DAY = 24
-
-							local years = math.floor(daysTotal / YEARS)
-							local remainingDays = daysTotal % YEARS
-
-							local months = math.floor(remainingDays / MONTHS)
-							local days = remainingDays % MONTHS
-
-							local hours = daysTotal == 1 and 1 or 0
-							local minutes = daysTotal == 1 and 0 or 0
-
-							local parts = {}
-
-							if years > 0 then
-								table.insert(parts, years .. (years == 1 and " year" or " years"))
-							end
-
-							if months > 0 then
-								table.insert(parts, months .. (months == 1 and " month" or " months"))
-							end
-
-							if days > 0 then
-								table.insert(parts, days .. (days == 1 and " day" or " days"))
-							end
-
-							if daysTotal <= 1 then
-								table.insert(parts, hours .. (hours == 1 and " hour" or " hours"))
-								table.insert(parts, minutes .. " minutes")
-							end
-
-							local result = table.concat(parts, ", ")
-							txt.Text = 'Account age: '..result
-						end)
-					end
-
-					local function LevelCheckHook(txt)
-						task.spawn(function()
-							while NewAutoWin.Enabled do
-								txt.Text = 'level: '..tostring(lplr:GetAttribute("PlayerLevel")) or "0"
-								task.wait(0.01)
-							end
-						end)
-					end
-					
-					local function LogoBGBGTween(image)
-						local MAX = 0.92
-						local MIN = 0.84
-
-						local tweenInfo = TweenInfo.new(
-							0.96,
-							Enum.EasingStyle.Sine,
-							Enum.EasingDirection.InOut
-						)
-
-
-						local growTween = tweenService:Create(image, tweenInfo, {
-							ImageTransparency = MAX
-						})
-
-						local shrinkTween = tweenService:Create(image, tweenInfo, {
-							ImageTransparency = MIN
-						})
-
-						task.spawn(function()
-							while NewAutoWin.Enabled do
-								growTween:Play()
-								growTween.Completed:Wait()
-
-								shrinkTween:Play()
-								shrinkTween.Completed:Wait()
-							end
-						end)
-					end
-
-					local function LogoBGTween(image)
-						local MAX = 0.95
-						local MIN = 0.9
-
-						local tweenInfo = TweenInfo.new(
-							0.96,
-							Enum.EasingStyle.Sine,
-							Enum.EasingDirection.InOut
-						)
-
-
-						local growTween = tweenService:Create(image, tweenInfo, {
-							ImageTransparency = MAX
-						})
-
-						local shrinkTween = tweenService:Create(image, tweenInfo, {
-							ImageTransparency = MIN
-						})
-
-						task.spawn(function()
-							while NewAutoWin.Enabled do
-								growTween:Play()
-								growTween.Completed:Wait()
-
-								shrinkTween:Play()
-								shrinkTween.Completed:Wait()
-							end
-						end)
-					end
-
-					local function Vig1Tween(image)
-						local MAX = 1
-						local MIN = 0.85
-
-						local tweenInfo = TweenInfo.new(
-							1.5,
-							Enum.EasingStyle.Sine,
-							Enum.EasingDirection.InOut
-						)
-
-						local growTween = tweenService:Create(image, tweenInfo, {
-							ImageTransparency = MAX
-						})
-
-						local shrinkTween = tweenService:Create(image, tweenInfo, {
-							ImageTransparency = MIN
-						})
-
-						task.spawn(function()
-							while NewAutoWin.Enabled do
-								growTween:Play()
-								growTween.Completed:Wait()
-
-								shrinkTween:Play()
-								shrinkTween.Completed:Wait()
-							end
-						end)
-					end
-
-					local function Vig2Tween(image)
-						local MAX = 0.98
-						local MIN = 0.48
-
-						local tweenInfo = TweenInfo.new(
-							1.2,
-							Enum.EasingStyle.Sine,
-							Enum.EasingDirection.InOut
-						)
-
-
-						local growTween = tweenService:Create(image, tweenInfo, {
-							ImageTransparency = MAX
-						})
-
-						local shrinkTween = tweenService:Create(image, tweenInfo, {
-							ImageTransparency = MIN
-						})
-
-						task.spawn(function()
-							while NewAutoWin.Enabled do
-								growTween:Play()
-								growTween.Completed:Wait()
-
-								shrinkTween:Play()
-								shrinkTween.Completed:Wait()
-							end
-						end)
-					end
-
-					local function username(txt,btn)
-						hidden = not hidden
-
-						if hidden then
-							txt.Text = "username: [HIDDEN]"
-							btn.BackgroundColor3 = Color3.fromRGB(236, 78, 78)
-							btn.Text = 'Reveal user'
-						else
-							txt.Text = "username: "..lplr.Name
-							btn.BackgroundColor3 = Color3.fromRGB(141, 236, 78)
-							btn.Text = 'Conceal user'
-						end
-					end
-
-					local function playTip(txt)
-						local index
-
-						if #tips > 1 then
-							repeat
-								index = math.random(1, #tips)
-							until index ~= lastTip
-						else
-							index = 1
-						end
-
-						lastTip = index
-						local tipText = tips[index]
-
-						txt.Text = prefix .. tipText
-						txt.MaxVisibleGraphemes = #prefix
-
-						for i = #prefix + 1, #prefix + #tipText do
-							txt.MaxVisibleGraphemes = i
-							task.wait(typeSpeed)
-						end
-
-						task.wait(1.5)
-
-						for i = #prefix + #tipText, #prefix, -1 do
-							txt.MaxVisibleGraphemes = i
-							task.wait(eraseSpeed)
-						end
-
-						task.wait(waitBetween)
-					end
-
-					local function StartTips(txt)
-						task.wait(2)
-						task.spawn(function()
-							while true do
-								playTip(txt)
-							end
-						end)
-					end
-
-					local function PercentUpdate(txt,per,snd)
-						per = math.clamp(per, 0, 100)
-						txt.Text = tostring(per).."%"
-						local MaxPercent = 100
-						local NewPercent = (per / MaxPercent)
-
-						local tweenInfo = TweenInfo.new(
-							0.3,
-							Enum.EasingStyle.Sine,
-							Enum.EasingDirection.Out
-						)
-
-
-						local tween = tweenService:Create(snd, tweenInfo, {
-							Size = UDim2.fromScale(NewPercent, 1)
-						})
-						tween:Play()
-						tween.Completed:Connect(function()
-							task.wait(.1)
-							tween:Destroy()
-						end)
-					end
-
-					local function hookcheck(txt,frame)
-						task.spawn(function()
-							txt:GetAttributeChangedSignal('Percent'):Connect(function()
-								PercentUpdate(txt,txt:GetAttribute("Percent"),frame)
-							end)
-						end)
-					end
-
-					local AutoFarmUI = create("ScreenGui",{Name='AutowinUI',Parent=lplr.PlayerGui,IgnoreGuiInset=true,ResetOnSpawn=false,DisplayOrder=999})
-					local MainFrame = create("Frame",{Parent=AutoFarmUI,Name='AutoFarmFrame',BackgroundColor3=Color3.fromRGB(25,25,25),Size=UDim2.fromScale(1,1)})
-					local PerFrameMain = create("Frame",{BorderSizePixel=0,Parent=MainFrame,Name='LevelFrame',BackgroundColor3=Color3.fromRGB(40,40,45),Position=UDim2.new(0.5,-150,0.5,80),Size=UDim2.fromOffset(300,3),ZIndex=2})
-					local PerFrameSecondary = create("Frame",{BackgroundColor3=Color3.fromRGB(215,215,215),BorderSizePixel=0,Parent=PerFrameMain,Name='Secondary',Size=UDim2.fromScale(0,1),ZIndex=3})
-					local PercentText = create("TextLabel",{Name='Percent',Parent=PerFrameMain,BackgroundTransparency=1,Position=UDim2.new(0.5,-50,-26.167,50),TextColor3 = Color3.fromRGB(200, 200, 200),BackgroundColor3=Color3.fromRGB(255,255,255),Size=UDim2.fromOffset(100,20),ZIndex=2,Font=Enum.Font.Code,Text='0%',TextSize=12})
-					PercentText:SetAttribute("Percent",0)
-					create("UIStroke",{Color=Color3.fromRGB(255,255,255),Transparency=0.8,Parent=PerFrameMain})
-					local XPFrameTip = create("Frame",{Name='XPFrame',BackgroundTransparency=1,Position=UDim2.fromScale(0.881,0.742),Size=UDim2.fromOffset(184,219),Parent=MainFrame})
-					local div = create("Frame",{Parent=XPFrameTip,Name='Divider',BackgroundColor3=Color3.fromRGB(56,56,56),Position=UDim2.fromScale(0.049,0.146),Size=UDim2.fromOffset(168,4)})
-					create("UICorner",{Parent = div})
-					create("TextLabel",{Name='d1',BackgroundTransparency=1,Position=UDim2.new(0.598,-110,0.288,-30),Size=UDim2.fromOffset(184,33),ZIndex=2,Font=Enum.Font.Code,Text='(Day 1) > Level 9',TextColor3=Color3.fromRGB(120,120,120),TextSize=14,TextWrapped=true,Parent = XPFrameTip})
-					create("TextLabel",{Name='d2',BackgroundTransparency=1,Position=UDim2.new(0.598, -110,0.438, -30),Size=UDim2.fromOffset(184,33),ZIndex=2,Font=Enum.Font.Code,Text='(Day 2) > Level 13',TextColor3=Color3.fromRGB(120,120,120),TextSize=14,TextWrapped=true,Parent = XPFrameTip})
-					create("TextLabel",{Name='d3',BackgroundTransparency=1,Position=UDim2.new(0.598, -110,0.589, -30),Size=UDim2.fromOffset(184,44),ZIndex=2,Font=Enum.Font.Code,Text='(Day 3) > Level 16',TextColor3=Color3.fromRGB(120,120,120),TextSize=14,TextWrapped=true,Parent = XPFrameTip})
-					create("TextLabel",{Name='d4',BackgroundTransparency=1,Position=UDim2.new(0.598, -110,0.79, -30),Size=UDim2.fromOffset(184,43),ZIndex=2,Font=Enum.Font.Code,Text='(Day 4) > Level 19',TextColor3=Color3.fromRGB(120,120,120),TextSize=14,TextWrapped=true,Parent = XPFrameTip})
-					create("TextLabel",{Name='d5',BackgroundTransparency=1,Position=UDim2.new(0.598, -110,0.986, -30),Size=UDim2.fromOffset(184,33),ZIndex=2,Font=Enum.Font.Code,Text='(Day 5) > Level 20(Rank!)',TextColor3=Color3.fromRGB(120,120,120),TextSize=14,TextWrapped=true,Parent = XPFrameTip})
-					create("TextLabel",{Name='title',BackgroundTransparency=1,Position=UDim2.new(0.598, -110,0.137, -30),Size=UDim2.fromOffset(184,33),ZIndex=2,Font=Enum.Font.Code,Text='XP Capped Level\'s',TextColor3=Color3.fromRGB(120,120,120),TextSize=18,TextWrapped=true,Parent = XPFrameTip})
-					local LogoBGBG = create("ImageLabel",{Parent=MainFrame,Name='LogoBGBG',BackgroundTransparency=1,Position=UDim2.new(0.5,-120,0.5,-170),Size=UDim2.fromOffset(240,240),Image='rbxassetid://127677235878436',ImageTransparency=0.84})
-					local LogoBG = create("ImageLabel",{Parent=LogoBGBG,Name='LogoBG',BackgroundTransparency=1,Size=UDim2.fromScale(1,1),Image='rbxassetid://127677235878436',ImageTransparency=0.95})
-					local Logo = create("ImageLabel",{Parent=LogoBG,Name='Logo',BackgroundTransparency=1,Position=UDim2.new(0.5,-100,0.708,-150),Size=UDim2.fromOffset(200,200),ZIndex=2,Image='rbxassetid://127677235878436'})
-					local Vig1 = create("ImageLabel",{Parent=MainFrame,Name='Vig1',BackgroundTransparency=1,Size=UDim2.fromScale(1,1),ZIndex=2,Image='rbxassetid://135131984221448',ImageTransparency=1})
-					local Vig2 = create("ImageLabel",{Parent=MainFrame,Name='Vig2',BackgroundTransparency=1,Size=UDim2.fromScale(2,2),Position=UDim2.fromScale(-0.474,-0.02),Rotation=90,ZIndex=2,Image='rbxassetid://135131984221448',ImageTransparency=1})
-					local AccAge = create("TextLabel",{Name='AccAge',BackgroundTransparency=1,Position=UDim2.new(0.068, -110,0.873, -30),Size=UDim2.fromOffset(184,33),ZIndex=2,Font=Enum.Font.Code,Text='Account age: ',TextColor3=Color3.fromRGB(120,120,120),TextSize=14,TextWrapped=true,Parent = MainFrame})
-					local Tip = create("TextLabel",{TextXAlignment='Left',Name='Tip',BackgroundTransparency=1,Position=UDim2.new(0.5,-300,1,-40),Size=UDim2.fromOffset(1171,20),ZIndex=2,Font=Enum.Font.Code,Text='tip: ...',TextColor3=Color3.fromRGB(130,130,130),TextSize=10,TextWrapped=true,Parent = MainFrame})
-					local Tooltip = create("TextLabel",{Name='Tooltip',BackgroundTransparency=1,Position=UDim2.new(0.5,-200,0.5,100),Size=UDim2.fromOffset(400,30),ZIndex=2,Font=Enum.Font.Code,Text='...',TextColor3=Color3.fromRGB(200,200,200),TextSize=14,TextWrapped=true,Parent = MainFrame})
-					local LvL = create("TextLabel",{Name='lvl',BackgroundTransparency=1,Position=UDim2.new(0.068, -110,0.949, -30),Size=UDim2.fromOffset(184,33),ZIndex=2,Font=Enum.Font.Code,Text='level: 0',TextColor3=Color3.fromRGB(120,120,120),TextSize=14,TextWrapped=true,Parent = MainFrame})
-					local Username = create("TextLabel",{Name='user',BackgroundTransparency=1,Position=UDim2.new(0.068, -110,0.911, -30),Size=UDim2.fromOffset(184,33),ZIndex=2,Font=Enum.Font.Code,Text='username: [HIDDEN]',TextColor3=Color3.fromRGB(120,120,120),TextSize=14,TextWrapped=true,Parent = MainFrame})
-					local UserButton = create("TextButton",{Name='btn',TextColor3=Color3.fromRGB(255,255,255),BackgroundColor3=Color3.fromRGB(236,78,78),Position=UDim2.new(4.098, 0,0, 0),Size=UDim2.fromOffset(130,26),ZIndex=1,Font=Enum.Font.Code,Text='Reveal user',TextSize=18,Parent = Username})
-					create("UICorner",{Parent = UserButton})
-
-					UserButton.Activated:Connect(function()
-						username(Username,UserButton)
-					end)
-					LevelCheckHook(LvL)
-					AccAgeHook(AccAge)
-					hookcheck(PercentText,PerFrameSecondary)
-					LogoBGTween(LogoBG)
-					LogoBGBGTween(LogoBGBG)
-					Vig1Tween(Vig1)
-					Vig2Tween(Vig2)
-					StartTips(Tip)
-					local num = math.floor((3 / 1.85))
-					Tooltip.Text = 'checking if you are in empty game...'
-					task.wait((3 / 1.85))
-					if #playersService:GetChildren() ~= 1 then
-						num = math.floor((6 / 3.335))
-						Tooltip.Text = 'player\'s found. Teleporting to a Empty Game..'
-						lplr:Kick("Don't disconnect, this will auto teleport you!")
-						task.wait((6 / 3.335))
-						Reset()
-					else
-						Tooltip.Text = 'waiting for match to start...'
-						repeat task.wait(0.1) until store.equippedKit ~= '' and store.matchState ~= 0 or (not NewAutoWin.Enabled)
-						MethodThree(Tooltip,PercentText)
-					end
-				else
-					vape:CreateNotification("AutoWin",'str64 error','warning',5.245)
-				end
-			
-			else
-				entitylib.character.Humanoid.Health = -9e9
-				if lplr.PlayerGui:FindFirstChild('AutowinUI') then
-					lplr.PlayerGui:FindFirstChild('AutowinUI'):Destroy()
-				end
-			end
-		end
-	})
-	Methods = NewAutoWin:CreateDropdown({
-		Name = "Methods",
-		List = {'Method 1', 'Method 2','Method 3'},
-		Tooltip = 'Method 1 - normal but undetected and fast\nMethod 2 - faster and blocks people who join(with autolobby) and even more undetected!\n Method 3 - same as method 2 but has faster and better player detections'
-	})
-	gui = NewAutoWin:CreateToggle({
-		Name = "Gui",
-		Default = true,
-		Function = function(v)
-			if lplr.PlayerGui:FindFirstChild('AutowinUI') then
-				lplr.PlayerGui:FindFirstChild('AutowinUI').Enabled = v
-			end
-		end
-	})
-end)
-
-
 Tun(function() -- keep this if ur a dev this disables speed n fly whenever you anti cheat
 	local whitelist = loadstring(downloadFile('ReVape/games/whitelist.lua'), 'whitelist')()	
 	if not isnetworkowner(entitylib.character.RootPart) then
@@ -19436,7 +18571,8 @@ Tun(function()
 	end	
 end)
 
-Tun(function() -- keep this if ur a dev this fixes the cannon if u have a glitched cannon ANNOYING ASF BRO
+
+Tun(function()
 	if bedwars.CannonLaunch == nil or bedwars.CannonLaunch == '' then
 		bedwars.CannonLaunch = {}
 		function bedwars.CannonLaunch:CallServer(self)
@@ -19457,198 +18593,5 @@ Tun(function() -- keep this if ur a dev this fixes the cannon if u have a glitch
 			end
 			return false
 		end
-	end
-end)
-
-Tun(function()
-	if getgenv().TestMode then
-		vape:Remove('StorageESP')
-run(function()
-	local StorageESP
-	local Amount
-	local TeamCheck
-	local Notify
-	local List
-	local Background
-	local Color = {}
-	local Reference = {}
-	local Folder = Instance.new('Folder')
-	Folder.Parent = vape.gui
-	
-	local function nearStorageItem(item)
-		for _, v in List.ListEnabled do
-			if item:find(v) then return v end
-		end
-	end
-	
-	local function refreshAdornee(v)
-		local chest = v.Adornee:FindFirstChild('ChestFolderValue')
-		chest = chest and chest.Value or nil
-		if not chest then
-			v.Enabled = false
-			return
-		end
-	
-		local chestitems = chest and chest:GetChildren() or {}
-		for _, obj in v.Frame:GetChildren() do
-			if obj:IsA('ImageLabel') and obj.Name ~= 'Blur' then
-				obj:Destroy()
-			end
-		end
-	
-		v.Enabled = false
-		local alreadygot = {}
-		for _, item in chestitems do
-			if not alreadygot[item.Name] and (table.find(List.ListEnabled, item.Name) or nearStorageItem(item.Name)) then
-				alreadygot[item.Name] = true
-				v.Enabled = true
-				local blockimage = Instance.new('ImageLabel')
-				blockimage.Size = UDim2.fromOffset(32, 32)
-				blockimage.BackgroundTransparency = 1
-				blockimage.Image = bedwars.getIcon({itemType = item.Name}, true)
-				blockimage.Parent = v.Frame
-			end
-			if Amount.Enabled then
-				local amount = item:GetAttribute('Amount') or 0
-				if amount > 1 then
-					local countLabel = Instance.new('TextLabel')
-					countLabel.Size = UDim2.fromScale(1, 1)
-					countLabel.BackgroundTransparency = 1
-					countLabel.Text = tostring(amount)
-					countLabel.TextColor3 = Color3.new(1, 1, 1)
-					countLabel.TextStrokeTransparency = 0
-					countLabel.TextScaled = true
-					countLabel.Font = Enum.Font.GothamBold
-					countLabel.Parent = v.Frame
-				end
-			end
-		end
-		table.clear(chestitems)
-	end
-	
-	local function Added(v)
-		local chest = v:WaitForChild('ChestFolderValue', 3)
-		if not (chest and StorageESP.Enabled) then return end
-		chest = chest.Value
-		if TeamCheck.Enabled then
-			local currentTeam = v:GetAttribute('Team') or 0
-			local lplrTeam = lplr.Character:GetAttribute('Team') or -1
-			if currentTeam == lplrTeam then
-				return
-			end
-		end		
-		local billboard = Instance.new('BillboardGui')
-		billboard.Parent = Folder
-		billboard.Name = 'chest'
-		billboard.StudsOffsetWorldSpace = Vector3.new(0, 3, 0)
-		billboard.Size = UDim2.fromOffset(36, 36)
-		billboard.AlwaysOnTop = true
-		billboard.ClipsDescendants = false
-		billboard.Adornee = v
-		local blur = addBlur(billboard)
-		blur.Visible = Background.Enabled
-		local frame = Instance.new('Frame')
-		frame.Size = UDim2.fromScale(1, 1)
-		frame.BackgroundColor3 = Color3.fromHSV(Color.Hue, Color.Sat, Color.Value)
-		frame.BackgroundTransparency = 1 - (Background.Enabled and Color.Opacity or 0)
-		frame.Parent = billboard
-		local layout = Instance.new('UIListLayout')
-		layout.FillDirection = Enum.FillDirection.Horizontal
-		layout.Padding = UDim.new(0, 4)
-		layout.VerticalAlignment = Enum.VerticalAlignment.Center
-		layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-		layout:GetPropertyChangedSignal('AbsoluteContentSize'):Connect(function()
-			billboard.Size = UDim2.fromOffset(math.max(layout.AbsoluteContentSize.X + 4, 36), 36)
-		end)
-		layout.Parent = frame
-		local corner = Instance.new('UICorner')
-		corner.CornerRadius = UDim.new(0, 4)
-		corner.Parent = frame
-		Reference[v] = billboard
-		StorageESP:Clean(chest.ChildAdded:Connect(function(item)
-			if Notify.Enabled then
-				vape:CreateNotification("StorageESP",`New object is added {item.Name}`,6)
-			end
-			if table.find(List.ListEnabled, item.Name) or nearStorageItem(item.Name) then
-				refreshAdornee(billboard)
-			end
-		end))
-		StorageESP:Clean(chest.ChildRemoved:Connect(function(item)
-			if table.find(List.ListEnabled, item.Name) or nearStorageItem(item.Name) then
-				refreshAdornee(billboard)
-			end
-		end))
-		task.spawn(refreshAdornee, billboard)
-	end
-	
-	StorageESP = vape.Categories.Render:CreateModule({
-		Name = 'StorageESP',
-		Function = function(callback)
-			if callback then
-				StorageESP:Clean(collectionService:GetInstanceAddedSignal('chest'):Connect(Added))
-				for _, v in collectionService:GetTagged('chest') do
-
-
-					task.spawn(Added, v)
-				end
-			else
-				table.clear(Reference)
-				Folder:ClearAllChildren()
-			end
-		end,
-		Tooltip = 'Displays items in chests'
-	})
-	Notify = StorageESP:CreateToggle({
-		Name = "Notify",
-		Default = false
-	})
-
-	TeamCheck = StorageESP:CreateToggle({
-		Name = "Team Check",
-		Default = false
-	})
-
-	Amount = StorageESP:CreateToggle({
-		Name = "Amount",
-		Default = true
-	})	
-
-	List = StorageESP:CreateTextList({
-		Name = 'Item',
-		Function = function()
-			for _, v in Reference do
-				task.spawn(refreshAdornee, v)
-			end
-		end
-	})
-	Background = StorageESP:CreateToggle({
-		Name = 'Background',
-		Function = function(callback)
-			if Color.Object then Color.Object.Visible = callback end
-			for _, v in Reference do
-				v.Frame.BackgroundTransparency = 1 - (callback and Color.Opacity or 0)
-				v.Blur.Visible = callback
-			end
-		end,
-		Default = true
-	})
-	Color = StorageESP:CreateColorSlider({
-		Name = 'Background Color',
-		DefaultValue = 0,
-		DefaultOpacity = 0.5,
-		Function = function(hue, sat, val, opacity)
-			for _, v in Reference do
-				v.Frame.BackgroundColor3 = Color3.fromHSV(hue, sat, val)
-				v.Frame.BackgroundTransparency = 1 - opacity
-			end
-		end,
-		Darker = true
-	})
-	Loot = StorageESP:CreateToggle({
-		Name = "Loot",
-		Default = false,
-		Tooltip = 'this shows how much loot is in iron or diamonds'
-	})	
-end)
 	end
 end)
