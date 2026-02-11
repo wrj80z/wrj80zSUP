@@ -6952,7 +6952,7 @@ run(function()
 	Range = Breaker:CreateSlider({ 
 		Name = "Break range", 
 		Min = 1, 
-		ax = 30, 
+		Max = 30, 
 		Default = 30 
 	})
 	Delay = Breaker:CreateSlider({ 
