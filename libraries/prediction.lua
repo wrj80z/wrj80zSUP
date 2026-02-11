@@ -1,4 +1,3 @@
-
 --[[
 	Prediction Library
 	Source: https://devforum.roblox.com/t/predict-projectile-ballistics-including-gravity-and-motion/1842434
@@ -9,11 +8,13 @@
 local module = {}
 local eps = 1e-9
 local oldthread = 0
-if getthreadidentity and setthreadidentity or vape.ThreadFix then
-	oldthread = getthreadidentity()
+
+if (getthreadidentity and setthreadidentity) or vape and vape.ThreadFix then
+	oldthread = getthreadidentity and getthreadidentity() or 0
 else
 	oldthread = 0
 end
+
 local cloneref = cloneref or function(obj)
 	return obj
 end
@@ -30,6 +31,7 @@ local function cuberoot(x)
 end
 
 local function solveQuadric(c0, c1, c2)
+	if not c0 or c0 == 0 then return end
 	local p = c1 / (2 * c0)
 	local q = c2 / c0
 	local D = p*p - q
@@ -45,6 +47,8 @@ local function solveQuadric(c0, c1, c2)
 end
 
 local function solveCubic(c0, c1, c2, c3)
+	if not c0 or c0 == 0 then return end
+
 	local A = c1 / c0
 	local B = c2 / c0
 	local C = c3 / c0
@@ -86,6 +90,8 @@ local function solveCubic(c0, c1, c2, c3)
 end
 
 function module.solveQuartic(c0, c1, c2, c3, c4)
+	if not c0 or c0 == 0 then return end
+
 	local A = c1 / c0
 	local B = c2 / c0
 	local C = c3 / c0
@@ -96,8 +102,8 @@ function module.solveQuartic(c0, c1, c2, c3, c4)
 	local q = 0.125*sqA*A - 0.5*A*B + C
 	local r = -(3/256)*sqA*sqA + 0.0625*sqA*B - 0.25*A*C + D
 
-	local s0, s1, s2, s3
 	local coeffs = {}
+	local s0, s1, s2, s3
 
 	if isZero(r) then
 		coeffs = {1, 0, p, q}
@@ -118,12 +124,8 @@ function module.solveQuartic(c0, c1, c2, c3, c4)
 		u = isZero(u) and 0 or math.sqrt(u)
 		v = isZero(v) and 0 or math.sqrt(v)
 
-		local function quad(a, b)
-			return solveQuadric(1, b, a)
-		end
-
-		s0, s1 = quad(z - u, q < 0 and -v or v)
-		s2, s3 = quad(z + u, q < 0 and v or -v)
+		s0, s1 = solveQuadric(1, q < 0 and -v or v, z - u)
+		s2, s3 = solveQuadric(1, q < 0 and v or -v, z + u)
 	end
 
 	local sub = A * 0.25
@@ -135,8 +137,6 @@ function module.solveQuartic(c0, c1, c2, c3, c4)
 	return {s0, s1, s2, s3}
 end
 
-
-
 local function distanceScale(dist)
 	return math.clamp(1 + (dist - 80) / 480, 1, 1.75)
 end
@@ -146,9 +146,23 @@ local function timeScale(t)
 end
 
 local lastVelocity = {}
-
 local function getSmoothedVelocity(player, part)
-	local id = player.UserId
+	if not part or not part:IsA("BasePart") then
+		return Vector3.zero
+	end
+
+	local realPlayer
+	if player and player:IsA("Player") then
+		realPlayer = player
+	elseif player then
+		realPlayer = playersService:GetPlayerFromCharacter(player)
+	end
+
+	if not realPlayer then
+		return part.AssemblyLinearVelocity
+	end
+
+	local id = realPlayer.UserId
 	local vel = part.AssemblyLinearVelocity
 
 	if lastVelocity[id] then
@@ -160,13 +174,13 @@ local function getSmoothedVelocity(player, part)
 end
 
 local function getPingSeconds()
-	local p = lplr:GetNetworkPing()
+	local p = lplr and lplr:GetNetworkPing() or 0.01
 	return (p > 0 and p) or 0.01
 end
 
 function module.predictStrafingMovement(targetPlayer, targetPart, projSpeed, gravity, origin)
-	if not targetPlayer or not targetPlayer.Character or not targetPart then
-		return targetPart and targetPart.Position or Vector3.zero
+	if not targetPart or not targetPart:IsA("BasePart") then
+		return Vector3.zero
 	end
 
 	local pos = targetPart.Position
@@ -210,16 +224,21 @@ local function predictWithPing(targetPlayer, targetPart, projSpeed, gravity, ori
 	return base + lead
 end
 
-function module.SolveTrajectory(origin,projectileSpeed,gravity,targetPos,targetVelocity,playerGravity,playerHeight,playerJump,params,targetPlayer,targetPart)
-	local newPOS = nil
-	task.spawn(function()
-		if getthreadidentity and setthreadidentity or vape.ThreadFix then
+function module.SolveTrajectory(origin, projectileSpeed, gravity, targetPos, targetVelocity, playerGravity, playerHeight, playerJump, params, targetPlayer, targetPart)
+
+	if (getthreadidentity and setthreadidentity) or vape and vape.ThreadFix then
+		task.spawn(function()
 			setthreadidentity(8)
-		end
-	end)	
-	if targetPlayer then
+		end)
+	end	
+
+	if targetPlayer and targetPart then
 		targetPos = predictWithPing(targetPlayer, targetPart, projectileSpeed, gravity, origin)
 		targetVelocity = getSmoothedVelocity(targetPlayer, targetPart)
+	end
+
+	if not targetPos or not targetVelocity then
+		return targetPos
 	end
 
 	local disp = targetPos - origin
@@ -231,21 +250,26 @@ function module.SolveTrajectory(origin,projectileSpeed,gravity,targetPos,targetV
 	local h, j, k = disp.X, disp.Y, disp.Z
 	local l = -0.5 * gravity
 
-	local solutions = module.solveQuartic(l*l,-2*q*l,q*q - 2*j*l - projectileSpeed^2 + p*p + r*r,2*j*q + 2*h*p + 2*k*r,j*j + h*h + k*k)
+	local solutions = module.solveQuartic(
+		l*l,
+		-2*q*l,
+		q*q - 2*j*l - projectileSpeed^2 + p*p + r*r,
+		2*j*q + 2*h*p + 2*k*r,
+		j*j + h*h + k*k
+	)
+
+	local newPOS
 
 	if solutions then
 		local bestT
 		for _, t in ipairs(solutions) do
-			if t and t > 0 then
-				if not bestT or t < bestT then
-					bestT = t
-				end
+			if t and t > 0 and (not bestT or t < bestT) then
+				bestT = t
 			end
 		end
 
 		if bestT then
 			local t = bestT * timeScale(bestT)
-
 			local vx = (h + p*t) / t
 			local vy = (j + q*t - l*t*t) / t
 			local vz = (k + r*t) / t
@@ -256,13 +280,14 @@ function module.SolveTrajectory(origin,projectileSpeed,gravity,targetPos,targetV
 		local t = disp.Magnitude / projectileSpeed
 		newPOS = origin + disp + targetVelocity * t
 	end
-	task.spawn(function()
-		if getthreadidentity and setthreadidentity or vape.ThreadFix then
+
+	if (getthreadidentity and setthreadidentity) or vape and vape.ThreadFix then
+		task.spawn(function()
 			setthreadidentity(oldthread)
-		end
-	end)
-	return newPOS	
+		end)
+	end
+
+	return newPOS
 end
 
 return module
-
