@@ -7903,6 +7903,7 @@ run(function()
 							if AS.Enabled then
 								local pickaxe = getPickaxeSlot()
 								if hotbarSwitch(pickaxe) or store.hand.tool.Name:lower():find("pickaxe") then
+									print('broken')
 									bedwars.breakBlock(child)
 									bedwars.breakBlock(child)
 								end
