@@ -17719,6 +17719,12 @@ run(function()
 		Default = 1.5,
 		Decimal = 5,
 	})
+	Color = BedAlarm:CreateColorSlider({
+		Name = 'Background Color',
+		DefaultValue = 0,
+		DefaultOpacity = 0.5,
+		Darker = true
+	})
 	HightlightOption = BedAlarm:CreateToggle({
 		Name = "Hightlight players",
 		Default = true,
@@ -17726,12 +17732,7 @@ run(function()
 			if Color.Object then Color.Object.Visible = callback end
 		end
 	})
-	Color = BedAlarm:CreateColorSlider({
-		Name = 'Background Color',
-		DefaultValue = 0,
-		DefaultOpacity = 0.5,
-		Darker = true
-	})
+
 
 end)
 
