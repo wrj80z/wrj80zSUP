@@ -7661,101 +7661,101 @@ run(function()
     local kitLabels = {}
     local updateDebounce = {}
     local retryThread = nil
+    local playerMonitorThread = nil
+    local processedPlayers = {}
     
     KitRender = vape.Categories.Utility:CreateModule({
-        Name = "KitRender ",
+        Name = "KitRender",
         Function = function(callback)   
             if callback then
+                local function createKitLabel(parent, kitImage)
+                    if kitLabels[parent] then
+                        kitLabels[parent]:Destroy()
+                    end
+                    
+                    local kitLabel = Instance.new("ImageLabel")
+                    kitLabel.Name = "OnyxKitIcon"
+                    kitLabel.Size = UDim2.new(1, 0, 1, 0)
+                    kitLabel.Position = UDim2.new(1.1, 0, 0, 0)
+                    kitLabel.BackgroundTransparency = 1
+                    kitLabel.Image = kitImage
+                    kitLabel.Parent = parent
+                    
+                    kitLabels[parent] = kitLabel
+                    return kitLabel
+                end
+                
+                local function setupKitRender(obj)
+                    if obj.Name == "PlayerRender" and obj.Parent and obj.Parent.Parent and obj.Parent.Parent.Parent and obj.Parent.Parent.Parent.Parent and obj.Parent.Parent.Parent.Parent.Parent and obj.Parent.Parent.Parent.Parent.Parent.Name == "MatchDraftTeamCardRow" then
+                        local Rank = obj.Parent:FindFirstChild('3')
+                        if not Rank then return end
+                        
+                        local userId = string.match(obj.Image, "id=(%d+)")
+                        if not userId then return end
+                        
+                        local id = tonumber(userId)
+                        if not id then return end
+                        
+                        local plr = playersService:GetPlayerByUserId(id)
+                        if not plr then return end
+                        
+                        local loopKey = plr.UserId
+                        
+                        processedPlayers[loopKey] = true
+                        
+                        if activeConnections[loopKey] then
+                            activeConnections[loopKey]:Disconnect()
+                            activeConnections[loopKey] = nil
+                        end
+                        
+                        local function updateKit()
+                            if not KitRender.Enabled then return end
+                            if not Rank or not Rank.Parent then
+                                if activeConnections[loopKey] then
+                                    activeConnections[loopKey]:Disconnect()
+                                    activeConnections[loopKey] = nil
+                                end
+                                if kitLabels[Rank] then
+                                    kitLabels[Rank]:Destroy()
+                                    kitLabels[Rank] = nil
+                                end
+                                return
+                            end
+                            
+                            local kitName = plr:GetAttribute("PlayingAsKits")
+                            if not kitName then
+                                kitName = "none"
+                            end
+                            
+                            local render = bedwars.BedwarsKitMeta[kitName] or bedwars.BedwarsKitMeta.none
+                            
+                            if kitLabels[Rank] then
+                                kitLabels[Rank].Image = render.renderImage
+                            else
+                                createKitLabel(Rank, render.renderImage)
+                            end
+                        end
+                        
+                        updateKit()
+                        
+                        local connection = plr:GetAttributeChangedSignal("PlayingAsKits"):Connect(function()
+                            local currentTick = tick()
+                            
+                            if not updateDebounce[loopKey] or (currentTick - updateDebounce[loopKey]) >= 0.1 then
+                                updateDebounce[loopKey] = currentTick
+                                updateKit()
+                            end
+                        end)
+                        
+                        activeConnections[loopKey] = connection
+                        KitRender:Clean(connection)
+                    end
+                end
+                
                 local function setupSquadsRender()
                     local teams = lplr.PlayerGui:FindFirstChild("MatchDraftApp")
                     if not teams then
                         return false
-                    end
-                    
-                    local function createKitLabel(parent, kitImage)
-                        if kitLabels[parent] then
-                            kitLabels[parent]:Destroy()
-                        end
-                        
-                        local kitLabel = Instance.new("ImageLabel")
-                        kitLabel.Name = "OnyxKitIcon"
-                        kitLabel.Size = UDim2.new(1, 0, 1, 0)
-                        kitLabel.Position = UDim2.new(1.1, 0, 0, 0)
-                        kitLabel.BackgroundTransparency = 1
-                        kitLabel.Image = kitImage
-                        kitLabel.Parent = parent
-                        
-                        kitLabels[parent] = kitLabel
-                        return kitLabel
-                    end
-                    
-                    local function setupKitRender(obj)
-                        if obj.Name == "PlayerRender" and obj.Parent and obj.Parent.Parent and obj.Parent.Parent.Parent and obj.Parent.Parent.Parent.Parent and obj.Parent.Parent.Parent.Parent.Parent and obj.Parent.Parent.Parent.Parent.Parent.Name == "MatchDraftTeamCardRow" then
-                            local Rank = obj.Parent:FindFirstChild('3')
-                            if not Rank then return end
-                            
-                            if kitLabels[Rank] then
-                                return
-                            end
-                            
-                            local userId = string.match(obj.Image, "id=(%d+)")
-                            if not userId then return end
-                            
-                            local id = tonumber(userId)
-                            if not id then return end
-                            
-                            local plr = playersService:GetPlayerByUserId(id)
-                            if not plr then return end
-                            
-                            local loopKey = plr.UserId
-                            
-                            if activeConnections[loopKey] then
-                                activeConnections[loopKey]:Disconnect()
-                                activeConnections[loopKey] = nil
-                            end
-                            
-                            local function updateKit()
-                                if not KitRender.Enabled then return end
-                                if not Rank or not Rank.Parent then
-                                    if activeConnections[loopKey] then
-                                        activeConnections[loopKey]:Disconnect()
-                                        activeConnections[loopKey] = nil
-                                    end
-                                    if kitLabels[Rank] then
-                                        kitLabels[Rank]:Destroy()
-                                        kitLabels[Rank] = nil
-                                    end
-                                    return
-                                end
-                                
-                                local kitName = plr:GetAttribute("PlayingAsKits")
-                                if not kitName then
-                                    kitName = "none"
-                                end
-                                
-                                local render = bedwars.BedwarsKitMeta[kitName] or bedwars.BedwarsKitMeta.none
-                                
-                                if kitLabels[Rank] then
-                                    kitLabels[Rank].Image = render.renderImage
-                                else
-                                    createKitLabel(Rank, render.renderImage)
-                                end
-                            end
-                            
-                            updateKit()
-                            
-                            local connection = plr:GetAttributeChangedSignal("PlayingAsKits"):Connect(function()
-                                local currentTick = tick()
-                                
-                                if not updateDebounce[loopKey] or (currentTick - updateDebounce[loopKey]) >= 0.1 then
-                                    updateDebounce[loopKey] = currentTick
-                                    updateKit()
-                                end
-                            end)
-                            
-                            activeConnections[loopKey] = connection
-                            KitRender:Clean(connection)
-                        end
                     end
                     
                     task.wait(0.5)
@@ -7778,6 +7778,29 @@ run(function()
                     return true
                 end
                 
+                playerMonitorThread = task.spawn(function()
+                    while KitRender.Enabled do
+                        task.wait(0.5)
+                        
+                        local teams = lplr.PlayerGui:FindFirstChild("MatchDraftApp")
+                        if teams then
+                            for _, obj in teams:GetDescendants() do
+                                if obj.Name == "PlayerRender" and KitRender.Enabled then
+                                    local userId = string.match(obj.Image, "id=(%d+)")
+                                    if userId then
+                                        local id = tonumber(userId)
+                                        if id and not processedPlayers[id] then
+                                            task.spawn(function()
+                                                setupKitRender(obj)
+                                            end)
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end)
+                
                 task.spawn(function()
                     local success = setupSquadsRender()
                     
@@ -7798,6 +7821,11 @@ run(function()
                     retryThread = nil
                 end
                 
+                if playerMonitorThread then
+                    task.cancel(playerMonitorThread)
+                    playerMonitorThread = nil
+                end
+                
                 for key, connection in pairs(activeConnections) do
                     if connection then
                         connection:Disconnect()
@@ -7813,6 +7841,7 @@ run(function()
                 end
                 
                 table.clear(updateDebounce)
+                table.clear(processedPlayers)
             end
         end,
         Tooltip = "Shows everyone's kit next to their rank during kit phase (squads ranked!)"
