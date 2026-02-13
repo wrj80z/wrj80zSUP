@@ -19523,3 +19523,46 @@ run(function()
 		end
 	})
 end)
+
+run(function()
+    if store.queueType ~= "bridge_duel" then
+        return
+    end
+    local AutoWin
+    AutoWin = vape.Categories.AltFarm:CreateModule({
+        Name = "BridgeAutoWin",
+        Function = function(callback)
+            if callback then
+                if #playersService:GetPlayers() > 1 then
+                    lplr:Kick("dont disconnect this will auto tp you in (0.05)s")
+                    task.wait(0.0001)
+                    local TeleportService = game:GetService("TeleportService")
+                    local data = TeleportService:GetLocalPlayerTeleportData()
+                    TeleportService:Teleport(game.PlaceId, game.Players.LocalPlayer, data)
+                end
+                for i, v in workspace:GetChildren() do
+                    if v.Name == "BridgeDuelTouchdownZone" then
+                        if  v:GetAttribute("TouchdownZoneTeamID") ~= game.Players.LocalPlayer.Character:GetAttribute("Team") then
+                            vape:CreateNotification("BridgeAutoWin", "This will wait (8s) for the match to fully start!", 8, "warning")
+                            task.wait(8)
+                            local character = game.Players.LocalPlayer.Character
+                            local hrp = character.HumanoidRootPart
+                            local targetPart = v
+                            firetouchinterest(hrp, targetPart, 1)
+                            task.wait(0.0001)
+                            firetouchinterest(hrp, targetPart, 0)
+                            task.wait(0.5)
+                            lplr:Kick("dont disconnect this will auto tp you in (1.23)s")
+                            task.wait(1.23)
+                            local TeleportService = game:GetService("TeleportService")
+                            local data = TeleportService:GetLocalPlayerTeleportData()
+                            TeleportService:Teleport(game.PlaceId, game.Players.LocalPlayer, data)
+                        end
+                    end
+                end
+            else
+                lplr.Character.Humanoid.Health = 0
+            end
+        end
+    })
+end)
