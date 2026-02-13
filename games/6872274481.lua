@@ -12709,7 +12709,7 @@ run(function()
 							end
 
 							ClientEffects:Clean(blocksFolder.ChildAdded:Connect(function(child)
-								if child.Name == TARGET_NAME then
+								if child.Name == TARGET_NAME and child:GetAttribute('PlacedByUserId') == lplr.UserId then
 									task.wait()
 									attachReskinTo(child, OFFSET_PLACED)
 									task.wait()
