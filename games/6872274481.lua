@@ -19533,6 +19533,7 @@ run(function()
         Name = "BridgeAutoWin",
         Function = function(callback)
             if callback then
+				repeat task.wait(0.1) until store.equippedKit ~= '' and store.matchState ~= 0 or (not AutoWin.Enabled)																												
                 if #playersService:GetPlayers() > 1 then
                     lplr:Kick("dont disconnect this will auto tp you in (0.05)s")
                     task.wait(0.0001)
