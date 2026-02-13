@@ -19525,6 +19525,11 @@ run(function()
 end)
 
 run(function()
+	task.spawn(function()
+		pcall(function()
+			vape:Remove('BridgeAutoWin')
+		end)
+	end)
     if store.queueType ~= "bridge_duel" then
         return
     end
