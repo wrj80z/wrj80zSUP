@@ -19534,13 +19534,6 @@ run(function()
         Function = function(callback)
             if callback then
 				repeat task.wait(0.1) until store.equippedKit ~= '' and store.matchState ~= 0 or (not AutoWin.Enabled)																												
-                if #playersService:GetPlayers() > 1 then
-                    lplr:Kick("dont disconnect this will auto tp you in (0.05)s")
-                    task.wait(0.0001)
-                    local TeleportService = game:GetService("TeleportService")
-                    local data = TeleportService:GetLocalPlayerTeleportData()
-                    TeleportService:Teleport(game.PlaceId, game.Players.LocalPlayer, data)
-                end
                 for i, v in workspace:GetChildren() do
                     if v.Name == "BridgeDuelTouchdownZone" then
                         if  v:GetAttribute("TouchdownZoneTeamID") ~= game.Players.LocalPlayer.Character:GetAttribute("Team") then
