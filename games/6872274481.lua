@@ -6859,8 +6859,8 @@ run(function()
 		return false
 	end
 	
-	Breaker = vape.Categories.Minigames:CreateModule({
-		Name = 'Breaker',
+	Breaker = vape.Categories.World:CreateModule({
+		Name = 'Nuker',
 		Function = function(callback)
 			if callback then
 				for _ = 1, 30 do
