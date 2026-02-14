@@ -3079,6 +3079,7 @@ run(function()
 						Wallcheck = Targets.Walls.Enabled,
 						Origin = entitylib.isAlive and (shootpos or entitylib.character.RootPart.Position) or Vector3.zero
 					})
+					print(plr,game.HttpService:JSONEncode(plr))																													
 					if ForestPriority.Enabled then
 						for _, ent in pairs(entitylib.List) do
 							if ent.Character and ent.HumanoidRootPart and ent ~= entitylib.character and HasSeed(ent.Character) then
@@ -3126,7 +3127,7 @@ run(function()
 					local calc
 					if BA.Enabled then
 						if Ping.Enabled then
-							calc = prediction.SolveTrajectory(newlook.p,projSpeed,gravity,plr[TargetPart.Value].Position,plr[TargetPart.Value].Velocity,playerGravity,plr.HipHeight,plr.Jumping and 42.6 or nil,rayCheck,plr,plr[TargetPart.Value])
+							calc = prediction.SolveTrajectory(newlook.p,projSpeed,gravity,plr[TargetPart.Value].Position,plr[TargetPart.Value].Velocity,playerGravity,plr.HipHeight,plr.Jumping and 42.6 or nil,rayCheck,plr,plr:FindFirstChild(TargetPart.Value))
 						else
 							calc = prediction.SolveTrajectory(newlook.p,projSpeed,gravity,plr[TargetPart.Value].Position,plr[TargetPart.Value].Velocity,playerGravity,plr.HipHeight,plr.Jumping and 42.6 or nil,rayCheck)
 						end
