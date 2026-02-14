@@ -3126,10 +3126,10 @@ run(function()
 					local calc
 					if BA.Enabled then
 						if Ping.Enabled then
-							calc = prediction.SolveTrajectory(newlook.p,projSpeed,gravity,plr[TargetPart.Value].Position,plr[TargetPart.Value].Velocity,playerGravity,plr.HipHeight,plr.Jumping and 42.6 or nil,rayCheck,)
+							local targetChar = playersService:GetPlayerFromCharacter(plr.Character)
+							local targetPartFromChar = targetChar[TargetPart.Value]																													
+							calc = prediction.SolveTrajectory(newlook.p,projSpeed,gravity,plr[TargetPart.Value].Position,plr[TargetPart.Value].Velocity,playerGravity,plr.HipHeight,plr.Jumping and 42.6 or nil,rayCheck,targetChar,targetPartFromChar)
 						else
-							print(plr)
-							warn(httpService:JSONEncode(plr))
 							calc = prediction.SolveTrajectory(newlook.p,projSpeed,gravity,plr[TargetPart.Value].Position,plr[TargetPart.Value].Velocity,playerGravity,plr.HipHeight,plr.Jumping and 42.6 or nil,rayCheck)
 						end
 					else
