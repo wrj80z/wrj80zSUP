@@ -6711,7 +6711,6 @@ if CheckExecutor == nil or CheckExecutor == '' then
 end
 if CheckExecutor ~= 'Potassium' and CheckExecutor ~= 'shitsploit' then
 run(function()
-	local Breaker
 	local Range
 	local BreakSpeed
 	local UpdateRate
@@ -6859,7 +6858,7 @@ run(function()
 		return false
 	end
 	
-	Breaker = vape.Categories.World:CreateModule({
+	Breaker = vape.Categories.Utility:CreateModule({
 		Name = 'Nuker',
 		Function = function(callback)
 			if callback then
