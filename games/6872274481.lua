@@ -6862,6 +6862,7 @@ run(function()
 		Name = 'Nuker',
 		Function = function(callback)
 			if callback then
+				repeat task.wait() until store.matchState ~= 0 or not Breaker.Enabled																																																																														
 				for _ = 1, 30 do
 					local part = Instance.new('Part')
 					part.Anchored = true
