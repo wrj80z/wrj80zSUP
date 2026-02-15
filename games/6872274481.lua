@@ -20143,8 +20143,11 @@ run(function()
 
 	local function setUpUIAK(kit,sets)
 		for i, v in sets do
-			if v.Visible then
-				v.Visible = false
+			if v then
+				if v.Object then
+					v.Object.Visible = false
+				end
+				sets[i] = nil
 			end
 		end
 		local ak = AutoKit
