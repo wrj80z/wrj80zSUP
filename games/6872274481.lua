@@ -3128,6 +3128,9 @@ run(function()
 						if Ping.Enabled then
 							local targetChar = playersService:GetPlayerFromCharacter(plr.Character)
 							local targetPartFromChar = targetChar[TargetPart.Value]																													
+							if TargetPart.Value == 'RootPart' then
+								targetPartFromChar = targetChar:FindFirstChild('HumanoidRootPart')
+							end																														
 							calc = prediction.SolveTrajectory(newlook.p,projSpeed,gravity,plr[TargetPart.Value].Position,plr[TargetPart.Value].Velocity,playerGravity,plr.HipHeight,plr.Jumping and 42.6 or nil,rayCheck,targetChar,targetPartFromChar)
 						else
 							calc = prediction.SolveTrajectory(newlook.p,projSpeed,gravity,plr[TargetPart.Value].Position,plr[TargetPart.Value].Velocity,playerGravity,plr.HipHeight,plr.Jumping and 42.6 or nil,rayCheck)
@@ -3138,7 +3141,7 @@ run(function()
 					if not calc then
 						return old(...)
 					end
-					local HC = HitChance.Value >= 100 and 0 or ((HitChance.Value / 500) + math.random(1,3) + math.random())
+					local HC = HitChance.Value >= 100 and 0 or ((HitChance.Value / 50) + math.random(1,3) + math.random())
 					local DDS = AutoCharge.Enabled and ((ChargePercent.Value / 100) * 0.58) or 5
 					return {
 						initialVelocity = CFrame.new(newlook.Position, calc).LookVector * projSpeed,
