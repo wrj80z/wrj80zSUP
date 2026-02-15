@@ -3126,16 +3126,17 @@ run(function()
 					local calc
 					if BA.Enabled then
 						if Ping.Enabled then
-							local targetChar = playersService:GetPlayerFromCharacter(plr.Character)
-							local targetPartFromChar = nil
-							if TargetPart.Value == 'RootPart' then
-								targetPartFromChar = targetChar:FindFirstChild('HumanoidRootPart')
-							elseif TargetPart.Value == 'Head' then
-								targetPartFromChar = targetChar:FindFirstChild('Head')
+							local targetChar = plr.Character or plr
+							if not targetChar then return end
+							local targetPartFromChar
+							if TargetPart.Value == "RootPart" then
+								targetPartFromChar = targetChar:FindFirstChild("HumanoidRootPart")
+							elseif TargetPart.Value == "Head" then
+								targetPartFromChar = targetChar:FindFirstChild("Head")
 							else
-								targetPartFromChar = targetChar:FindFirstChild('HumanoidRootPart')																													
+								targetPartFromChar = targetChar:FindFirstChild("HumanoidRootPart")
 							end
-							print(targetPartFromChar,targetPartFromChar.Name)																													
+							if not targetPartFromChar then return end
 							calc = prediction.SolveTrajectory(newlook.p,projSpeed,gravity,plr[TargetPart.Value].Position,plr[TargetPart.Value].Velocity,playerGravity,plr.HipHeight,plr.Jumping and 42.6 or nil,rayCheck,targetChar,targetPartFromChar)
 						else
 							calc = prediction.SolveTrajectory(newlook.p,projSpeed,gravity,plr[TargetPart.Value].Position,plr[TargetPart.Value].Velocity,playerGravity,plr.HipHeight,plr.Jumping and 42.6 or nil,rayCheck)
