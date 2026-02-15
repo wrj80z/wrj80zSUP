@@ -19896,7 +19896,7 @@ run(function()
 		spearman = {
 			Range = nil,
 			Limits = nil,
-			Wallcheck nil,
+			Wallcheck = nil,
 		},
 		void_walker = {
 			Threshold = nil,
@@ -19905,7 +19905,7 @@ run(function()
 		},
 		falconer = {
 			Range = nil,
-			Wallcheck nil
+			Wallcheck = nil
 		},
 		styx = {
 			OpenPortalRange = nil,
@@ -19935,12 +19935,12 @@ run(function()
 		ninja = {
 			Limits = nil,
 			Range = nil,
-			Wallcheck nil,
+			Wallcheck = nil,
 		},
 		frosty = {
 			Limits = nil,
 			Range = nil,
-			Wallcheck nil,
+			Wallcheck = nil,
 		},
 		sheep_herder = {
 			Range = nil,
@@ -19951,7 +19951,7 @@ run(function()
 		dragon_sword = {
 			Range1 = nil,
 			Range2 = nil,
-			Wallcheck nil,
+			Wallcheck = nil,
 		},
 		defender = {
 			Limits = nil,
@@ -19985,11 +19985,11 @@ run(function()
 		cactus = {
 			Range = nil,
 			Threshold = nil,
-			Wallcheck nil,
+			Wallcheck = nil,
 		},
 		card = {
 			Range = nil,
-			Wallcheck nil,
+			Wallcheck = nil,
 		},
 		drill = {
 			Exploit = nil,
@@ -19997,7 +19997,7 @@ run(function()
 			Delay = nil,
 		},
 		airbender = {
-			Wallcheck nil,
+			Wallcheck = nil,
 			Range1 = nil,
 			MovingTornado = nil,
 			Range2 = nil,
@@ -20009,7 +20009,7 @@ run(function()
 		},
 		void_knight = {
 			Range = nil,
-			Wallcheck nil,
+			Wallcheck = nil,
 		},
 		hatter = {
 			Delay = nil
