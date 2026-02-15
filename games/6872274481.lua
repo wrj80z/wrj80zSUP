@@ -22598,6 +22598,14 @@ run(function()
 						AutoKitFunctions[store.equippedKit](AutoKitSettings[store.equippedKit])
 					end
 				else
+					for i, v in sets do
+						if v then
+							if v.Object then
+								v.Object.Visible = false
+							end
+							sets[i] = nil
+						end
+					end
 					if store.matchState == 0 then
 						return
 					end
