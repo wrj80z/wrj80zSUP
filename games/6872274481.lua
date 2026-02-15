@@ -20142,19 +20142,26 @@ run(function()
 	}
 
 	local function setUpUIAK(kit,sets)
+		for i, v in sets do
+			if v.Visible then
+				v.Visible = false
+			end
+		end
 		local ak = AutoKit
 		if kit == 'ice_queen' then
 			sets.Range = ak:CreateSlider({
 				Name = "Distance",
 				Min = 0,
 				Max = 30,
-				Default = 16
+				Default = 16,
+				Visible = true
 			}) 
 			sets.Threshold = ak:CreateSlider({
 				Name = "Threshold",
 				Min = 0,
 				Max = 3,
 				Default = 0.045,
+				Visible = true,
 				Decimal = 100
 			})
 		elseif kit == 'necromancer' then
@@ -20162,11 +20169,13 @@ run(function()
 				Name = "Distance",
 				Min = 0,
 				Max = 12,
-				Default = 8
+				Default = 8,
+				Visible = true
 			}) 
 			sets.Animations = ak:CreateToggle({
 				Name = "Animations",
 				Default = true,
+				Visible = true,
 			})
 		elseif kit == 'paladin' then
 			sets.Delay = ak:CreateSlider({
@@ -20174,11 +20183,13 @@ run(function()
 				Min = 0,
 				Max = 2,
 				Default = 0.5,
+				Visible = true,
 				Decimal = 10
 			}) 
 			sets.TeamOnly = ak:CreateToggle({
 				Name = "Team Only",
 				Default = true,
+				Visible = true,
 			})
 		elseif kit == 'spearman' then
 			sets.Range = ak:CreateSlider({
@@ -20186,27 +20197,32 @@ run(function()
 				Min = 0,
 				Max = 30,
 				Default = 15,
+				Visible = true,
 			}) 
 			sets.Limits = ak:CreateToggle({
 				Name = "Limits to items",
 				Default = true,
+				Visible = true,
 			})
 			sets.Wallcheck = ak:CreateToggle({
 				Name = "Wall Check",
 				Default = true,
+				Visible = true,
 			})
 		elseif kit == 'void_walker' then
 			sets.Range = ak:CreateSlider({
 				Name = "Distance",
 				Min = 0,
 				Max = 23,
-				Default = 10
+				Default = 10,
+				Visible = true
 			}) 
 			sets.Threshold = ak:CreateSlider({
 				Name = "Threshold",
 				Min = 0,
 				Max = 3,
 				Default = 0.045,
+				Visible = true,
 				Decimal = 100
 			})
 			sets.Chance = ak:CreateSlider({
@@ -20214,43 +20230,50 @@ run(function()
 				Min = 0,
 				Max = 100,
 				Default = 85,
+				Visible = true,
 			})
 		elseif kit == 'falconer' then
 			sets.Range = ak:CreateSlider({
 				Name = "Distance",
 				Min = 0,
 				Max = 30,
-				Default = 16
+				Default = 16,
+				Visible = true
 			}) 
 			sets.Wallcheck = ak:CreateToggle({
 				Name = "Wall Check",
 				Default = true,
+				Visible = true,
 			})
 		elseif kit == 'styx' then
 			sets.AutoUseRange = ak:CreateSlider({
 				Name = "Auto Use Distance",
 				Min = 0,
 				Max = 12,
-				Default = 8
+				Default = 8,
+				Visible = true
 			}) 
 			sets.OpenPortalRange = ak:CreateSlider({
 				Name = "Open Portal Range",
 				Min = 0,
 				Max = 16,
 				Default = 8,
+				Visible = true,
 			})
 		elseif kit == 'elektra' then
 			sets.Range = ak:CreateSlider({
 				Name = "Distance",
 				Min = 0,
 				Max = 23,
-				Default = 10
+				Default = 10,
+				Visible = true
 			}) 
 			sets.Threshold = ak:CreateSlider({
 				Name = "Threshold",
 				Min = 0,
 				Max = 3,
 				Default = 0.045,
+				Visible = true,
 				Decimal = 100
 			})
 			sets.Chance = ak:CreateSlider({
@@ -20258,17 +20281,20 @@ run(function()
 				Min = 0,
 				Max = 100,
 				Default = 85,
+				Visible = true,
 			})
 		elseif kit == 'taliyah' or kit == 'farmer_cletus' then
 			sets.Range = ak:CreateSlider({
 				Name = "Distance",
 				Min = 0,
 				Max = 30,
-				Default = 16
+				Default = 16,
+				Visible = true
 			})
 			sets.Animations = ak:CreateToggle({
 				Name = "Animations",
-				Default = true
+				Default = true,
+				Visible = true
 			})
 
 		elseif kit == 'black_market_trader' then
@@ -20276,7 +20302,8 @@ run(function()
 				Name = "Distance",
 				Min = 0,
 				Max = 30,
-				Default = 16
+				Default = 16,
+				Visible = true
 			})
 
 		elseif kit == 'oasis' then
@@ -20285,13 +20312,15 @@ run(function()
 				Min = 0,
 				Max = 3,
 				Default = 0.5,
+				Visible = true,
 				Decimal = 100
 			})
 			sets.Health = ak:CreateSlider({
 				Name = "Health",
 				Min = 0,
 				Max = 100,
-				Default = 50
+				Default = 50,
+				Visible = true
 			})
 
 		elseif kit == 'rebellion_leader' then
@@ -20299,20 +20328,23 @@ run(function()
 				Name = "Distance",
 				Min = 0,
 				Max = 30,
-				Default = 16
+				Default = 16,
+				Visible = true
 			})
 			sets.Threshold = ak:CreateSlider({
 				Name = "Threshold",
 				Min = 0,
 				Max = 3,
 				Default = 0.5,
+				Visible = true,
 				Decimal = 100
 			})
 			sets.Health = ak:CreateSlider({
 				Name = "Health",
 				Min = 0,
 				Max = 100,
-				Default = 50
+				Default = 50,
+				Visible = true
 			})
 
 		elseif kit == 'ninja' or kit == 'frosty' then
@@ -20320,15 +20352,18 @@ run(function()
 				Name = "Distance",
 				Min = 0,
 				Max = 30,
-				Default = 15
+				Default = 15,
+				Visible = true
 			})
 			sets.Limits = ak:CreateToggle({
 				Name = "Limits to items",
-				Default = true
+				Default = true,
+				Visible = true
 			})
 			sets.Wallcheck = ak:CreateToggle({
 				Name = "Wall Check",
-				Default = true
+				Default = true,
+				Visible = true
 			})
 
 		elseif kit == 'sheep_herder' or kit == 'yeti' then
@@ -20336,7 +20371,8 @@ run(function()
 				Name = "Distance",
 				Min = 0,
 				Max = 30,
-				Default = 16
+				Default = 16,
+				Visible = true
 			})
 
 		elseif kit == 'dragon_sword' then
@@ -20344,17 +20380,20 @@ run(function()
 				Name = "Range 1",
 				Min = 0,
 				Max = 30,
-				Default = 10
+				Default = 10,
+				Visible = true
 			})
 			sets.Range2 = ak:CreateSlider({
 				Name = "Range 2",
 				Min = 0,
 				Max = 30,
-				Default = 16
+				Default = 16,
+				Visible = true
 			})
 			sets.Wallcheck = ak:CreateToggle({
 				Name = "Wall Check",
-				Default = true
+				Default = true,
+				Visible = true
 			})
 
 		elseif kit == 'defender' then
@@ -20363,15 +20402,18 @@ run(function()
 				Min = 0,
 				Max = 2,
 				Default = 0.5,
+				Visible = true,
 				Decimal = 10
 			})
 			sets.Limits = ak:CreateToggle({
 				Name = "Limits",
-				Default = true
+				Default = true,
+				Visible = true
 			})
 			sets.Sounds = ak:CreateToggle({
 				Name = "Sounds",
-				Default = true
+				Default = true,
+				Visible = true
 			})
 
 		elseif kit == 'shielder' then
@@ -20380,12 +20422,14 @@ run(function()
 				Min = 0,
 				Max = 144,
 				Default = 60,
+				Visible = true,
 			})
 			sets.Range = ak:CreateSlider({
 				Name = "Distance",
 				Min = 0,
 				Max = 30,
-				Default = 16
+				Default = 16,
+				Visible = true
 			})
 
 		elseif kit == 'alchemist' then
@@ -20393,20 +20437,23 @@ run(function()
 				Name = "Distance",
 				Min = 0,
 				Max = 30,
-				Default = 16
+				Default = 16,
+				Visible = true
 			})
 		elseif kit == 'midnight' then
 			sets.Range = ak:CreateSlider({
 				Name = "Distance",
 				Min = 0,
 				Max = 30,
-				Default = 16
+				Default = 16,
+				Visible = true
 			})
 			sets.Threshold = ak:CreateSlider({
 				Name = "Threshold",
 				Min = 0,
 				Max = 3,
 				Default = 0.5,
+				Visible = true,
 				Decimal = 100
 			})
 			sets.UseSpeed = ak:CreateSlider({
@@ -20414,168 +20461,246 @@ run(function()
 				Min = 0,
 				Max = 5,
 				Default = 1,
+				Visible = true,
 				Decimal = 10
 			})
 			sets.Amount = ak:CreateSlider({
 				Name = "Amount",
 				Min = 0,
 				Max = 10,
-				Default = 3
+				Default = 3,
+				Visible = true
 			})
 		elseif kit == 'sorcerer' or kit == 'grim_reaper' or kit == 'jailor' or kit == 'hannah' or kit == 'warlock' or kit == 'void_dragon' or kit == 'mimic' or kit == 'pinata' or kit == 'block_kicker' then
 			sets.Range = ak:CreateSlider({
 				Name = "Distance",
 				Min = 0,
 				Max = 30,
-				Default = 16
+				Default = 16,
+				Visible = true
 			})
 		elseif kit == 'berserker' then
-			sets.SizeX = ak:CreateSlider({Name = "Size X", Min = 0, Max = 72, Default = 48})
-			sets.SizeY = ak:CreateSlider({Name = "Size Y", Min = 0, Max = 72, Default = 48})
-			sets.SizeZ = ak:CreateSlider({Name = "Size Z", Min = 0, Max = 72, Default = 48})
+			sets.SizeX = ak:CreateSlider({Name = "Size X", Min = 0, Max = 72, Default = 48}),
+				Visible = true
+			sets.SizeY = ak:CreateSlider({Name = "Size Y", Min = 0, Max = 72, Default = 48}),
+				Visible = true
+			sets.SizeZ = ak:CreateSlider({Name = "Size Z", Min = 0, Max = 72, Default = 48}),
+				Visible = true
 		elseif kit == 'glacial_skater' then
 			sets.UseExploit = ak:CreateToggle({
 				Name = "Use Exploit",
-				Default = false
+				Default = false,
+				Visible = true
 			})
 		elseif kit == 'cactus' or kit == 'card' then
 			sets.Range = ak:CreateSlider({
 				Name = "Distance",
 				Min = 0,
 				Max = 30,
-				Default = 16
+				Default = 16,
+				Visible = true
 			})
 			sets.Threshold = ak:CreateSlider({
 				Name = "Threshold",
 				Min = 0,
 				Max = 3,
 				Default = 0.5,
+				Visible = true,
 				Decimal = 100
 			})
 			sets.Wallcheck = ak:CreateToggle({
 				Name = "Wall Check",
-				Default = true
+				Default = true,
+				Visible = true
 			})
 
 		elseif kit == 'drill' then
 			sets.Exploit = ak:CreateToggle({
 				Name = "Exploit",
-				Default = false
+				Default = false,
+				Visible = true
 			})
 			sets.Range = ak:CreateSlider({
 				Name = "Distance",
 				Min = 0,
 				Max = 30,
-				Default = 16
+				Default = 16,
+				Visible = true
 			})
 			sets.Delay = ak:CreateSlider({
 				Name = "Delay",
 				Min = 0,
 				Max = 2,
 				Default = 0.5,
+				Visible = true,
 				Decimal = 10
 			})
 
 		elseif kit == 'summoner' then
-			sets.Range = ak:CreateSlider({Name = "Distance", Min = 0, Max = 30, Default = 16})
-			sets.Angle = ak:CreateSlider({Name = "Angle", Min = 0, Max = 360, Default = 120})
-			sets.AutoAim = ak:CreateToggle({Name = "Auto Aim", Default = true })
-			sets.MaxTargets = ak:CreateSlider({Name = "Max Targets", Min = 1, Max = 10, Default = 3})
-			sets.WallCheck = ak:CreateToggle({Name = "Wall Check", Default = true })
+			sets.Range = ak:CreateSlider({Name = "Distance", Min = 0, Max = 30, Default = 16}),
+				Visible = true
+			sets.Angle = ak:CreateSlider({Name = "Angle", Min = 0, Max = 360, Default = 120}),
+				Visible = true
+			sets.AutoAim = ak:CreateToggle({Name = "Auto Aim", Default = true }),
+				Visible = true
+			sets.MaxTargets = ak:CreateSlider({Name = "Max Targets", Min = 1, Max = 10, Default = 3}),
+				Visible = true
+			sets.WallCheck = ak:CreateToggle({Name = "Wall Check", Default = true }),
+				Visible = true
 		elseif kit == 'star_collector' or kit == 'spirit_assassin' then
-			sets.Range = ak:CreateSlider({Name = "Distance", Min = 0, Max = 30, Default = 16})
+			sets.Range = ak:CreateSlider({Name = "Distance", Min = 0, Max = 30, Default = 16}),
+				Visible = true
 			sets.Delay = ak:CreateSlider({
 				Name = "Delay",
 				Min = 0,
 				Max = 2,
 				Default = 0.5,
+				Visible = true,
 				Decimal = 10
 			})
 		elseif kit == 'melody' then
-			sets.Range = ak:CreateSlider({Name = "Distance", Min = 0, Max = 30, Default = 16})
-			sets.Threshold = ak:CreateSlider({Name = "Threshold", Min = 0, Max = 3, Default = 0.5, Decimal = 100})
-			sets.Limits = ak:CreateToggle({Name = "Limits", Default = true})
+			sets.Range = ak:CreateSlider({Name = "Distance", Min = 0, Max = 30, Default = 16}),
+				Visible = true
+			sets.Threshold = ak:CreateSlider({Name = "Threshold", Min = 0, Max = 3, Default = 0.5,
+				Visible = true, Decimal = 100})
+			sets.Limits = ak:CreateToggle({Name = "Limits", Default = true}),
+				Visible = true
 
 		elseif kit == 'metal_detector' then
-			sets.Range = ak:CreateSlider({Name = "Distance", Min = 0, Max = 30, Default = 16})
-			sets.Delay = ak:CreateSlider({Name = "Delay", Min = 0, Max = 2, Default = 0.5, Decimal = 10})
-			sets.Limits = ak:CreateToggle({Name = "Limits", Default = true})
-			sets.Animations = ak:CreateToggle({Name = "Animations", Default = true})
+			sets.Range = ak:CreateSlider({Name = "Distance", Min = 0, Max = 30, Default = 16}),
+				Visible = true
+			sets.Delay = ak:CreateSlider({Name = "Delay", Min = 0, Max = 2, Default = 0.5,
+				Visible = true, Decimal = 10})
+			sets.Limits = ak:CreateToggle({Name = "Limits", Default = true}),
+				Visible = true
+			sets.Animations = ak:CreateToggle({Name = "Animations", Default = true}),
+				Visible = true
 
 		elseif kit == 'spider_queen' then
-			sets.Range = ak:CreateSlider({Name = "Distance", Min = 0, Max = 30, Default = 16})
-			sets.Smoothness = ak:CreateSlider({Name = "Smoothness", Min = 0, Max = 1, Default = 0.5, Decimal = 100})
+			sets.Range = ak:CreateSlider({Name = "Distance", Min = 0, Max = 30, Default = 16}),
+				Visible = true
+			sets.Smoothness = ak:CreateSlider({Name = "Smoothness", Min = 0, Max = 1, Default = 0.5,
+				Visible = true, Decimal = 100})
 
 		elseif kit == 'blood_assassin' then
-			sets.Range = ak:CreateSlider({Name = "Distance", Min = 0, Max = 30, Default = 16})
-			sets.Delay = ak:CreateSlider({Name = "Delay", Min = 0, Max = 2, Default = 0.5, Decimal = 10})
-			sets.ContractSelection = ak:CreateToggle({Name = "Contract Selection", Default = 'FirstHit', List = {'LowHP','FirstHit','FarRange'}})
-			sets.Deselect = ak:CreateToggle({Name = "Deselect", Default = true})
+			sets.Range = ak:CreateSlider({Name = "Distance", Min = 0, Max = 30, Default = 16}),
+				Visible = true
+			sets.Delay = ak:CreateSlider({Name = "Delay", Min = 0, Max = 2, Default = 0.5,
+				Visible = true, Decimal = 10})
+			sets.ContractSelection = ak:CreateToggle({Name = "Contract Selection", Default = 'FirstHit',
+				Visible = true, List = {'LowHP','FirstHit','FarRange'}})
+			sets.Deselect = ak:CreateToggle({Name = "Deselect", Default = true}),
+				Visible = true
 
 		elseif kit == 'gun_blade' then
-			sets.Range = ak:CreateSlider({Name = "Distance", Min = 0, Max = 30, Default = 16})
-			sets.Threshold = ak:CreateSlider({Name = "Threshold", Min = 0, Max = 3, Default = 0.5, Decimal = 100})
-			sets.RNG = ak:CreateSlider({Name = "Chance", Min = 0, Max = 100, Default = 75})
+			sets.Range = ak:CreateSlider({Name = "Distance", Min = 0, Max = 30, Default = 16}),
+				Visible = true
+			sets.Threshold = ak:CreateSlider({Name = "Threshold", Min = 0, Max = 3, Default = 0.5,
+				Visible = true, Decimal = 100})
+			sets.RNG = ak:CreateSlider({Name = "Chance", Min = 0, Max = 100, Default = 75}),
+				Visible = true
 
 		elseif kit == 'wizard' then
-			sets.Range1 = ak:CreateSlider({Name = "Wizard Ability Range", Min = 0, Max = 30, Default = 12})
-			sets.Range2 = ak:CreateSlider({Name = "Lightning Storm Range", Min = 0, Max = 30, Default = 16})
-			sets.Range3 = ak:CreateSlider({Name = "ShockWave Range", Min = 0, Max = 30, Default = 20})
-			sets.Roll1 = ak:CreateSlider({Name = "Wizard Ability Roll", Min = 0, Max = 100, Default = 50})
-			sets.Roll2 = ak:CreateSlider({Name = "Lightning Storm Roll", Min = 0, Max = 100, Default = 50})
-			sets.Roll3 = ak:CreateSlider({Name = "ShockWave Roll", Min = 0, Max = 100, Default = 50})
-			sets.Limits = ak:CreateToggle({Name = "Limits", Default = true})
+			sets.Range1 = ak:CreateSlider({Name = "Wizard Ability Range", Min = 0, Max = 30, Default = 12}),
+				Visible = true
+			sets.Range2 = ak:CreateSlider({Name = "Lightning Storm Range", Min = 0, Max = 30, Default = 16}),
+				Visible = true
+			sets.Range3 = ak:CreateSlider({Name = "ShockWave Range", Min = 0, Max = 30, Default = 20}),
+				Visible = true
+			sets.Roll1 = ak:CreateSlider({Name = "Wizard Ability Roll", Min = 0, Max = 100, Default = 50}),
+				Visible = true
+			sets.Roll2 = ak:CreateSlider({Name = "Lightning Storm Roll", Min = 0, Max = 100, Default = 50}),
+				Visible = true
+			sets.Roll3 = ak:CreateSlider({Name = "ShockWave Roll", Min = 0, Max = 100, Default = 50}),
+				Visible = true
+			sets.Limits = ak:CreateToggle({Name = "Limits", Default = true}),
+				Visible = true
 		elseif kit == 'spirit_summoner' then
-			sets.Limits = ak:CreateToggle({Name = "Limits", Default = true})
+			sets.Limits = ak:CreateToggle({Name = "Limits", Default = true}),
+				Visible = true
 		elseif kit == 'miner' then
-			sets.Range = ak:CreateSlider({Name = "Distance", Min = 0, Max = 30, Default = 16})
-			sets.Animations = ak:CreateToggle({Name = "Animations", Default = true})
+			sets.Range = ak:CreateSlider({Name = "Distance", Min = 0, Max = 30, Default = 16}),
+				Visible = true
+			sets.Animations = ak:CreateToggle({Name = "Animations", Default = true}),
+				Visible = true
 		elseif kit == 'fisherman' then
-			sets.AutoWin = ak:CreateToggle({Name = "Auto Win", Default = true})
+			sets.AutoWin = ak:CreateToggle({Name = "Auto Win", Default = true}),
+				Visible = true
 		elseif kit == 'gingerbread_man' then
-			sets.BreakDelay = ak:CreateSlider({Name = "Break Delay", Min = 0, Max = 2, Default = 0.5, Decimal = 10})
-			sets.AutoSwitch = ak:CreateToggle({Name = "Auto Switch", Default = true})
+			sets.BreakDelay = ak:CreateSlider({Name = "Break Delay", Min = 0, Max = 2, Default = 0.5,
+				Visible = true, Decimal = 10})
+			sets.AutoSwitch = ak:CreateToggle({Name = "Auto Switch", Default = true}),
+				Visible = true
 		elseif kit == 'hatter' then
-			sets.Delay = ak:CreateSlider({Name = "Delay", Min = 0, Max = 2, Default = 0.5, Decimal = 10})
+			sets.Delay = ak:CreateSlider({Name = "Delay", Min = 0, Max = 2, Default = 0.5,
+				Visible = true, Decimal = 10})
 		elseif kit == 'mage' then
-			sets.Range = ak:CreateSlider({Name = "Distance", Min = 0, Max = 30, Default = 16})
-			sets.Animations = ak:CreateToggle({Name = "Animations", Default = true})
-			sets.Exploit = ak:CreateToggle({Name = "Exploit", Default = false})
+			sets.Range = ak:CreateSlider({Name = "Distance", Min = 0, Max = 30, Default = 16}),
+				Visible = true
+			sets.Animations = ak:CreateToggle({Name = "Animations", Default = true}),
+				Visible = true
+			sets.Exploit = ak:CreateToggle({Name = "Exploit", Default = false}),
+				Visible = true
 		elseif kit == 'pyro' then
-			sets.Range = ak:CreateSlider({Name = "Distance", Min = 0, Max = 30, Default = 16})
-			sets.Threshold = ak:CreateSlider({Name = "Threshold", Min = 0, Max = 3, Default = 0.5, Decimal = 100})
-			sets.Long = ak:CreateSlider({Name = "Long", Min = 0, Max = 5, Default = 1, Decimal = 10})
-			sets.Long = ak:CreateToggle({Name = "Use Speed", Default = true})
+			sets.Range = ak:CreateSlider({Name = "Distance", Min = 0, Max = 30, Default = 16}),
+				Visible = true
+			sets.Threshold = ak:CreateSlider({Name = "Threshold", Min = 0, Max = 3, Default = 0.5,
+				Visible = true, Decimal = 100})
+			sets.Long = ak:CreateSlider({Name = "Long", Min = 0, Max = 5, Default = 1,
+				Visible = true, Decimal = 10})
+			sets.Long = ak:CreateToggle({Name = "Use Speed", Default = true}),
+				Visible = true
 		elseif kit == 'battery' then
-			sets.Range = ak:CreateSlider({Name = "Distance", Min = 0, Max = 30, Default = 16})
-			sets.Threshold = ak:CreateSlider({Name = "Threshold", Min = 0, Max = 3, Default = 0.5, Decimal = 100})
-			sets.Cooldown = ak:CreateSlider({Name = "Cooldown", Min = 0, Max = 5, Default = 1, Decimal = 10})
+			sets.Range = ak:CreateSlider({Name = "Distance", Min = 0, Max = 30, Default = 16}),
+				Visible = true
+			sets.Threshold = ak:CreateSlider({Name = "Threshold", Min = 0, Max = 3, Default = 0.5,
+				Visible = true, Decimal = 100})
+			sets.Cooldown = ak:CreateSlider({Name = "Cooldown", Min = 0, Max = 5, Default = 1,
+				Visible = true, Decimal = 10})
 		elseif kit == 'beekeeper' then
-			sets.Range = ak:CreateSlider({Name = "Distance", Min = 0, Max = 30, Default = 16})
-			sets.Delay = ak:CreateSlider({Name = "Delay", Min = 0, Max = 2, Default = 0.5, Decimal = 10})
-			sets.Limits = ak:CreateToggle({Name = "Limits", Default = true})
+			sets.Range = ak:CreateSlider({Name = "Distance", Min = 0, Max = 30, Default = 16}),
+				Visible = true
+			sets.Delay = ak:CreateSlider({Name = "Delay", Min = 0, Max = 2, Default = 0.5,
+				Visible = true, Decimal = 10})
+			sets.Limits = ak:CreateToggle({Name = "Limits", Default = true}),
+				Visible = true
 		elseif kit == 'bigman' then
-			sets.Range = ak:CreateSlider({Name = "Distance", Min = 0, Max = 30, Default = 16})
-			sets.Delay = ak:CreateSlider({Name = "Delay", Min = 0, Max = 2, Default = 0.5, Decimal = 10})
-			sets.Animations = ak:CreateToggle({Name = "Animations", Default = true})
+			sets.Range = ak:CreateSlider({Name = "Distance", Min = 0, Max = 30, Default = 16}),
+				Visible = true
+			sets.Delay = ak:CreateSlider({Name = "Delay", Min = 0, Max = 2, Default = 0.5,
+				Visible = true, Decimal = 10})
+			sets.Animations = ak:CreateToggle({Name = "Animations", Default = true}),
+				Visible = true
 		elseif kit == 'davey' then
-			sets.AutoSwitch = ak:CreateToggle({Name = "Auto Switch", Default = true})
+			sets.AutoSwitch = ak:CreateToggle({Name = "Auto Switch", Default = true}),
+				Visible = true
 		elseif kit == 'dragon_slayer' then
-			sets.Range = ak:CreateSlider({Name = "Distance", Min = 0, Max = 30, Default = 16})
-			sets.Animations = ak:CreateToggle({Name = "Animations", Default = true})
+			sets.Range = ak:CreateSlider({Name = "Distance", Min = 0, Max = 30, Default = 16}),
+				Visible = true
+			sets.Animations = ak:CreateToggle({Name = "Animations", Default = true}),
+				Visible = true
 		elseif kit == 'airbender' then
-			sets.Range1 = ak:CreateSlider({Name = "Range 1", Min = 0, Max = 30, Default = 12})
-			sets.Range2 = ak:CreateSlider({Name = "Range 2", Min = 0, Max = 30, Default = 16})
-			sets.Threshold = ak:CreateSlider({Name = "Threshold", Min = 0, Max = 3, Default = 0.5, Decimal = 100})
-			sets.MovingTornado = ak:CreateToggle({Name = "Moving Tornado", Default = true})
-			sets.Wallcheck = ak:CreateToggle({Name = "Wall Check", Default = true})
+			sets.Range1 = ak:CreateSlider({Name = "Range 1", Min = 0, Max = 30, Default = 12}),
+				Visible = true
+			sets.Range2 = ak:CreateSlider({Name = "Range 2", Min = 0, Max = 30, Default = 16}),
+				Visible = true
+			sets.Threshold = ak:CreateSlider({Name = "Threshold", Min = 0, Max = 3, Default = 0.5,
+				Visible = true, Decimal = 100})
+			sets.MovingTornado = ak:CreateToggle({Name = "Moving Tornado", Default = true}),
+				Visible = true
+			sets.Wallcheck = ak:CreateToggle({Name = "Wall Check", Default = true}),
+				Visible = true
 		elseif kit == 'nazar' then
-			sets.timeout = ak:CreateSlider({Name = "Timeout", Min = 0, Max = 10, Default = 3})
-			sets.Health = ak:CreateSlider({Name = "Health", Min = 0, Max = 100, Default = 50})
+			sets.timeout = ak:CreateSlider({Name = "Timeout", Min = 0, Max = 10, Default = 3}),
+				Visible = true
+			sets.Health = ak:CreateSlider({Name = "Health", Min = 0, Max = 100, Default = 50}),
+				Visible = true
 
 		elseif kit == 'void_knight' then
-			sets.Range = ak:CreateSlider({Name = "Distance", Min = 0, Max = 30, Default = 16})
-			sets.Wallcheck = ak:CreateToggle({Name = "Wall Check", Default = true})
+			sets.Range = ak:CreateSlider({Name = "Distance", Min = 0, Max = 30, Default = 16}),
+				Visible = true
+			sets.Wallcheck = ak:CreateToggle({Name = "Wall Check", Default = true}),
+				Visible = true
 		end
 	end
 
