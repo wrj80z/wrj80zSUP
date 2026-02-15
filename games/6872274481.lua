@@ -22598,7 +22598,7 @@ run(function()
 						AutoKitFunctions[store.equippedKit](AutoKitSettings[store.equippedKit])
 					end
 				else
-					for i, v in sets do
+					for kit, sets in AutoKitSettings do
 						if v then
 							if v.Object then
 								v.Object.Visible = false
