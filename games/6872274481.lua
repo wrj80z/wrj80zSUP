@@ -20191,7 +20191,7 @@ run(function()
 				Name = "Limits to items",
 				Default = true,
 			})
-			sets.Wallcheck ak:CreateToggle({
+			sets.Wallcheck = ak:CreateToggle({
 				Name = "Wall Check",
 				Default = true,
 			})
@@ -20222,7 +20222,7 @@ run(function()
 				Max = 30,
 				Default = 16
 			}) 
-			sets.Wallcheck ak:CreateToggle({
+			sets.Wallcheck = ak:CreateToggle({
 				Name = "Wall Check",
 				Default = true,
 			})
@@ -20326,7 +20326,7 @@ run(function()
 				Name = "Limits to items",
 				Default = true
 			})
-			sets.Wallcheck ak:CreateToggle({
+			sets.Wallcheck = ak:CreateToggle({
 				Name = "Wall Check",
 				Default = true
 			})
@@ -20352,7 +20352,7 @@ run(function()
 				Max = 30,
 				Default = 16
 			})
-			sets.Wallcheck ak:CreateToggle({
+			sets.Wallcheck = ak:CreateToggle({
 				Name = "Wall Check",
 				Default = true
 			})
@@ -20452,7 +20452,7 @@ run(function()
 				Default = 0.5,
 				Decimal = 100
 			})
-			sets.Wallcheck ak:CreateToggle({
+			sets.Wallcheck = ak:CreateToggle({
 				Name = "Wall Check",
 				Default = true
 			})
@@ -20568,14 +20568,14 @@ run(function()
 			sets.Range2 = ak:CreateSlider({Name = "Range 2", Min = 0, Max = 30, Default = 16})
 			sets.Threshold = ak:CreateSlider({Name = "Threshold", Min = 0, Max = 3, Default = 0.5, Decimal = 100})
 			sets.MovingTornado = ak:CreateToggle({Name = "Moving Tornado", Default = true})
-			sets.Wallcheck ak:CreateToggle({Name = "Wall Check", Default = true})
+			sets.Wallcheck = ak:CreateToggle({Name = "Wall Check", Default = true})
 		elseif kit == 'nazar' then
 			sets.timeout = ak:CreateSlider({Name = "Timeout", Min = 0, Max = 10, Default = 3})
 			sets.Health = ak:CreateSlider({Name = "Health", Min = 0, Max = 100, Default = 50})
 
 		elseif kit == 'void_knight' then
 			sets.Range = ak:CreateSlider({Name = "Distance", Min = 0, Max = 30, Default = 16})
-			sets.Wallcheck ak:CreateToggle({Name = "Wall Check", Default = true})
+			sets.Wallcheck = ak:CreateToggle({Name = "Wall Check", Default = true})
 		end
 	end
 
