@@ -20142,10 +20142,12 @@ run(function()
 	}
 
 	local function setUpUIAK(kit,sets)
-		for i, v in sets do
-			if v then
-				v = nil
-				sets[i] = nil
+		for optionName, optionData in pairs(AutoKit.Options) do
+			if optionName ~= "Sort" and optionData and optionData.Object then
+				pcall(function()
+					optionData.Object:Remove()
+				end)
+				AutoKit.Options[optionName] = nil
 			end
 		end
 		local ak = AutoKit
@@ -22596,10 +22598,20 @@ run(function()
 						AutoKitFunctions[store.equippedKit](AutoKitSettings[store.equippedKit])
 					end
 				else
-					for kit, sets in AutoKitSettings do
-						print(game.HttpService:JSONEncode(sets))
-						warn(game.HttpService:JSONEncode(kit))
+					for optionName, optionData in pairs(AutoKit.Options) do
+						if optionData and optionData.Object then
+							pcall(function()
+								optionData.Object:Remove()
+							end)
+						end
 					end
+					local defaultOptions = {"Sort"}
+					for optionName, _ in pairs(AutoKit.Options) do
+						if not table.find(defaultOptions, optionName) then
+							AutoKit.Options[optionName] = nil
+						end
+					end
+					return
 					if store.matchState == 0 then
 						return
 					end
