@@ -22597,12 +22597,8 @@ run(function()
 					end
 				else
 					for kit, sets in AutoKitSettings do
-						if v then
-							if v.Object then
-								v.Object.Visible = false
-							end
-							sets[i] = nil
-						end
+						print(game.HttpService:JSONEncode(sets))
+						warn(game.HttpService:JSONEncode(kit))
 					end
 					if store.matchState == 0 then
 						return
