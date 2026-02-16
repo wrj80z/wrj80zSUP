@@ -22599,19 +22599,6 @@ run(function()
 						AutoKitFunctions[store.equippedKit](AutoKitSettings[store.equippedKit])
 					end
 				else
-					for optionName, optionData in pairs(AutoKit.Options) do
-						if optionData and optionData.Object then
-							pcall(function()
-								optionData.Object:Remove()
-							end)
-						end
-					end
-					local defaultOptions = {"Sort"}
-					for optionName, _ in pairs(AutoKit.Options) do
-						if not table.find(defaultOptions, optionName) then
-							AutoKit.Options[optionName] = nil
-						end
-					end
 					if store.matchState == 0 then
 						return
 					end
