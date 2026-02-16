@@ -18695,7 +18695,7 @@ Decimal = 100})
 			until not AutoKit.Enabled
 		end,		
 	}
-	AutoKit.SavedValues = {}
+	locaL SavedValues = {}
 	AutoKit = vape.Categories.Kits:CreateModule({
 		Name = 'AutoKit',
 		Tooltip = 'Automatically uses kit abilities.',
@@ -18723,7 +18723,7 @@ Decimal = 100})
 						AutoKit.Options[optionName] = nil
 					end
 				end
-				AutoKit.SavedValues = savedValues
+				SavedValues = savedValues
 				return
 			end
 			repeat
@@ -18735,8 +18735,8 @@ Decimal = 100})
 			local kit = store.equippedKit
 			if AutoKitFunctions[kit] and AutoKitSettings[kit] then
 				setUpUIAK(kit, AutoKitSettings[kit])
-					if AutoKit.SavedValues then
-					for optionName, value in pairs(AutoKit.SavedValues) do
+					if SavedValues then
+					for optionName, value in pairs(SavedValues) do
 						local option = AutoKit.Options[optionName]
 						if option then
 							if option.SetValue then
@@ -18750,7 +18750,7 @@ Decimal = 100})
 						end
 					end
 	
-					AutoKit.SavedValues = nil
+					SavedValues = {}
 				end
 				AutoKitFunctions[kit](AutoKitSettings[kit])
 			else
