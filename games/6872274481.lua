@@ -18704,7 +18704,7 @@ Decimal = 100})
 			end
 			if not callback then
 				local savedValues = {}
-				for optionName, optionData in pairs(vape.Modules.AutoKit) do
+				for optionName, optionData in pairs(AutoKit.Options) do
 					if optionData then
 						if optionData.Value ~= nil then
 							savedValues[optionName] = optionData.Value
