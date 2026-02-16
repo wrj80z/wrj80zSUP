@@ -18704,7 +18704,7 @@ Decimal = 100})
 			end
 			if not callback then
 				local savedValues = {}
-				for optionName, optionData in pairs(AutoKit.Options) do
+				for optionName, optionData in pairs(vape.Modules.AutoKit) do
 					if optionData then
 						if optionData.Value ~= nil then
 							savedValues[optionName] = optionData.Value
@@ -18713,16 +18713,16 @@ Decimal = 100})
 						end
 					end
 				end
-				for optionName, optionData in pairs(AutoKit.Options) do
+				for optionName, optionData in pairs(vape.Modules.AutoKit) do
 					if optionData and optionData.Object then
 						pcall(function()
 							optionData.Object:Remove()
 						end)
 					end
 				end
-				for optionName, _ in pairs(AutoKit.Options) do
+				for optionName, _ in pairs(vape.Modules.AutoKit) do
 					if optionName ~= "Sort" then
-						AutoKit.Options[optionName] = nil
+						vape.Modules.AutoKit[optionName] = nil
 					end
 				end
 				AutoKit.SavedValues = savedValues
@@ -18735,13 +18735,13 @@ Decimal = 100})
 						setUpUIAK(store.equippedKit,AutoKitSettings[store.equippedKit])
 						if AutoKit.SavedValues then
 							for optionName, value in pairs(AutoKit.SavedValues) do
-								if AutoKit.Options[optionName] then
-									if AutoKit.Options[optionName] then
-										AutoKit.Options[optionName]:SetValue(value)
-										if value and not AutoKit.Options[optionName].Enabled then
-											AutoKit.Options[optionName]:Toggle()
-										elseif not value and AutoKit.Options[optionName].Enabled then
-											AutoKit.Options[optionName]:Toggle()
+								if vape.Modules.AutoKit[optionName] then
+									if vape.Modules.AutoKit[optionName] then
+										vape.Modules.AutoKit[optionName]:SetValue(value)
+										if value and not vape.Modules.AutoKit[optionName].Enabled then
+											vape.Modules.AutoKit[optionName]:Toggle()
+										elseif not value and vape.Modules.AutoKit[optionName].Enabled then
+											vape.Modules.AutoKit[optionName]:Toggle()
 										end
 									end
 								end
