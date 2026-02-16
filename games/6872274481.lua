@@ -16474,12 +16474,9 @@ run(function()
 				Visible = true
 			})
 		elseif kit == 'berserker' then
-			sets.SizeX = ak:CreateSlider({Name = "Size X", Min = 0, Max = 72, Default = 48}),
-				Visible = true
-			sets.SizeY = ak:CreateSlider({Name = "Size Y", Min = 0, Max = 72, Default = 48}),
-				Visible = true
-			sets.SizeZ = ak:CreateSlider({Name = "Size Z", Min = 0, Max = 72, Default = 48}),
-				Visible = true
+			sets.SizeX = ak:CreateSlider({Name = "Size X", Min = 0, Max = 72, Default = 48,Visible = true})
+			sets.SizeY = ak:CreateSlider({Name = "Size Y", Min = 0, Max = 72, Default = 48,Visible = true})
+			sets.SizeZ = ak:CreateSlider({Name = "Size Z", Min = 0, Max = 72, Default = 48,Visible = true})
 		elseif kit == 'glacial_skater' then
 			sets.UseExploit = ak:CreateToggle({
 				Name = "Use Exploit",
