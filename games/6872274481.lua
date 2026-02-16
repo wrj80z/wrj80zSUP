@@ -18736,17 +18736,20 @@ Decimal = 100})
 						if AutoKit.SavedValues then
 							for optionName, value in pairs(AutoKit.SavedValues) do
 								if vape.Modules.AutoKit.Options[optionName] then
-									task.spawn(function()
-										pcall(function()
-											vape.Modules.AutoKit.Options[optionName]:Toggle(value)
-										end)
-									end)
 									if vape.Modules.AutoKit.Options[optionName].Type == 'Slider' then
 										vape.Modules.AutoKit.Options[optionName]:SetValue(value)
 									end
 								end
 							end
-							AutoKit.SavedValues = nil
+						end
+						if AutoKit.SavedValues then
+							for optionName, value in pairs(AutoKit.SavedValues) do
+								if vape.Modules.AutoKit.Options[optionName] then
+									if vape.Modules.AutoKit.Options[optionName].Type == 'Toggle' then
+										vape.Modules.AutoKit.Options[optionName]:Toggle(value)
+									end
+								end
+							end
 						end
 						AutoKitFunctions[store.equippedKit](AutoKitSettings[store.equippedKit])
 					end
