@@ -18736,11 +18736,14 @@ Decimal = 100})
 						if AutoKit.SavedValues then
 							for optionName, value in pairs(AutoKit.SavedValues) do
 									if vape.Modules.AutoKit.Options[optionName] then
-										print(httpService:JSONEncode(vape.Modules.AutoKit.Options[optionName]),value)
-										vape.Modules.AutoKit.Options[optionName]:SetValue(value)
+										if vape.Modules.AutoKit.Options[optionName].Type == 'Slider' then
+											vape.Modules.AutoKit.Options[optionName]:SetValue(value)
+										end
 										if value and not vape.Modules.AutoKit.Options[optionName].Enabled then
 											vape.Modules.AutoKit.Options[optionName]:Toggle()
 										elseif not value and vape.Modules.AutoKit.Options[optionName].Enabled then
+											vape.Modules.AutoKit.Options[optionName]:Toggle()
+										elseif vape.Modules.AutoKit.Options[optionName].Type == 'Toggle' then
 											vape.Modules.AutoKit.Options[optionName]:Toggle()
 										end
 									end
