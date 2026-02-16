@@ -18713,7 +18713,7 @@ Decimal = 100})
 						end
 					end
 				end
-				for optionName, optionData in pairs(vape.Modules.AutoKit.Options.Options) do
+				for optionName, optionData in pairs(vape.Modules.AutoKit.Options) do
 					if optionData and optionData.Object then
 						pcall(function()
 							optionData.Object:Remove()
