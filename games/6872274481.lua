@@ -3151,7 +3151,7 @@ run(function()
 						lplr.Character.Humanoid.WalkSpeed = NewSpeed
 					end
 
-					local DeltaDistance = (plr[TargetPart.Value].Position - entity.character[TargetPart.Value].Position).Magnitude
+					local DeltaDistance = (plr[TargetPart.Value].Position - entitylib.character[TargetPart.Value].Position).Magnitude
 					if DeltaDistance >= Distance.Value then
 						return old(...)
 					end
@@ -18738,6 +18738,7 @@ Decimal = 100})
 							for optionName, value in pairs(AutoKit.SavedValues) do
 								if AutoKit.Options[optionName] then
 									if AutoKit.Options[optionName] then
+										print(httpService:JSONEncode(AutoKit.Options[optionName]))
 										AutoKit.Options[optionName]:SetValue(value)
 										if value and not AutoKit.Options[optionName].Enabled then
 											AutoKit.Options[optionName]:Toggle()
