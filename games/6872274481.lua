@@ -20143,11 +20143,8 @@ run(function()
 
 	local function setUpUIAK(kit,sets)
 		for i, v in sets do
-			print(game.HttpService:JSONEncode(v))
 			if v then
-				if v.Object then
-					v.Object.Visible = false
-				end
+				v = nil
 				sets[i] = nil
 			end
 		end
