@@ -22611,7 +22611,6 @@ run(function()
 							AutoKit.Options[optionName] = nil
 						end
 					end
-					return
 					if store.matchState == 0 then
 						return
 					end
