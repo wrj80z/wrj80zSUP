@@ -7575,12 +7575,12 @@ run(function()
 							if AS.Enabled then
 								local pickaxe = getPickaxeSlot()
 								if hotbarSwitch(pickaxe) or store.hand.tool.Name:lower():find("pickaxe") then
-task.spawn(bedwars.breakBlock, block, false, nil, true)
-task.spawn(bedwars.breakBlock, block, false, nil, true)		
+task.spawn(bedwars.breakBlock, child, false, nil, true)
+task.spawn(bedwars.breakBlock, child, false, nil, true)		
 								end
 							else
-								task.spawn(bedwars.breakBlock, block, false, nil, true)
-								task.spawn(bedwars.breakBlock, block, false, nil, true)								
+								task.spawn(bedwars.breakBlock, child, false, nil, true)
+								task.spawn(bedwars.breakBlock, child, false, nil, true)								
 							end
 							if AJ.Enabled then
 								if humanoid:GetState() ~= Enum.HumanoidStateType.Jumping then
