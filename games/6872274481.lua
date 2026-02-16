@@ -18737,13 +18737,13 @@ Decimal = 100})
 						if AutoKit.SavedValues then
 							for optionName, value in pairs(AutoKit.SavedValues) do
 								if AutoKit.Options[optionName] then
-									if AutoKit.Options[optionName].SetValue then
-										AutoKit.Options[optionName].SetValue(value)
+									if AutoKit.Options[optionName]:SetValue then
+										AutoKit.Options[optionName]:SetValue(value)
 									elseif AutoKit.Options[optionName].Toggle then
 										if value and not AutoKit.Options[optionName].Enabled then
-											AutoKit.Options[optionName].Toggle()
+											AutoKit.Options[optionName]:Toggle()
 										elseif not value and AutoKit.Options[optionName].Enabled then
-											AutoKit.Options[optionName].Toggle()
+											AutoKit.Options[optionName]:Toggle()
 										end
 									end
 								end
