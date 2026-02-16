@@ -18735,8 +18735,8 @@ Decimal = 100})
 						setUpUIAK(store.equippedKit,AutoKitSettings[store.equippedKit])
 						if AutoKit.SavedValues then
 							for optionName, value in pairs(AutoKit.SavedValues) do
-								if vape.Modules.AutoKit.Options[optionName] then
 									if vape.Modules.AutoKit.Options[optionName] then
+										print(httpService:JSONEncode((vape.Modules.AutoKit.Options[optionName]),value)
 										vape.Modules.AutoKit.Options[optionName]:SetValue(value)
 										if value and not vape.Modules.AutoKit.Options[optionName].Enabled then
 											vape.Modules.AutoKit.Options[optionName]:Toggle()
@@ -18744,7 +18744,6 @@ Decimal = 100})
 											vape.Modules.AutoKit.Options[optionName]:Toggle()
 										end
 									end
-								end
 							end
 							AutoKit.SavedValues = nil
 						end
