@@ -18739,11 +18739,7 @@ Decimal = 100})
 										if vape.Modules.AutoKit.Options[optionName].Type == 'Slider' then
 											vape.Modules.AutoKit.Options[optionName]:SetValue(value)
 										end
-										if value and not vape.Modules.AutoKit.Options[optionName].Enabled then
-											vape.Modules.AutoKit.Options[optionName]:Toggle()
-										elseif not value and vape.Modules.AutoKit.Options[optionName].Enabled then
-											vape.Modules.AutoKit.Options[optionName]:Toggle()
-										elseif vape.Modules.AutoKit.Options[optionName].Type == 'Toggle' then
+										if vape.Modules.AutoKit.Options[optionName].Type == 'Toggle' then
 											vape.Modules.AutoKit.Options[optionName]:Toggle()
 										end
 									end
