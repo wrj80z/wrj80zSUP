@@ -7539,7 +7539,7 @@ run(function()
 					return
 				end       
             local worldFolder = getWorldFolder()
-            if not worldFolder then return end
+            if not worldFolder then print('ignored no world folder') return end
             local blocks = worldFolder:WaitForChild("Blocks")
 			if store.equippedKit ~= "davey" then
 				vape:CreateNotification("AutoDavey","Kit required only!",8,"warning")
@@ -7561,7 +7561,7 @@ run(function()
 						BetterDavey:Clean(LaunchSelfPrompt.Triggered:Connect(function(p)
 							local humanoid = entitylib.character.Humanoid
 						
-							if not humanoid then return end
+							if not humanoid then print('ignored no humanoid folder')  return end
 						
 							if Speed.Enabled and Fly.Enabled then
 								Fly:Toggle(false)
@@ -7603,7 +7603,7 @@ run(function()
 						BetterDavey:Clean(LaunchSelfPrompt.Triggered:Connect(function(p)
 							local humanoid = entitylib.character.Humanoid
 						
-							if not humanoid then return end
+							if not humanoid then print('ignored no humaniopd folder')  return end
 						
 							if Speed.Enabled and Fly.Enabled then
 								Fly:Toggle(false)
