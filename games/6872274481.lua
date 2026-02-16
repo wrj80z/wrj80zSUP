@@ -12272,8 +12272,7 @@ run(function()
         Name = "Angle",
         Min = 0,
         Max = 360,
-        Default = math.random(120,
-				Visible = true,180)
+        Default = math.random(120,180)
     })
 	Delay = BetterZeno:CreateTwoSlider({
 		Name = 'Delay',
@@ -12369,8 +12368,7 @@ run(function()
 		Name = "Distance",
 		Min = 1,
 		Max = 12,
-		Default = math.random(4,
-				Visible = true,12),
+		Default = math.random(4,12),
 		Visible = false
 	})
 	Angle = BetterWarden:CreateSlider({
