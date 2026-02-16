@@ -22095,6 +22095,7 @@ run(function()
 					Range = Range,
 					Part = 'RootPart',
 					Players = true,
+					NPCs = true,																												
 					Sort = sortmethods[Sorts.Value],
 					Wallcheck = WallCheck,
                 	Limit = MaxTargets,
