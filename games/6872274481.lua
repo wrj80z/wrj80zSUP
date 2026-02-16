@@ -18695,33 +18695,30 @@ Decimal = 100})
 			until not AutoKit.Enabled
 		end,		
 	}
-	
+	AutoKit.SavedValues = {}
 	AutoKit = vape.Categories.Kits:CreateModule({
 		Name = 'AutoKit',
+		Tooltip = 'Automatically uses kit abilities.',
 		Function = function(callback)
-			if role ~= "owner" and role ~= "coowner" and role ~= "admin" and role ~= "friend" and role ~= "premium" and role ~= "user"then
-				vape:CreateNotification("Onyx", "You don't have access to this.", 10, "alert")
-				return
-			end
 			if not callback then
 				local savedValues = {}
-				for optionName, optionData in pairs(AutoKit.Options) do
-					if optionData then
-						if optionData.Value ~= nil then
-							savedValues[optionName] = optionData.Value
-						elseif optionData.Enabled ~= nil then
-							savedValues[optionName] = optionData.Enabled
+				for optionName, option in pairs(AutoKit.Options) do
+					if type(option) == "table" then
+						if option.Value ~= nil then
+							savedValues[optionName] = option.Value
+						elseif option.Enabled ~= nil then
+							savedValues[optionName] = option.Enabled
 						end
 					end
 				end
-				for optionName, optionData in pairs(AutoKit.Options) do
-					if optionData and optionData.Object then
+				for optionName, option in pairs(AutoKit.Options) do
+					if type(option) == "table" and option.Object then
 						pcall(function()
-							optionData.Object:Remove()
+							option.Object:Remove()
 						end)
 					end
 				end
-				for optionName, _ in pairs(AutoKit.Options) do
+				for optionName in pairs(AutoKit.Options) do
 					if optionName ~= "Sort" then
 						AutoKit.Options[optionName] = nil
 					end
@@ -18729,47 +18726,50 @@ Decimal = 100})
 				AutoKit.SavedValues = savedValues
 				return
 			end
-			if callback then
-				repeat task.wait(0.1) until store.equippedKit ~= '' and store.matchState ~= 0 or (not AutoKit.Enabled)
-				if AutoKit.Enabled and AutoKitFunctions[store.equippedKit] then
-					if AutoKitSettings[store.equippedKit] then
-						setUpUIAK(store.equippedKit,AutoKitSettings[store.equippedKit])
-						if AutoKit.SavedValues then
-							for optionName, value in pairs(AutoKit.SavedValues) do
-								if AutoKit.Options[optionName] then
-									if AutoKit.Options[optionName] then
-										print(httpService:JSONEncode(AutoKit.Options[optionName]))
-										AutoKit.Options[optionName]:SetValue(value)
-										if value and not AutoKit.Options[optionName].Enabled then
-											AutoKit.Options[optionName]:Toggle()
-										elseif not value and AutoKit.Options[optionName].Enabled then
-											AutoKit.Options[optionName]:Toggle()
-										end
-									end
+			repeat
+				task.wait(0.1)
+			until (store.equippedKit ~= '' and store.matchState ~= 0) or not AutoKit.Enabled
+			if not AutoKit.Enabled then
+				return
+			end
+			local kit = store.equippedKit
+			if AutoKitFunctions[kit] and AutoKitSettings[kit] then
+				setUpUIAK(kit, AutoKitSettings[kit])
+					if AutoKit.SavedValues then
+					for optionName, value in pairs(AutoKit.SavedValues) do
+						local option = AutoKit.Options[optionName]
+						if option then
+							if option.SetValue then
+								option:SetValue(value)
+							end
+							if option.Enabled ~= nil and type(value) == "boolean" then
+								if option.Enabled ~= value then
+									option:Toggle()
 								end
 							end
-							AutoKit.SavedValues = nil
 						end
-						AutoKitFunctions[store.equippedKit](AutoKitSettings[store.equippedKit])
 					end
-				else
-					if store.matchState == 0 then
-						return
-					end
-					vape:CreateNotification("AutoKit", "Your current kit is not supported yet!", 4, "warning")
-					return
+	
+					AutoKit.SavedValues = nil
+				end
+				AutoKitFunctions[kit](AutoKitSettings[kit])
+			else
+				if store.matchState ~= 0 then
+					vape:CreateNotification("AutoKit","Your current kit is not supported yet!",4,"warning")
 				end
 			end
-		end,
-		Tooltip = 'Automatically uses kit abilities.'
+		end
 	})
 	local methods = {'Damage', 'Distance'}
 	for i in sortmethods do
 		if not table.find(methods, i) then
 			table.insert(methods, i)
 		end
-	end			
-	Sorts = AutoKit:CreateDropdown({Name = 'Sort',List=methods})
+	end
+	Sorts = AutoKit:CreateDropdown({
+		Name = 'Sort',
+		List = methods
+	})
 end)
 
 Tun(function() -- keep this if ur a dev this disables speed n fly whenever you anti cheat
