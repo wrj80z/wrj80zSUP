@@ -15413,9 +15413,8 @@ run(function()
 				if NoSlow.Enabled then
 					if not old then
 						old = bedwars.DragonSlayerController.playPunchAnimation
-						bedwars.DragonSlayerController.playPunchAnimation = function(...)
+						bedwars.DragonSlayerController.playPunchAnimation = function(self,arg)
 							if NoSlow.Enabled then
-								local arg = select(2, ...)
 								local import = debug.getupvalue(old, 1)
 								local task = import.new()
 								local anim = nil
@@ -15461,7 +15460,11 @@ run(function()
 					task.wait(dela)
 					if Animations.Enabled then
 						bedwars.DragonSlayerController:deleteEmblem(v)
-						bedwars.DragonSlayerController:playPunchAnimation(Vector3.zero)
+				        local playerPos = lplr.Character:GetPrimaryPartCFrame().Position
+				        local targetPos = v:GetPrimaryPartCFrame().Position * Vector3.new(1, 0, 1) + Vector3.new(0, playerPos.Y, 0)
+				        local lookAtCFrame = CFrame.new(playerPos, targetPos)
+				        lplr.Character:PivotTo(lookAtCFrame)
+						bedwars.DragonSlayerController:playPunchAnimation(lookAtCFrame - lookAtCFrame.Position)
 						bedwars.Client:Get('RequestDragonPunch'):SendToServer({
 							target = v
 						})
