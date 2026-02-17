@@ -15446,7 +15446,7 @@ run(function()
 								
 								return task
 							else
-								return old(...)
+								return old(self,arg)
 							end
 						end
 					end
