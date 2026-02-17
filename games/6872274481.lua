@@ -15626,6 +15626,13 @@ run(function()
 			end
 		end	
 	})
+	DepoRange = AutoBee:CreateSlider({
+		Name = "Deposit Range",
+		Default = 8,
+		Min = 0,
+		Max = 12,
+		Darker = true
+	})
 	AutoDepo = AutoBee:CreateToggle({
 		Name = "Auto Deposit",
 		Default = true,
@@ -15633,9 +15640,9 @@ run(function()
 			DepoRange.Object.Visible = cb
 		end
 	})
-	DepoRange = AutoBee:CreateSlider({
-		Name = "Deposit Range",
-		Default = 8,
+	CollectRange = AutoBee:CreateSlider({
+		Name = "Collection Range",
+		Default = 6,
 		Min = 0,
 		Max = 12,
 		Darker = true
@@ -15646,13 +15653,6 @@ run(function()
 		Function = function(cb)
 			CollectRange.Object.Visible = cb
 		end
-	})
-	CollectRange = AutoBee:CreateSlider({
-		Name = "Collection Range",
-		Default = 6,
-		Min = 0,
-		Max = 12,
-		Darker = true
 	})
 	Limit = AutoBee:CreateToggle({
 		Name = "Limit to item",
