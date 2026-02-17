@@ -15561,7 +15561,7 @@ run(function()
 							continue
 						end
 						for osoi, bee in collectionService:GetTagged('bee') do
-							local deltaPos = (bee.Position - entitylib.character.RootPart.Position).Magnitude
+							local deltaPos = (bee.PrimaryPart.Position - entitylib.character.RootPart.Position).Magnitude
 							if deltaPos <= CollectRange.Value then
 								if Limit.Enabled then
 									if not isHoldingBeeNet() then
