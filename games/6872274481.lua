@@ -20179,7 +20179,7 @@ run(function()
 	local function GetCurrentStats()
 		return {
 			price = workspace:GetAttribute('ChickenPrice') or 35,
-			cur  workspace:GetAttribute('Currency') or 'Iron'
+			cur = workspace:GetAttribute('Currency') or 'Iron'
 		}
 	end
 
