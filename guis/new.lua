@@ -6375,6 +6375,7 @@ local textguisort = textgui:CreateDropdown({
 local textguifont = textgui:CreateFont({
 	Name = 'Font',
 	Blacklist = 'Arial',
+	Default = 'SourceSans',
 	Function = function()
 		mainapi:UpdateTextGUI()
 	end
@@ -6914,7 +6915,7 @@ function mainapi:UpdateTextGUI(afterload)
 		VapeLogo.Position = right and UDim2.new(1 / VapeTextScale.Scale, -113, 0, 6) or UDim2.fromOffset(0, 6)
 		VapeLogoShadow.Visible = textguishadow.Enabled
 		VapeLabelCustom.Text = textguibox.Value
-		VapeLabelCustom.FontFace = textguifontcustom.Value
+		VapeLabelCustom.FontFace = Font.fromEnum(Enum.Font.SourceSans)
 		VapeLabelCustom.Visible = VapeLabelCustom.Text ~= '' and textguitext.Enabled
 		VapeLabelCustomShadow.Visible = VapeLabelCustom.Visible and textguishadow.Enabled
 		VapeLabelSorter.HorizontalAlignment = right and Enum.HorizontalAlignment.Right or Enum.HorizontalAlignment.Left
@@ -6978,7 +6979,7 @@ function mainapi:UpdateTextGUI(afterload)
 				holdertext.BorderSizePixel = 0
 				holdertext.Text = i..(v.ExtraText and " <font color='#A8A8A8'>"..v.ExtraText()..'</font>' or '')
 				holdertext.TextSize = 15
-				holdertext.FontFace = textguifont.Value
+				holdertext.FontFace = Font.fromEnum(Enum.Font.SourceSans)
 				holdertext.RichText = true
 				local size = getfontsize(removeTags(holdertext.Text), holdertext.TextSize, holdertext.FontFace)
 				holdertext.Size = UDim2.fromOffset(size.X, size.Y)
