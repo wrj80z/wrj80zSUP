@@ -16755,7 +16755,7 @@ run(function()
 				end	
 				task.wait(0.1)
 			until not AutoKit.Enabled
-		end
+		end,
 		ice_queen = function(sets)
 			local last = 0
 			repeat
