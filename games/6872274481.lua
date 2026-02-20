@@ -8008,7 +8008,7 @@ run(function()
 			return true
 		end
 		local currentTime = tick()
-		local delayBetweenHits = (10 / HR.Value) * 0.98
+		local delayBetweenHits = (10 / HR.Value) * 0.88
 		if HR.Value >= 36 then
 			return true
 		end
