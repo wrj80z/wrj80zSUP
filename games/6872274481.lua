@@ -20133,7 +20133,7 @@ run(function()
 		end)
 	end
 
-	local function AutoSell(curr,pr)
+	local function AutoSellFunc(curr,pr)
 		task.wait(math.random())
 		bedwars.Client:Get('BedwarsPurchaseItem'):CallServerAsync({
 			shopItem = {
@@ -20226,25 +20226,25 @@ run(function()
 							if DropDownType.Value == 'Iron' then
 								if workspace:GetAttribute('ChickenCurrency') == 'Iron' or workspace:GetAttribute('ChickenCurrency') == 'iron' then
 									if workspace:GetAttribute('ChickenPrice') <= Amount.Value then
-										AutoSell(workspace:GetAttribute('ChickenCurrency'),workspace:GetAttribute('ChickenPrice'))
+										AutoSellFunc(workspace:GetAttribute('ChickenCurrency'),workspace:GetAttribute('ChickenPrice'))
 									end
 								end
 							elseif DropDownType.Value == 'Diamond' then
 								if workspace:GetAttribute('ChickenCurrency') == 'Diamond' or workspace:GetAttribute('ChickenCurrency') == 'diamond' then
 									if workspace:GetAttribute('ChickenPrice') <= Amount.Value then
-										AutoSell(workspace:GetAttribute('ChickenCurrency'),workspace:GetAttribute('ChickenPrice'))
+										AutoSellFunc(workspace:GetAttribute('ChickenCurrency'),workspace:GetAttribute('ChickenPrice'))
 									end
 								end
 							elseif DropDownType.Value == 'Emerald' then
 								if workspace:GetAttribute('ChickenCurrency') == 'Emerald' or workspace:GetAttribute('ChickenCurrency') == 'emerald' then
 									if workspace:GetAttribute('ChickenPrice') <= Amount.Value then
-										AutoSell(workspace:GetAttribute('ChickenCurrency'),workspace:GetAttribute('ChickenPrice'))
+										AutoSellFunc(workspace:GetAttribute('ChickenCurrency'),workspace:GetAttribute('ChickenPrice'))
 									end
 								end
 							else
 								if workspace:GetAttribute('ChickenCurrency') == 'Iron' or workspace:GetAttribute('ChickenCurrency') == 'iron' then
 									if workspace:GetAttribute('ChickenPrice') <= Amount.Value then
-										AutoSell(workspace:GetAttribute('ChickenCurrency'),workspace:GetAttribute('ChickenPrice'))
+										AutoSellFunc(workspace:GetAttribute('ChickenCurrency'),workspace:GetAttribute('ChickenPrice'))
 									end
 								end
 							end
