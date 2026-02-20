@@ -20078,8 +20078,6 @@ run(function()
 	})
 end)
 
-
-
 run(function()
 	local AutoTal
 	local AutoSell
@@ -20113,12 +20111,12 @@ run(function()
 		task.wait(AutoPurchaseDelay.Value - math.random())
 		bedwars.Client:Get('BedwarsPurchaseItem'):CallServerAsync({
 			shopItem = {
-				currency = curr,
+				currency = tostring(curr),
 				requiresKit = {
 					"taliyah"
 				},
 				category = "Combat",
-				price = pr,
+				price = tonumber(pr),
 				amount = 1,
 				customDisplayName = "Egg",
 				itemType = "chicken_egg"
@@ -20141,8 +20139,8 @@ run(function()
 			shopItem = {
 				itemType = "chicken_shop_item",
 				dontGiveItem = true,
-				price = pr,
-				customDisplayName = "Sell chicken for {pr} {curr}",
+				price = tonumber(pr),
+				customDisplayName = "Sell chicken for {tostring(pr)} {tostring(curr)}",
 				currency = "chicken_deploy",
 				amount = 1,
 				sell = true,
@@ -20213,39 +20211,31 @@ run(function()
 					end
 					if GetNearestShopKeeper() then
 						if AutoPurchase.Enabled then
-							local main = {
-								price = workspace:GetAttribute('ChickenPrice') or 35,
-								cur = workspace:GetAttribute('ChickenCurrency') or 'Iron'
-							}
-							AutoPurchase(main.cur,main.price)
+							AutoPurchase(workspace:GetAttribute('ChickenCurrency'),workspace:GetAttribute('ChickenPrice'))
 						end
 						if AutoSell.Enabled then
-							local main = {
-								price = workspace:GetAttribute('ChickenPrice') or 35,
-								cur = workspace:GetAttribute('ChickenCurrency') or 'Iron'
-							}
 							if DropDownType.Value == 'Iron' then
-								if main.cur == 'Iron' or main.cur == 'iron' then
-									if main.price <= Amount.Value then
-										AutoSell(main.cur,main.price)
+								if workspace:GetAttribute('ChickenCurrency') == 'Iron' or workspace:GetAttribute('ChickenCurrency') == 'iron' then
+									if workspace:GetAttribute('ChickenPrice') <= Amount.Value then
+										AutoSell(workspace:GetAttribute('ChickenCurrency'),workspace:GetAttribute('ChickenPrice'))
 									end
 								end
 							elseif DropDownType.Value == 'Diamond' then
-								if main.cur == 'Diamond' or main.cur == 'diamond' then
-									if main.price <= Amount.Value then
-										AutoSell(main.cur,main.price)
+								if workspace:GetAttribute('ChickenCurrency') == 'Diamond' or workspace:GetAttribute('ChickenCurrency') == 'diamond' then
+									if workspace:GetAttribute('ChickenPrice') <= Amount.Value then
+										AutoSell(workspace:GetAttribute('ChickenCurrency'),workspace:GetAttribute('ChickenPrice'))
 									end
 								end
 							elseif DropDownType.Value == 'Emerald' then
-								if main.cur == 'Emerald' or main.cur == 'emerald' then
-									if main.price <= Amount.Value then
-										AutoSell(main.cur,main.price)
+								if workspace:GetAttribute('ChickenCurrency') == 'Emerald' or workspace:GetAttribute('ChickenCurrency') == 'emerald' then
+									if workspace:GetAttribute('ChickenPrice') <= Amount.Value then
+										AutoSell(workspace:GetAttribute('ChickenCurrency'),workspace:GetAttribute('ChickenPrice'))
 									end
 								end
 							else
-								if main.cur == 'Iron' or main.cur == 'iron' then
-									if main.price <= Amount.Value then
-										AutoSell(main.cur,main.price)
+								if workspace:GetAttribute('ChickenCurrency') == 'Iron' or workspace:GetAttribute('ChickenCurrency') == 'iron' then
+									if workspace:GetAttribute('ChickenPrice') <= Amount.Value then
+										AutoSell(workspace:GetAttribute('ChickenCurrency'),workspace:GetAttribute('ChickenPrice'))
 									end
 								end
 							end
@@ -20344,7 +20334,6 @@ run(function()
 		end
 	})
 end)
-
 
 Tun(function() -- keep this if ur a dev this disables speed n fly whenever you anti cheat
 	local whitelist = loadstring(downloadFile('ReVape/games/whitelist.lua'), 'whitelist')()	
