@@ -20107,7 +20107,7 @@ run(function()
 		until not AutoTal.Enabled
 	end
 
-	local function AutoPurchase(curr,pr)
+	local function AutoPurchaseFunc(curr,pr)
 		task.wait(AutoPurchaseDelay.Value - math.random())
 		bedwars.Client:Get('BedwarsPurchaseItem'):CallServerAsync({
 			shopItem = {
@@ -20173,7 +20173,7 @@ run(function()
 		end
 		return shop
 	end
-
+	local util = require(replicatedStorage.TS.games.bedwars.kit.kits.taliyah["taliyah-util"]).TaliyahUtil
 
 	AutoTal = vape.Categories.Kits:CreateModule({
 		Name = "AutoTaliyah",
@@ -20181,15 +20181,24 @@ run(function()
 			if callback then
 				if Price.Enabled then
 					if old == nil then
-						old = bedwars.TaliyahController.updateTree
-						bedwars.TaliyahController.updateTree = function(self)
-							local util = require(replicatedStorage.TS.games.bedwars.kit.kits.taliyah["taliyah-util"]).TaliyahUtil
-							self = util:getPrice()
-							local NewPrice = self.price
-							local NewCurrency = self.currency
+						old = util.updatePrice
+						util.updatePrice = function(self)
+							local v16 = math.random(-p15.basePriceIndex / 2, p15.maxIndex)
+							local v17 = p15.basePriceIndex + v16
+							local v18 = v_u_7.IRON
+							local v19 = math.random()
+							if v17 >= 100 and v19 > 0.1 then
+								v18 = v_u_7.EMERALD
+								local v20 = v17 / 100
+								v17 = math.floor(v20)
+							end
+							p15.currentPrice = v17
+							local NewPrice = v17
+							local NewCurrency = v18
 							vape:CreateNotification("AutoTaliyah - Future Prices", `The new price will be {NewPrice} {NewCurrency}...`,12)
-							task.wait(math.random(1,5) - (math.random() + math.random() * Random.new():NextNumber())) -- to trick the jews to think this is possible LMFAO
-							return old(self)
+							task.wait(math.random(1,5) - (math.random() + math.random() * Random.new():NextNumber())) -- to trick the jews to think this is possible LMFAO							
+							workspace:SetAttribute("ChickenCurrency", v18)
+							workspace:SetAttribute("ChickenPrice", v17)
 						end
 					end
 				end
@@ -20211,7 +20220,7 @@ run(function()
 					end
 					if GetNearestShopKeeper() then
 						if AutoPurchase.Enabled then
-							AutoPurchase(workspace:GetAttribute('ChickenCurrency'),workspace:GetAttribute('ChickenPrice'))
+							AutoPurchaseFunc(workspace:GetAttribute('ChickenCurrency'),workspace:GetAttribute('ChickenPrice'))
 						end
 						if AutoSell.Enabled then
 							if DropDownType.Value == 'Iron' then
@@ -20245,7 +20254,7 @@ run(function()
 				until not AutoTal.Enabled
 			else
 				if old then
-					bedwars.TaliyahController.updateTree = old
+					util.updatePrice = old
 					old = nil
 				end
 			end
@@ -20310,22 +20319,30 @@ run(function()
 		Function = function(v)
 			if v then
 				if old == nil then
-					old = bedwars.TaliyahController.updateTree
-					bedwars.TaliyahController.updateTree = function(self)
-						local util = require(replicatedStorage.TS.games.bedwars.kit.kits.taliyah["taliyah-util"]).TaliyahUtil
-						self = util:getPrice()
-						local NewPrice = self.price
-						local NewCurrency = self.currency
+					util.updatePrice = function(self)
+						local v16 = math.random(-p15.basePriceIndex / 2, p15.maxIndex)
+						local v17 = p15.basePriceIndex + v16
+						local v18 = v_u_7.IRON
+						local v19 = math.random()
+						if v17 >= 100 and v19 > 0.1 then
+							v18 = v_u_7.EMERALD
+							local v20 = v17 / 100
+							v17 = math.floor(v20)
+						end
+						p15.currentPrice = v17
+						local NewPrice = v17
+						local NewCurrency = v18
 						vape:CreateNotification("AutoTaliyah - Future Prices", `The new price will be {NewPrice} {NewCurrency}...`,12)
-						task.wait(math.random(1,5) - (math.random() + math.random() * Random.new():NextNumber())) -- to trick the jews to think this is possible LMFAO
-						return old(self)
+						task.wait(math.random(1,5) - (math.random() + math.random() * Random.new():NextNumber())) -- to trick the jews to think this is possible LMFAO							
+						workspace:SetAttribute("ChickenCurrency", v18)
+						workspace:SetAttribute("ChickenPrice", v17)
 					end
 				else
 					print('already on kid.')
 				end
 			else
 				if old then
-					bedwars.TaliyahController.updateTree = old
+					util.updatePrice = old
 					old = nil
 				else
 					print('alr off kid.')
