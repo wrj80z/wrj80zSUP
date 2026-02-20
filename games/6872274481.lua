@@ -20176,13 +20176,6 @@ run(function()
 		return shop
 	end
 
-	local function GetCurrentStats()
-		return {
-			price = workspace:GetAttribute('ChickenPrice') or 35,
-			cur = workspace:GetAttribute('Currency') or 'Iron'
-		}
-	end
-
 
 	AutoTal = vape.Categories.Kits:CreateModule({
 		Name = "AutoTaliyah",
@@ -20193,7 +20186,7 @@ run(function()
 						old = bedwars.TaliyahController.updateTree
 						bedwars.TaliyahController.updateTree = function(self)
 							local util = require(replicatedStorage.TS.games.bedwars.kit.kits.taliyah["taliyah-util"]).TaliyahUtil
-							self = util:GetStore()
+							self = util:getPrice()
 							local NewPrice = self.price
 							local NewCurrency = self.currency
 							vape:CreateNotification("AutoTaliyah - Future Prices", `The new price will be {NewPrice} {NewCurrency}...`,12)
@@ -20220,11 +20213,17 @@ run(function()
 					end
 					if GetNearestShopKeeper() then
 						if AutoPurchase.Enabled then
-							local self = GetCurrentStats()
-							AutoPurchase(self.cur,self.price)
+							local main = {
+								price = workspace:GetAttribute('ChickenPrice') or 35,
+								cur = workspace:GetAttribute('ChickenCurrency') or 'Iron'
+							}
+							AutoPurchase(main.cur,main.price)
 						end
 						if AutoSell.Enabled then
-							local main = GetCurrentStats()
+							local main = {
+								price = workspace:GetAttribute('ChickenPrice') or 35,
+								cur = workspace:GetAttribute('ChickenCurrency') or 'Iron'
+							}
 							if DropDownType.Value == 'Iron' then
 								if main.cur == 'Iron' or main.cur == 'iron' then
 									if main.price <= Amount.Value then
@@ -20324,7 +20323,7 @@ run(function()
 					old = bedwars.TaliyahController.updateTree
 					bedwars.TaliyahController.updateTree = function(self)
 						local util = require(replicatedStorage.TS.games.bedwars.kit.kits.taliyah["taliyah-util"]).TaliyahUtil
-						self = util:GetStore()
+						self = util:getPrice()
 						local NewPrice = self.price
 						local NewCurrency = self.currency
 						vape:CreateNotification("AutoTaliyah - Future Prices", `The new price will be {NewPrice} {NewCurrency}...`,12)
