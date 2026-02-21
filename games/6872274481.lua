@@ -8743,6 +8743,21 @@ run(function()
 		List = methods
 	})
 	ACheck = Killaura:CreateToggle({Name = 'Attackable Check',Tooltip='checks if the current target is possible to hit'})
+	KALegitFOV = CreateSlider({
+		Name = "FOV",
+		Min = 0,
+		Max = 120,
+		Default = 100,
+		Darker = true,
+		Visible = false
+	})
+	KALegit = Killaura:CreateToggle({
+		Name='Legit Mode',
+		Default=false,
+		Function = function(v)
+			KALegitFOV.Object.Visible = v
+		end
+	})
 	Mouse = Killaura:CreateToggle({Name = 'Require mouse down'})
 	Swing = Killaura:CreateToggle({Name = 'No Swing'})
 	GUI = Killaura:CreateToggle({Name = 'GUI check'})
@@ -8941,31 +8956,6 @@ run(function()
 	LegitAura = Killaura:CreateToggle({
 		Name = 'Swing Only',
 		Tooltip = 'Only attacks when the mouse is clicking'
-	})
-	SC = Killaura:CreateToggle({Name='Sigird Check',Default=true})
-	KALegitFOV = CreateSlider({
-		Name = "FOV",
-		Min = 0,
-		Max = 120,
-		Default = 100,
-		Darker = true,
-		Visible = false
-	})
-	KALegit = Killaura:CreateToggle({
-		Name='Legit Mode',
-		Default=false,
-		Function = function(v)
-			KALegitFOV.Object.Visible = v
-		end
-	})
-	SophiaCheck = Killaura:CreateToggle({
-		Name='Sophia Check',
-		Default=true,
-		Function = function(v)
-			if not v then
-				CURRENT_LEVEL_FROZEN = 0
-			end
-		end
 	})
 
 end)
