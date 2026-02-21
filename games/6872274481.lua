@@ -8039,7 +8039,6 @@ run(function()
 	local lastSwingTimes = {}
 	local KALegit
 	local KALegitFOV
-	local Animation
 	local function getAttackData()
 		if Mouse.Enabled then
 			if not inputService:IsMouseButtonPressed(0) then return false end
@@ -8198,62 +8197,6 @@ run(function()
 				if inputService.TouchEnabled then
 					pcall(function()
 						lplr.PlayerGui.MobileUI['2'].Visible = Limit.Enabled
-					end)
-				end
-
-				if Animation.Enabled and not (identifyexecutor and table.find({'Argon', 'Delta','Codex'}, ({identifyexecutor()})[1])) then
-					local fake = {
-						Controllers = {
-							ViewmodelController = {
-								isVisible = function()
-									return not Attacking
-								end,
-								playAnimation = function(...)
-									if not Attacking then
-										bedwars.ViewmodelController:playAnimation(select(2, ...))
-									end
-								end
-							}
-						}
-					}
-					debug.setupvalue(oldSwing or bedwars.SwordController.playSwordEffect, 6, fake)
-					debug.setupvalue(bedwars.ScytheController.playLocalAnimation, 3, fake)
-
-					task.spawn(function()
-						local started = false
-						repeat
-							if Attacking then
-								if not armC0 then
-									armC0 = gameCamera.Viewmodel.RightHand.RightWrist.C0
-								end
-								local first = not started
-								started = true
-
-								if AnimationMode.Value == 'Random' then
-									anims.Random = {{CFrame = CFrame.Angles(math.rad(math.random(1, 360)), math.rad(math.random(1, 360)), math.rad(math.random(1, 360))), Time = 0.12}}
-								end
-
-								for _, v in anims[AnimationMode.Value] do
-									AnimTween = tweenService:Create(gameCamera.Viewmodel.RightHand.RightWrist, TweenInfo.new(first and (AnimationTween.Enabled and 0.001 or 0.1) or v.Time / AnimationSpeed.Value, Enum.EasingStyle.Linear), {
-										C0 = armC0 * v.CFrame
-									})
-									AnimTween:Play()
-									AnimTween.Completed:Wait()
-									first = false
-									if (not Killaura.Enabled) or (not Attacking) then break end
-								end
-							elseif started then
-								started = false
-								AnimTween = tweenService:Create(gameCamera.Viewmodel.RightHand.RightWrist, TweenInfo.new(AnimationTween.Enabled and 0.001 or 0.3, Enum.EasingStyle.Exponential), {
-									C0 = armC0
-								})
-								AnimTween:Play()
-							end
-
-							if not started then
-								task.wait(1 / UpdateRate.Value)
-							end
-						until (not Killaura.Enabled) or (not Animation.Enabled)
 					end)
 				end
 
