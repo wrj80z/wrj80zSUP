@@ -8052,7 +8052,7 @@ run(function()
 		if Limit.Enabled then
 			if store.hand.toolType ~= 'sword' or bedwars.DaoController.chargingMaid then return false end
 		end
-		if LegitAura.Enabled or KALegit.Enabled then
+		if LegitAura.Enabled then
 			if (tick() - bedwars.SwordController.lastSwing) >= 0.2 then
 				CanHit = false
 				return false
