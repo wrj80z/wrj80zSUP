@@ -6190,83 +6190,206 @@ run(function()
 end)
 	
 run(function()
-	local FPSBoost
-	local Kill
-	local Visualizer
-	local effects, util = {}, {}
-	
-	FPSBoost = vape.Categories.Legit:CreateModule({
-		Name = 'FPS Boost',
-		Function = function(callback)
-			if callback then
-				if Kill.Enabled then
-					for i, v in bedwars.KillEffectController.killEffects do
-						if not i:find('Custom') then
-							effects[i] = v
-							bedwars.KillEffectController.killEffects[i] = {
-								new = function() 
-									return {
-										onKill = function() end, 
-										isPlayDefaultKillEffect = function() 
-											return true 
-										end
-									} 
-								end
-							}
-						end
-					end
-				end
-	
-				if Visualizer.Enabled then
-					for i, v in bedwars.VisualizerUtils do
-						util[i] = v
-						bedwars.VisualizerUtils[i] = function() end
-					end
-				end
-	
-				repeat task.wait(0.1) until store.matchState ~= 0
-				if not bedwars.AppController then return end
-				bedwars.NametagController.addGameNametag = function() end
-				for _, v in bedwars.AppController:getOpenApps() do
-					if tostring(v):find('Nametag') then
-						bedwars.AppController:closeApp(tostring(v))
-					end
-				end
-			else
-				for i, v in effects do 
-					bedwars.KillEffectController.killEffects[i] = v 
-				end
-				for i, v in util do 
-					bedwars.VisualizerUtils[i] = v 
-				end
-				table.clear(effects)
-				table.clear(util)
-			end
-		end,
-		Tooltip = 'Improves the framerate by turning off certain effects'
-	})
-	Kill = FPSBoost:CreateToggle({
-		Name = 'Kill Effects',
-		Function = function()
-			if FPSBoost.Enabled then
-				FPSBoost:Toggle()
-				FPSBoost:Toggle()
-			end
-		end,
-		Default = true,
-				Visible = true
-	})
-	Visualizer = FPSBoost:CreateToggle({
-		Name = 'Visualizer',
-		Function = function()
-			if FPSBoost.Enabled then
-				FPSBoost:Toggle()
-				FPSBoost:Toggle()
-			end
-		end,
-		Default = true,
-				Visible = true
-	})
+    local FPSBoost
+    local ParticleToggle
+    local ShadowToggle
+    local ArmorToggle
+    local TitanToggle
+    local EffectsOnlyToggle
+    local connections = {}
+    local particleOriginal = {}
+    local shadowOriginal = {}
+    local hiddenArmor = {}
+    local titanOriginal = {}
+    local titanProcessed = {}
+    local titanPatterns = {"titan","golem","bhaa","spiritgolem","voidgolem"}
+    local function matchesTitan(name)
+        local lower = name:lower()
+        for _,pattern in ipairs(titanPatterns) do
+            if lower:find(pattern,1,true) then
+                return true
+            end
+        end
+        return false
+    end
+
+    local particleTypes = {
+        ParticleEmitter = true,
+        Trail = true,
+        Beam = true,
+        Fire = true,
+        Smoke = true,
+        Sparkles = true
+    }
+
+    local function removeParticle(obj)
+        if particleTypes[obj.ClassName] then
+            if particleOriginal[obj] == nil then
+                particleOriginal[obj] = obj.Enabled
+            end
+            obj.Enabled = false
+        end
+    end
+
+    local function removeShadow(obj)
+        if obj:IsA("BasePart") then
+            if shadowOriginal[obj] == nil then
+                shadowOriginal[obj] = obj.CastShadow
+            end
+            obj.CastShadow = false
+        end
+    end
+
+    local function hideArmor(char)
+        if not char or char == lplr.Character then return end
+        for _,v in ipairs(char:GetChildren()) do
+            if v:IsA("Accessory") and not hiddenArmor[v] then
+                hiddenArmor[v] = char
+                v.Parent = nil
+            end
+        end
+    end
+
+    local function processTitan(model)
+        if titanProcessed[model] then return end
+        titanProcessed[model] = true
+
+        local effectsOnly = EffectsOnlyToggle and EffectsOnlyToggle.Enabled
+
+        for _,obj in ipairs(model:GetDescendants()) do
+            if obj:IsA("ParticleEmitter") then
+                titanOriginal[obj] = {Enabled = obj.Enabled}
+                obj.Enabled = false
+
+            elseif obj:IsA("Sound") then
+                titanOriginal[obj] = {Volume = obj.Volume}
+                obj.Volume = 0
+
+            elseif not effectsOnly then
+                if obj:IsA("BasePart") then
+                    titanOriginal[obj] = {
+                        Transparency = obj.Transparency,
+                        CanCollide = obj.CanCollide,
+                        CastShadow = obj.CastShadow
+                    }
+                    obj.Transparency = 1
+                    obj.CanCollide = false
+                    obj.CastShadow = false
+
+                elseif obj:IsA("Decal") or obj:IsA("Texture") then
+                    titanOriginal[obj] = {Transparency = obj.Transparency}
+                    obj.Transparency = 1
+                end
+            end
+        end
+    end
+
+    local function applyAll()
+        for _,obj in ipairs(workspace:GetDescendants()) do
+            if ParticleToggle.Enabled then removeParticle(obj) end
+            if ShadowToggle.Enabled then removeShadow(obj) end
+        end
+
+        if ArmorToggle.Enabled then
+            for _,plr in ipairs(game.Players:GetPlayers()) do
+                if plr ~= lplr and plr.Character then
+                    hideArmor(plr.Character)
+                end
+            end
+        end
+
+        if TitanToggle.Enabled then
+            for _,model in ipairs(workspace:GetChildren()) do
+                if model:IsA("Model") and matchesTitan(model.Name) then
+                    processTitan(model)
+                end
+            end
+        end
+    end
+
+    local function restoreAll()
+        for obj,val in pairs(particleOriginal) do
+            if obj and obj.Parent then
+                pcall(function() obj.Enabled = val end)
+            end
+        end
+
+        for obj,val in pairs(shadowOriginal) do
+            if obj and obj.Parent then
+                pcall(function() obj.CastShadow = val end)
+            end
+        end
+
+        for acc,char in pairs(hiddenArmor) do
+            if acc and char and char.Parent then
+                pcall(function() acc.Parent = char end)
+            end
+        end
+
+        for obj,props in pairs(titanOriginal) do
+            if obj and obj.Parent then
+                pcall(function()
+                    for k,v in pairs(props) do
+                        obj[k] = v
+                    end
+                end)
+            end
+        end
+
+        table.clear(particleOriginal)
+        table.clear(shadowOriginal)
+        table.clear(hiddenArmor)
+        table.clear(titanOriginal)
+        table.clear(titanProcessed)
+
+        for _,conn in ipairs(connections) do
+            conn:Disconnect()
+        end
+        table.clear(connections)
+    end
+
+    FPSBoost = vape.Categories.Legit:CreateModule({
+        Name = "FPS Boost",
+        Function = function(callback)
+            if callback then
+                applyAll()
+
+                table.insert(connections,
+                    workspace.DescendantAdded:Connect(function(obj)
+                        if ParticleToggle.Enabled then removeParticle(obj) end
+                        if ShadowToggle.Enabled then removeShadow(obj) end
+
+                        if TitanToggle.Enabled and obj:IsA("Model") and matchesTitan(obj.Name) then
+                            task.delay(0.1,function()
+                                if obj.Parent then
+                                    processTitan(obj)
+                                end
+                            end)
+                        end
+                    end)
+                )
+            else
+                restoreAll()
+            end
+        end
+    })
+
+    ParticleToggle = FPSBoost:CreateToggle({Name="Particle Remover", Default=true})
+    ShadowToggle = FPSBoost:CreateToggle({Name="Shadow Remover", Default=true})
+    ArmorToggle = FPSBoost:CreateToggle({Name="Armor Remover", Default=false})
+    TitanToggle = FPSBoost:CreateToggle({Name="Titan Remover", Default=true})
+
+    EffectsOnlyToggle = FPSBoost:CreateToggle({
+        Name="Titan Effects Only",
+        Default=false,
+        Function=function()
+            if FPSBoost.Enabled and TitanToggle.Enabled then
+                FPSBoost:Toggle()
+                task.wait()
+                FPSBoost:Toggle()
+            end
+        end
+    })
 end)
 	
 run(function()
