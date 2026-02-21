@@ -7984,7 +7984,7 @@ run(function()
 	local MaxTargets
 	local Mouse = {Enabled=false}
 	local Swing
-	local GUI
+	local GUI= {Enabled=false}
 	local BoxSwingColor
 	local BoxAttackColor
 	local ParticleTexture
