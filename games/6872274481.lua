@@ -7966,63 +7966,63 @@ run(function()
 end)
 
 local Killaura
-local ChargeTime
+local ChargeTime = {Enabled=false}
 
 run(function()
 	local CanHit = true
-	local MutiAura
-	local SophiaCheck
-	local MutiAuraDelay
-	local SyncHit
-	local Targets
-	local Sort
-	local SwingRange
-	local AttackRange
-	local AfterSwing
-	local UpdateRate
-	local AngleSlider
-	local MaxTargets
+	local MutiAura = {Enabled=false}
+	local SophiaCheck = {Enabled=false}
+	local MutiAuraDelay = {Enabled=false}
+	local SyncHit = {Enabled=false}
+	local Targets = {Enabled=false}
+	local Sort = {Enabled=false}
+	local SwingRange = {Enabled=false}
+	local AttackRange = {Enabled=false}
+	local AfterSwing = {Enabled=false}
+	local UpdateRate = {Enabled=false}
+	local AngleSlider = {Enabled=false}
+	local MaxTargets = {Enabled=false}
 	local Mouse = {Enabled=false}
-	local Swing
+	local Swing = {Enabled=false}
 	local GUI= {Enabled=false}
-	local BoxSwingColor
-	local BoxAttackColor
-	local ParticleTexture
-	local ParticleColor1
-	local ParticleColor2
-	local ParticleSize
-	local Face
-	local Animation
-	local AnimationMode
-	local AnimationSpeed
-	local AnimationTween
-	local Limit
-	local SC 
-	local RV
-	local HR
-	local FastHits
-	local HitsDelay
-	local AirHit
-	local AirHitsChance
-	local AfterSwing
-	local AfterSwingTime
-	local HitRegOption
-	local ACheck
-	local VisualiserRange
+	local BoxSwingColor= {Enabled=false}
+	local BoxAttackColor= {Enabled=false}
+	local ParticleTexture= {Enabled=false}
+	local ParticleColor1= {Enabled=false}
+	local ParticleColor2= {Enabled=false}
+	local ParticleSize= {Enabled=false}
+	local Face= {Enabled=false}
+	local Animation= {Enabled=false}
+	local AnimationMode= {Enabled=false}
+	local AnimationSpeed= {Enabled=false}
+	local AnimationTween= {Enabled=false}
+	local Limit= {Enabled=false}
+	local SC = {Enabled=false}
+	local RV= {Enabled=false}
+	local HR= {Enabled=false}
+	local FastHits= {Enabled=false}
+	local HitsDelay= {Enabled=false}
+	local AirHit= {Enabled=false}
+	local AirHitsChance= {Enabled=false}
+	local AfterSwing= {Enabled=false}
+	local AfterSwingTime= {Enabled=false}
+	local HitRegOption= {Enabled=false}
+	local ACheck= {Enabled=false}
+	local VisualiserRange= {Enabled=false}
 	local HRTR = {
 		[1] = 0.042,
 		[2] = 0.0042,
 	}
-	local ClosetMode
-	local AttackMode
-	local LegitAura = {}
-	local Particles, Boxes = {}, {}
+	local ClosetMode= {Enabled=false}
+	local AttackMode= {Enabled=false}
+	local LegitAura= {Enabled=false}
+	local Particles, Boxes = {Enabled=false}, {Enabled=false}
 	local rand = Random.new()
 	local anims, AnimDelay, AnimTween, armC0 = vape.Libraries.auraanims, tick()
 	local SwitchIndex = 1
 	local LastSwitchTime = 0
-	local SwitchDelay
-	local Visualiser
+	local SwitchDelay = {Enabled=false}
+	local Visualiser = {Enabled=false}
 	local AttackRemote = {SendToServer = function() end}
 	task.spawn(function()
 		AttackRemote = bedwars.Client:Get(remotes.AttackEntity)
