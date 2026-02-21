@@ -8258,7 +8258,7 @@ run(function()
 
 				local swingCooldown = 0
 				repeat
-					if ACheck.Enabled or KALegit.Enabled then
+					if ACheck.Enabled  then
 						CURRENT_LEVEL_FROZEN = lplr.Character:GetAttribute("ColdStacks") or lplr.Character:GetAttribute("FrostStacks") or lplr.Character:GetAttribute("FreezeStacks") or 0
 						if CURRENT_LEVEL_FROZEN >= FROZEN_THRESHOLD then
 							Attacking = false
@@ -8279,18 +8279,18 @@ run(function()
 					Attacking = false
 					store.KillauraTarget = nil
 					if sword then
-						if ACheck.Enabled or (KALegit.Enabled and entitylib.isAlive and lplr.Character:FindFirstChild("elk"))  then task.wait(math.max(ChargeTime.Value, 0.08)) continue end
+						if ACheck.Enabled and entitylib.isAlive and lplr.Character:FindFirstChild("elk")  then task.wait(math.max(ChargeTime.Value, 0.08)) continue end
 						local isAde = string.find(string.lower(tostring(sword and sword.itemType or "")), "frost_hammer")
 						local selfpos = entitylib.character.RootPart.Position
 						local localfacing = entitylib.character.RootPart.CFrame.LookVector * Vector3.new(1, 0, 1)
 
 						local nonplrs_raw = entitylib.AllPosition({
-							Range = KALegit.Enabled and 20 or SwingRange.Value,
-							Wallcheck = KALegit.Enabled and true or Targets.Walls.Enabled or nil,
+							Range = SwingRange.Value,
+							Wallcheck = Targets.Walls.Enabled or nil,
 							Part = 'RootPart',
-							Players = KALegit.Enabled and true or Targets.Players.Enabled,
-							NPCs = KALegit.Enabled and true or Targets.NPCs.Enabled,
-							Limit = KALegit.Enabled and 1 or MaxTargets.Value,
+							Players = Targets.Players.Enabled,
+							NPCs =  Targets.NPCs.Enabled,
+							Limit = MaxTargets.Value,
 							Sort = sortmethods[Sort.Value]
 						})
 
@@ -8314,7 +8314,7 @@ run(function()
 
 							for _, v in plrs do
 								local delta = (v.RootPart.Position - selfpos)
-								local num = KALegit.Enabled and 13 or AttackRange.Value
+								local num = AttackRange.Value
 
 								table.insert(attacked, {
 									Entity = v,
@@ -8327,12 +8327,9 @@ run(function()
 									store.KillauraTarget = v
 									LastAuraTarget = v
 									AfterSwingDone = false
-									if KALegit.Enabled then
-										task.wait(0.11 + (Random.new():NextNumber(-0.03, 0.05)) - (math.random() * math.random()))
-									end
 									if not Swing.Enabled and AnimDelay < tick() and not LegitAura.Enabled then
 										AnimDelay = tick() + (meta.sword.respectAttackSpeedForEffects and meta.sword.attackSpeed or math.max(ChargeTime.Value, 0.11))
-										if not KALegit.Enabled or not LegitAura.Enabled then
+										if not LegitAura.Enabled then
 											bedwars.SwordController:playSwordEffect(meta, false)
 										end
 										if meta.displayName:find(' Scythe') then
@@ -8350,7 +8347,7 @@ run(function()
 								if (now - lastSwingForTarget) < requiredSwingDelay then
 									continue
 								end
-								if SyncHit.Enabled or KALegit.Enabled then
+								if SyncHit.Enabled  then
 									local swingSpeed = ChargeTime.Value
 									local lastHit = lastHitTimes[v] or 0
 									local timeSince = tick() - lastHit
@@ -8375,7 +8372,7 @@ run(function()
 									end
 
 									local canHitTarget = true
-									if MutiAura.Enabled and not KALegit.Enabled then
+									if MutiAura.Enabled then
 										if AirHit.Enabled then
 											local chance = math.random(0,100)
 											local state = v.Character.Humanoid:GetState()
@@ -8409,7 +8406,7 @@ run(function()
 											lastHitTimes[v] = tick()
 										end
 									else
-										if AirHit.Enabled or KALegit.Enabled then
+										if AirHit.Enabled  then
 											local chance = math.random(0,100)
 											local state = v.Character.Humanoid:GetState()
 											if (state == Enum.HumanoidStateType.Jumping or state == Enum.HumanoidStateType.Freefall) and chance > AirHitsChance.Value then
@@ -8444,7 +8441,7 @@ run(function()
 								end
 							end
 
-							if SyncHit.Enabled or KALegit.Enabled then
+							if SyncHit.Enabled then
 								CurrentSwingTICK = tick()
 							end
 						else
