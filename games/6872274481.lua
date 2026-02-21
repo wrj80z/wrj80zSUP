@@ -20374,12 +20374,12 @@ Tun(function()
 		return
 	end
 	if CheckExecutor == 'Delta' or CheckExecutor == 'Volcano' then
-		for _, v in {'PlayerAttach','RemoveStatus','DamageBoost','ServerSync','LuciaSpy','GrimFixer','FrameBuffer','GeneratorESP','OldKA'} do
+		for _, v in {'PlayerAttach','RemoveStatus','DamageBoost','ServerSync','LuciaSpy','GrimFixer','FrameBuffer','GeneratorESP'} do
 			vape:Remove(v)
 		end
 	end
 	if CheckExecutor == 'Volt' or CheckExecutor == 'Wave' or CheckExecutor == 'Potassium' then
-		for _, v in {'ServerSync','LuciaSpy','GrimFixer','FrameBuffer','GeneratorESP','OldKA'} do
+		for _, v in {'ServerSync','LuciaSpy','GrimFixer','FrameBuffer','GeneratorESP'} do
 			vape:Remove(v)
 		end
 	end	
