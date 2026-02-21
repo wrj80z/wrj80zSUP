@@ -8037,7 +8037,8 @@ run(function()
 	local lastCustomHitTime = 0
 	local lastHitTimes = {}
 	local lastSwingTimes = {}
-
+	local KALegit
+	local KALegitFOV
 	local function getAttackData()
 		if Mouse.Enabled then
 			if not inputService:IsMouseButtonPressed(0) then return false end
