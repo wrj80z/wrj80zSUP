@@ -7982,7 +7982,7 @@ run(function()
 	local UpdateRate
 	local AngleSlider
 	local MaxTargets
-	local Mouse
+	local Mouse = {Enabled=false}
 	local Swing
 	local GUI
 	local BoxSwingColor
@@ -8039,6 +8039,7 @@ run(function()
 	local lastSwingTimes = {}
 	local KALegit
 	local KALegitFOV
+
 	local function getAttackData()
 		if Mouse.Enabled then
 			if not inputService:IsMouseButtonPressed(0) then return false end
