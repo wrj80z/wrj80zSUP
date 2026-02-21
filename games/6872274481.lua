@@ -8016,7 +8016,7 @@ run(function()
 	local ClosetMode= {Enabled=false}
 	local AttackMode= {Enabled=false}
 	local LegitAura= {Enabled=false}
-	local Particles, Boxes = {Enabled=false}, {Enabled=false}
+	local Particles, Boxes = {},{}
 	local rand = Random.new()
 	local anims, AnimDelay, AnimTween, armC0 = vape.Libraries.auraanims, tick()
 	local SwitchIndex = 1
