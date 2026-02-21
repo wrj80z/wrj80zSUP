@@ -7,13 +7,6 @@
 
 local module = {}
 local eps = 1e-9
-local oldthread = 0
-
-if (getthreadidentity and setthreadidentity) or vape and vape.ThreadFix then
-	oldthread = getthreadidentity and getthreadidentity() or 0
-else
-	oldthread = 0
-end
 
 local cloneref = cloneref or function(obj)
 	return obj
@@ -56,8 +49,8 @@ local function solveCubic(c0, c1, c2, c3)
 	local sqA = A*A
 	local p = (1/3)*(-sqA/3 + B)
 	local q = 0.5*((2/27)*A*sqA - (A*B)/3 + C)
-
 	local D = q*q + p*p*p
+
 	local s0, s1, s2, num
 
 	if isZero(D) then
@@ -102,19 +95,12 @@ function module.solveQuartic(c0, c1, c2, c3, c4)
 	local q = 0.125*sqA*A - 0.5*A*B + C
 	local r = -(3/256)*sqA*sqA + 0.0625*sqA*B - 0.25*A*C + D
 
-	local coeffs = {}
 	local s0, s1, s2, s3
 
 	if isZero(r) then
-		coeffs = {1, 0, p, q}
-		s0, s1, s2 = solveCubic(coeffs[1], coeffs[2], coeffs[3], coeffs[4])
+		s0, s1, s2 = solveCubic(1, 0, p, q)
 	else
-		coeffs[1] = 1
-		coeffs[2] = -0.5*p
-		coeffs[3] = -r
-		coeffs[4] = 0.5*r*p - 0.125*q*q
-
-		local z = solveCubic(coeffs[1], coeffs[2], coeffs[3], coeffs[4])
+		local z = solveCubic(1, -0.5*p, -r, 0.5*r*p - 0.125*q*q)
 		if not z then return end
 
 		local u = z*z - r
@@ -137,104 +123,52 @@ function module.solveQuartic(c0, c1, c2, c3, c4)
 	return {s0, s1, s2, s3}
 end
 
-local function distanceScale(dist)
-	return math.clamp(1 + (dist - 80) / 480, 1, 1.75)
-end
-
-local function timeScale(t)
-	return math.clamp(1 + t * 0.45, 1, 1.6)
-end
-
 local lastVelocity = {}
+local lastTime = {}
+
 local function getSmoothedVelocity(player, part)
 	if not part or not part:IsA("BasePart") then
 		return Vector3.zero
 	end
 
-	local realPlayer
-	if player and player:IsA("Player") then
-		realPlayer = player
-	elseif player then
-		realPlayer = playersService:GetPlayerFromCharacter(player)
-	end
+	local realPlayer = player and player:IsA("Player") and player
+		or playersService:GetPlayerFromCharacter(player)
+
+	local vel = part.AssemblyLinearVelocity
 
 	if not realPlayer then
-		return part.AssemblyLinearVelocity
+		return vel
 	end
 
 	local id = realPlayer.UserId
-	local vel = part.AssemblyLinearVelocity
+	local now = tick()
 
 	if lastVelocity[id] then
-		vel = lastVelocity[id]:Lerp(vel, 0.35)
+		local alpha = math.clamp(vel.Magnitude / 60, 0.45, 0.8)
+		vel = lastVelocity[id]:Lerp(vel, alpha)
+
+		local dt = now - (lastTime[id] or now)
+		if dt > 0 then
+			local accel = (vel - lastVelocity[id]) / dt
+			vel = vel + accel * 0.08
+		end
 	end
 
 	lastVelocity[id] = vel
+	lastTime[id] = now
+
 	return vel
 end
 
-local function getPingSeconds()
+local function getPing()
 	local p = lplr and lplr:GetNetworkPing() or 0.01
 	return (p > 0 and p) or 0.01
 end
 
-function module.predictStrafingMovement(targetPlayer, targetPart, projSpeed, gravity, origin)
-	if not targetPart or not targetPart:IsA("BasePart") then
-		return Vector3.zero
-	end
-
-	local pos = targetPart.Position
-	local vel = getSmoothedVelocity(targetPlayer, targetPart)
-	local disp = pos - origin
-	local dist = disp.Magnitude
-	if dist < 1 then return pos end
-
-	local time = dist / projSpeed
-	local dScale = distanceScale(dist)
-	local tScale = timeScale(time)
-
-	time *= math.clamp(1.15 * dScale, 1.15, 1.9)
-
-	local hVel = Vector3.new(vel.X, 0, vel.Z)
-	local hPred = hVel * time * (0.85 * dScale)
-
-	local vPred
-	if vel.Y < -12 then
-		vPred = vel.Y * time * (0.38 * tScale)
-	elseif vel.Y > 10 then
-		vPred = vel.Y * time * (0.33 * tScale)
-	else
-		vPred = (vel.Y * time * 0.26) - (gravity * time * time * 0.12)
-	end
-
-	return pos + hPred + Vector3.new(0, vPred, 0)
-end
-
-local function predictWithPing(targetPlayer, targetPart, projSpeed, gravity, origin)
-	local ping = getPingSeconds()
-	local base = module.predictStrafingMovement(targetPlayer, targetPart, projSpeed, gravity, origin)
-
-	local vel = getSmoothedVelocity(targetPlayer, targetPart)
-	local dist = (base - origin).Magnitude
-	local pingScale = math.clamp(1 + dist / 350, 1, 1.6)
-
-	local lead = vel * ping * 0.9 * pingScale
-	lead = Vector3.new(lead.X, math.clamp(lead.Y, -8, 8), lead.Z)
-
-	return base + lead
-end
-
-function module.SolveTrajectory(origin, projectileSpeed, gravity, targetPos, targetVelocity, playerGravity, playerHeight, playerJump, params, targetPlayer, targetPart)
-
-	if (getthreadidentity and setthreadidentity) or vape and vape.ThreadFix then
-		task.spawn(function()
-			setthreadidentity(8)
-		end)
-	end	
-
+function module.SolveTrajectory(origin, projectileSpeed, gravity, targetPos, targetVelocity, _, _, _, _, targetPlayer, targetPart)
 	if targetPlayer and targetPart then
-		targetPos = predictWithPing(targetPlayer, targetPart, projectileSpeed, gravity, origin)
 		targetVelocity = getSmoothedVelocity(targetPlayer, targetPart)
+		targetPos = targetPart.Position
 	end
 
 	if not targetPos or not targetVelocity then
@@ -258,36 +192,34 @@ function module.SolveTrajectory(origin, projectileSpeed, gravity, targetPos, tar
 		j*j + h*h + k*k
 	)
 
-	local newPOS
-
+	local bestT
 	if solutions then
-		local bestT
 		for _, t in ipairs(solutions) do
-			if t and t > 0 and (not bestT or t < bestT) then
-				bestT = t
+			if t and t > 0.01 and t < 4 then
+				if not bestT or t < bestT then
+					bestT = t
+				end
 			end
 		end
+	end
 
-		if bestT then
-			local t = bestT * timeScale(bestT)
-			local vx = (h + p*t) / t
-			local vy = (j + q*t - l*t*t) / t
-			local vz = (k + r*t) / t
+	if bestT then
+		local ping = getPing()
+		bestT += ping + (0.5 / projectileSpeed)
 
-			newPOS = origin + Vector3.new(vx, vy, vz)
-		end
-	elseif gravity == 0 then
+		local vx = (h + p*bestT) / bestT
+		local vy = (j + q*bestT - l*bestT*bestT) / bestT
+		local vz = (k + r*bestT) / bestT
+
+		return origin + Vector3.new(vx, vy, vz)
+	end
+
+	if gravity == 0 then
 		local t = disp.Magnitude / projectileSpeed
-		newPOS = origin + disp + targetVelocity * t
+		return targetPos + targetVelocity * t
 	end
 
-	if (getthreadidentity and setthreadidentity) or vape and vape.ThreadFix then
-		task.spawn(function()
-			setthreadidentity(oldthread)
-		end)
-	end
-
-	return newPOS
+	return targetPos
 end
 
 return module
