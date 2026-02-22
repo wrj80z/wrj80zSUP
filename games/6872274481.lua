@@ -14782,28 +14782,28 @@ run(function()
                 AutoNoelle:Clean(playersService.PlayerAdded:Connect(function()
                     task.wait(0.5)
                     local newList = getTeammateList()
-                    if HealSlimeDropdown then HealSlimeDropdown:SetList(newList) end
-                    if VoidSlimeDropdown then VoidSlimeDropdown:SetList(newList) end
-                    if StickySlimeDropdown then StickySlimeDropdown:SetList(newList) end
-                    if FrostySlimeDropdown then FrostySlimeDropdown:SetList(newList) end
+                    if HealSlimeDropdown then HealSlimeDropdown:SetList(getTeammateList()) end
+                    if VoidSlimeDropdown then VoidSlimeDropdown:SetList(getTeammateList()) end
+                    if StickySlimeDropdown then StickySlimeDropdown:SetList(getTeammateList()) end
+                    if FrostySlimeDropdown then FrostySlimeDropdown:SetList(getTeammateList()) end
                 end))
                 
                 AutoNoelle:Clean(playersService.PlayerRemoving:Connect(function()
                     task.wait(0.5)
                     local newList = getTeammateList()
-                    if HealSlimeDropdown then HealSlimeDropdown:SetList(newList) end
-                    if VoidSlimeDropdown then VoidSlimeDropdown:SetList(newList) end
-                    if StickySlimeDropdown then StickySlimeDropdown:SetList(newList) end
-                    if FrostySlimeDropdown then FrostySlimeDropdown:SetList(newList) end
+                    if HealSlimeDropdown then HealSlimeDropdown:SetList(getTeammateList()) end
+                    if VoidSlimeDropdown then VoidSlimeDropdown:SetList(getTeammateList()) end
+                    if StickySlimeDropdown then StickySlimeDropdown:SetList(getTeammateList()) end
+                    if FrostySlimeDropdown then FrostySlimeDropdown:SetList(getTeammateList()) end
                 end))
                 
                 AutoNoelle:Clean(lplr:GetAttributeChangedSignal('Team'):Connect(function()
                     task.wait(1)
                     local newList = getTeammateList()
-                    if HealSlimeDropdown then HealSlimeDropdown:SetList(newList) end
-                    if VoidSlimeDropdown then VoidSlimeDropdown:SetList(newList) end
-                    if StickySlimeDropdown then StickySlimeDropdown:SetList(newList) end
-                    if FrostySlimeDropdown then FrostySlimeDropdown:SetList(newList) end
+                    if HealSlimeDropdown then HealSlimeDropdown:SetList(getTeammateList()) end
+                    if VoidSlimeDropdown then VoidSlimeDropdown:SetList(getTeammateList()) end
+                    if StickySlimeDropdown then StickySlimeDropdown:SetList(getTeammateList()) end
+                    if FrostySlimeDropdown then FrostySlimeDropdown:SetList(getTeammateList()) end
                 end))
             else
                 stopSlimeManagement()
@@ -14814,7 +14814,7 @@ run(function()
     
     HealSlimeToggle = AutoNoelle:CreateToggle({
         Name = "Heal Slime",
-        Default = false,
+        Default = true,
         Tooltip = "Assign heal slime to teammate",
         Function = function(callback)
             if HealSlimeDropdown and HealSlimeDropdown.Object then
@@ -14833,14 +14833,12 @@ run(function()
     HealSlimeDropdown = AutoNoelle:CreateDropdown({
         Name = "Heal Target",
         List = getTeammateList(),
-        Function = function(val)
-        end,
         Tooltip = "Select teammate for heal slime"
     })
     
     VoidSlimeToggle = AutoNoelle:CreateToggle({
         Name = "Void Slime",
-        Default = false,
+        Default = true,
         Tooltip = "Assign Void slime to teammate",
         Function = function(callback)
             if VoidSlimeDropdown and VoidSlimeDropdown.Object then
@@ -14864,7 +14862,7 @@ run(function()
     
     StickySlimeToggle = AutoNoelle:CreateToggle({
         Name = "Sticky Slime",
-        Default = false,
+        Default = true,
         Tooltip = "Assign Sticky slime to teammate",
         Function = function(callback)
             if StickySlimeDropdown and StickySlimeDropdown.Object then
@@ -14888,7 +14886,7 @@ run(function()
 
     FrostySlimeToggle = AutoNoelle:CreateToggle({
         Name = "Frosty Slime",
-        Default = false,
+        Default = true,
         Tooltip = "Assign Frosty slime to teammate",
         Function = function(callback)
             if FrostySlimeDropdown and FrostySlimeDropdown.Object then
