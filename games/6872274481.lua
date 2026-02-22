@@ -9371,18 +9371,18 @@ run(function()
 						end
  						local targetPlayer = playersService:FindFirstChild(Target.Value)
                         if targetPlayer then
-							local delta = (targetPlayer.HumanoidRootPart.Position - entitylib.character.RootPart.Position).Magnitude
+							local delta = (targetPlayer.Character.HumanoidRootPart.Position - entitylib.character.RootPart.Position).Magnitude
 							if delta <= MountRange.Value then
 								if Limits.Enabled then
 									if store.inventory.inventory.hand.itemType == 'owl_orb' then
 										WhisperController:request("Unmount")
 										task.wait(math.random())
-										WhisperController:request("Mount",targetPlayer.Character)
+										WhisperController:request("Mount",targetPlayer)
 									end
 								else
 									WhisperController:request("Unmount")
 									task.wait(math.random())
-									WhisperController:request("Mount",targetPlayer.Character)
+									WhisperController:request("Mount",targetPlayer)
 								end
 							end
 						end
