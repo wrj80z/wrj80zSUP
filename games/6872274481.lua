@@ -9369,7 +9369,7 @@ run(function()
 							task.wait(0.15)
 							continue
 						end
- 						local targetPlayer = playersService:FindFirstChild(PlayerDropdown.Value)
+ 						local targetPlayer = playersService:FindFirstChild(Target.Value)
                         if targetPlayer then
 							local delta = (targetPlayer.HumanoidRootPart.Position - entitylib.character.RootPart.Position).Magnitude
 							if delta <= MountRange.Value then
