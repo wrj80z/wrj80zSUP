@@ -9389,7 +9389,7 @@ run(function()
 						task.wait(0.1)
 					end
 				end)
-                AutoWhisper:Clean(playersService.PlayerAdded:Connect(function()
+                BetterWhisper:Clean(playersService.PlayerAdded:Connect(function()
                     task.wait(0.5)
                     local newList = getTeammateList()
                     if Target then
@@ -9397,7 +9397,7 @@ run(function()
                     end
                 end))
                 
-                AutoWhisper:Clean(playersService.PlayerRemoving:Connect(function(player)
+                BetterWhisper:Clean(playersService.PlayerRemoving:Connect(function(player)
                     task.wait(0.5)
                     local newList = getTeammateList()
                     if Target then
@@ -9405,7 +9405,7 @@ run(function()
                     end
                 end))
                 
-                AutoWhisper:Clean(lplr:GetAttributeChangedSignal('Team'):Connect(function()
+                BetterWhisper:Clean(lplr:GetAttributeChangedSignal('Team'):Connect(function()
                     task.wait(0.5)
                     local newList = getTeammateList()
                     if Target then
