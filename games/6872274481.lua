@@ -9377,12 +9377,12 @@ run(function()
 									if store.inventory.inventory.hand.itemType == 'owl_orb' then
 										WhisperController:request("Unmount")
 										task.wait(math.random())
-										WhisperController:request("Mount",targetPlayer)
+										WhisperController:request("Mount",targetPlayer.Character)
 									end
 								else
 									WhisperController:request("Unmount")
 									task.wait(math.random())
-									WhisperController:request("Mount",targetPlayer)
+									WhisperController:request("Mount",targetPlayer.Character)
 								end
 							end
 						end
