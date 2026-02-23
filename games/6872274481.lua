@@ -13625,18 +13625,9 @@ run(function()
 								})
 								if AutoLaunch.Enabled then
 									task.wait(math.random() * math.random() * Random.new():NextNumber() + delay)
-									local call = bedwars.Client:Get('LaunchSelfFromCannon'):CallServer({cannonBlockPos = bedwars.BlockController:getBlockPosition(cannon.Position)})
+									local call = bedwars.Client:Get(bedwars.CannonLaunch):CallServer({cannonBlockPos = bedwars.BlockController:getBlockPosition(cannon.Position)})
 									if call then
-										local v30 = lplr.Character.PrimaryPart.AssemblyMass
-										lplr.Character.PrimaryPart:ApplyImpulse(cannon:GetAttribute('LookVector') * (v30 == nil and 0 or v30) * 200)
-										local pickaxe = getPickaxeSlot()
-										if hotbarSwitch(pickaxe) or store.hand.tool.Name:lower():find("pickaxe") then
-											bedwars.breakBlock(cannon)
-											bedwars.breakBlock(cannon)
-											if humanoid:GetState() ~= Enum.HumanoidStateType.Jumping then
-												humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
-											end
-										end
+										print('ye')
 									end
 								end								
 							else
@@ -13657,18 +13648,9 @@ run(function()
 								})
 								if AutoLaunch.Enabled then
 									task.wait(math.random() * math.random() * Random.new():NextNumber() + delay)
-									local call = bedwars.Client:Get('LaunchSelfFromCannon'):CallServer({cannonBlockPos = bedwars.BlockController:getBlockPosition(cannon.Position)})
+									local call = bedwars.Client:Get(bedwars.CannonLaunch):CallServer({cannonBlockPos = bedwars.BlockController:getBlockPosition(cannon.Position)})
 									if call then
-										local v30 = lplr.Character.PrimaryPart.AssemblyMass
-										lplr.Character.PrimaryPart:ApplyImpulse(cannon:GetAttribute('LookVector') * (v30 == nil and 0 or v30) * 200)
-										local pickaxe = getPickaxeSlot()
-										if hotbarSwitch(pickaxe) or store.hand.tool.Name:lower():find("pickaxe") then
-											bedwars.breakBlock(cannon)
-											bedwars.breakBlock(cannon)
-											if humanoid:GetState() ~= Enum.HumanoidStateType.Jumping then
-												humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
-											end
-										end
+										print('ye')
 									end
 								end
 							end
