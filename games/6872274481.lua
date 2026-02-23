@@ -16252,7 +16252,7 @@ run(function()
 			sets.Range = ak:CreateSlider({Name = "Distance", Min = 0, Max = 30, Default = 16,Visible = true})
 			sets.Delay = ak:CreateSlider({Name = "Delay", Min = 0, Max = 2, Default = 0.5,
 			Decimal = 10})
-			sets.ContractSelection = ak:CreateToggle({Name = "Contract Selection", Default = 'FirstHit',
+			sets.ContractSelection = ak:CreateDropdown({Name = "Contract Selection", Default = 'FirstHit',
 			List = {'LowHP','FirstHit','FarRange'}})
 			sets.Deselect = ak:CreateToggle({Name = "Deselect", Default = true,Visible = true})
 
