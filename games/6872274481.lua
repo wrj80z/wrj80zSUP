@@ -12999,7 +12999,7 @@ run(function()
 	})
 	BlacklistOption = BetterFisher:CreateToggle({
 		Name = "Blacklist Option",
-		Tooltip = 'enables the blacklist feature (iron_fish) that autojumps when its founded',
+		Tooltip = 'enables the blacklist feature (fish_iron) that autojumps when its founded',
 		Default = false,
 		Function = function(cv)
 			Blacklist.Object.Visible = cv
@@ -13007,7 +13007,7 @@ run(function()
 	})
 	Blacklist = BetterFisher:CreateTextList({
 		Name = "Blacklist",
-		Default = {'iron_fish'}
+		Default = {'fish_iron'}
 	})	
 end)
 
