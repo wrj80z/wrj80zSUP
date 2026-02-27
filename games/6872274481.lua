@@ -20579,7 +20579,7 @@ run(function()
 					old = bedwars.FlamethrowerController.useFlamethrower
 					bedwars.FlamethrowerController.useFlamethrower = function(arg)
 						local util = require(replicatedStorage.TS.games.bedwars.kit.kits.pyro['pyro-util']).PyroUtil
-						local ftu = require(replicatedStorage.TS.cooldown.["cooldown-id"]).CooldownId.FLAMETHROWER_USE
+						local ftu = require(replicatedStorage.TS.cooldown["cooldown-id"]).CooldownId.FLAMETHROWER_USE
 						if bedwars.CooldownController:isOnCooldown(ftu) then
 							if bedwars.CooldownController(ftu) < 0.25 then
 								bedwars.CooldownController(ftu, "buffer", function()
