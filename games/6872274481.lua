@@ -2268,7 +2268,6 @@ run(function()
 										if air == true then
 											air = false
 											task.wait(0.05)
-											return old(root, mass, dir, knockback, ...)
 										end
 									end)
 								end
