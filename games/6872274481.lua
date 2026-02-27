@@ -17517,6 +17517,7 @@ run(function()
 					Range = sets.Range.Value,
 					Origin = origin,
 					Players = true,
+					NPCs = true,
 					Wallcheck = true
 				})
 		
