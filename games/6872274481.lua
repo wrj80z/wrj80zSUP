@@ -3864,7 +3864,7 @@ run(function()
 				end
 			end)
 			task.spawn(function()
-				if Enchant.Enabled and ent.Player then
+				if Enchants.Enabled and ent.Player then
 					local Icon = Instance.new('ImageLabel')
 					Icon.Name = 'EnchantIcon'
 					Icon.Size = UDim2.fromOffset(30, 30)
