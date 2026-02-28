@@ -12761,7 +12761,7 @@ run(function()
 									end
 								end
 							end
-						until not AutoFisher.Enabled or not AutoCast.Enabled
+						until not BetterFisher.Enabled or not AutoCast.Enabled
 					end)
 				end
 			else
