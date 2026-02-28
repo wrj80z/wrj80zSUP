@@ -12693,6 +12693,7 @@ run(function()
 										if check then
 											local meta = bedwars.ProjectileMeta.fisherman_bobber
 											local dir = CFrame.lookAt(movedir, gameCamera.CFrame.Position).LookVector * meta.launchVelocity
+											bedwars.ProjectileController:createLocalProjectile(meta, rod, 'fisherman_bobber', movedir, httpService:GenerateGUID(true), dir, {drawDurationSeconds = 0})
 											projectileRemote:InvokeServer(
 												rod,
 												'fisherman_bobber', 'fisherman_bobber',
@@ -12701,7 +12702,6 @@ run(function()
 												{drawDurationSeconds = 0, shotId = httpService:GenerateGUID(false)},
 												workspace:GetServerTimeNow() - 0.045
 											)
-					print('fired projectile',workspace:GetServerTimeNow() - 0.085)
 										end
 									end
 								end
@@ -12801,6 +12801,7 @@ run(function()
 									if check then
 										local meta = bedwars.ProjectileMeta.fisherman_bobber
 										local dir = CFrame.lookAt(movedir, gameCamera.CFrame.Position).LookVector * meta.launchVelocity
+										bedwars.ProjectileController:createLocalProjectile(meta, rod, 'fisherman_bobber', movedir, httpService:GenerateGUID(true), dir, {drawDurationSeconds = 0})
 										projectileRemote:InvokeServer(
 											rod,
 											'fisherman_bobber', 'fisherman_bobber',
