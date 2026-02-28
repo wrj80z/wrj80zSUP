@@ -12748,7 +12748,7 @@ run(function()
 										local check = game.Workspace:Blockcast(root.CFrame, Vector3.new(3, 1, 3), Vector3.new(0, -(entitylib.character.HipHeight + 1), 0), rayCheck)
 										if check then
 											local meta = bedwars.ProjectileMeta.fisherman_bobber
-											local dir = CFrame.lookAt(movedir, gameCamera.CFrame).LookVector * meta.launchVelocity
+											local dir = CFrame.lookAt(movedir, gameCamera.CFrame.Position).LookVector * meta.launchVelocity
 											projectileRemote:InvokeServer(
 												rod,
 												'fisherman_bobber', 'fisherman_bobber',
