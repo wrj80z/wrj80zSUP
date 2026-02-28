@@ -12702,7 +12702,7 @@ run(function()
 												{drawDurationSeconds = 0, shotId = httpService:GenerateGUID(false)},
 												workspace:GetServerTimeNow() - 0.045
 											)
-											mouse1click()
+											--mouse1click()
 										end
 									end
 								end
@@ -12811,7 +12811,7 @@ run(function()
 											{drawDurationSeconds = 0, shotId = httpService:GenerateGUID(false)},
 											workspace:GetServerTimeNow() - 0.045
 										)
-										mouse1click()
+										--mouse1click()
 									end
 								end
 							end
