@@ -12761,6 +12761,7 @@ run(function()
 									end
 								end
 							end
+						task.wait(1)
 						until not BetterFisher.Enabled or not AutoCast.Enabled
 					end)
 				end
