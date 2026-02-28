@@ -12757,6 +12757,7 @@ run(function()
 												{drawDurationSeconds = 0, shotId = httpService:GenerateGUID(false)},
 												workspace:GetServerTimeNow() - 0.045
 											)
+					print('fired projectile',workspace:GetServerTimeNow() - 0.085)
 										end
 									end
 								end
@@ -12864,10 +12865,12 @@ run(function()
 											{drawDurationSeconds = 0, shotId = httpService:GenerateGUID(false)},
 											workspace:GetServerTimeNow() - 0.045
 										)
+										print('fired projectile',workspace:GetServerTimeNow() - 0.085)
 									end
 								end
 							end
 						end
+		task.wait(1)
 					until not BetterFisher.Enabled or not v
 				end)
 			end
