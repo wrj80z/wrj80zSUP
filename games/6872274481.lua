@@ -3336,7 +3336,6 @@ run(function()
 						Players = Targets.Players.Enabled,
 						NPCs = Targets.NPCs.Enabled,
 						Wallcheck = Targets.Walls.Enabled,
-						Sort = sortmethods[Sort.Value or 'Distance'],
 						Origin = origin
 					})
 
