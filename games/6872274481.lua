@@ -20979,7 +20979,7 @@ run(function()
 							instance = call.instance,
 							SendToServer = function(...)
 								local plrs = entitylib.AllPosition({
-									Range = Range.Value,
+									Range = 20,
 									Wallcheck = Targets.Walls.Enabled,
 									Part = "RootPart",
 									Players = Targets.Players.Enabled,
