@@ -3740,7 +3740,7 @@ function mainapi:CreateCategory(categorysettings)
 			Enabled = false,
 			Options = {},
 			Bind = {},
-			Tags = modulesettings.Tags or {},
+			Tags = {},
 			Alias = modulesettings.Alias or {},
 			Index = getTableSize(mainapi.Modules),
 			ExtraText = modulesettings.ExtraText,
@@ -3755,12 +3755,29 @@ function mainapi:CreateCategory(categorysettings)
 		modulebutton.BackgroundColor3 = uipallet.Main
 		modulebutton.BorderSizePixel = 0
 		modulebutton.AutoButtonColor = false
-		modulebutton.Text = '            '..modulesettings.Name
+		modulebutton.Text = '            '..({modulesettings.Name:gsub(' ', '')})[1]
 		modulebutton.TextXAlignment = Enum.TextXAlignment.Left
 		modulebutton.TextColor3 = color.Dark(uipallet.Text, 0.16)
 		modulebutton.TextSize = 14
 		modulebutton.FontFace = uipallet.Font
 		modulebutton.Parent = children
+
+		local indicatorholder = Instance.new('Frame')
+		indicatorholder.Parent = modulebutton
+		indicatorholder.Size = UDim2.fromOffset(0, 21)
+		indicatorholder.AnchorPoint = Vector2.new(0, 0.5)
+		indicatorholder.Name = 'Indicators'
+		indicatorholder.BackgroundTransparency = 1
+		indicatorholder.Position = UDim2.fromScale(0.85, 0.5)
+
+		do
+			local layout = Instance.new('UIListLayout')
+			layout.Parent = indicatorholder
+			layout.HorizontalAlignment = Enum.HorizontalAlignment.Right
+			layout.VerticalAlignment = Enum.VerticalAlignment.Center
+			layout.FillDirection = Enum.FillDirection.Horizontal
+			layout.Padding = UDim.new(0, 5)
+		end
 
 		modulesettings.Tags = modulesettings.Tags or {}
 		table.insert(modulesettings.Tags, 'matched')
@@ -3800,7 +3817,7 @@ function mainapi:CreateCategory(categorysettings)
 				indicator.Visible = tag ~= 'MATCHED'
 			end
 		end
-
+		
 		local gradient = Instance.new('UIGradient')
 		gradient.Rotation = 90
 		gradient.Enabled = false
@@ -3825,7 +3842,7 @@ function mainapi:CreateCategory(categorysettings)
 		bindicon.Size = UDim2.fromOffset(12, 12)
 		bindicon.Position = UDim2.new(0.5, -6, 0, 5)
 		bindicon.BackgroundTransparency = 1
-		bindicon.Image = getcustomasset('ReVape/assets/new/bind.png')
+		bindicon.Image = getcustomasset('catrewrite/assets/new/bind.png')
 		bindicon.ImageColor3 = color.Dark(uipallet.Text, 0.43)
 		bindicon.Parent = bind
 		local bindtext = Instance.new('TextLabel')
@@ -3843,7 +3860,7 @@ function mainapi:CreateCategory(categorysettings)
 		bindcover.Size = UDim2.fromOffset(154, 40)
 		bindcover.BackgroundTransparency = 1
 		bindcover.Visible = false
-		bindcover.Image = getcustomasset('ReVape/assets/new/bindbkg.png')
+		bindcover.Image = getcustomasset('catrewrite/assets/new/bindbkg.png')
 		bindcover.ScaleType = Enum.ScaleType.Slice
 		bindcover.SliceCenter = Rect.new(0, 0, 141, 40)
 		bindcover.Parent = modulebutton
@@ -3869,7 +3886,7 @@ function mainapi:CreateCategory(categorysettings)
 		dots.Size = UDim2.fromOffset(3, 16)
 		dots.Position = UDim2.fromOffset(4, 12)
 		dots.BackgroundTransparency = 1
-		dots.Image = getcustomasset('ReVape/assets/new/dots.png')
+		dots.Image = getcustomasset('catrewrite/assets/new/dots.png')
 		dots.ImageColor3 = color.Light(uipallet.Main, 0.37)
 		dots.Parent = dotsbutton
 		modulechildren.Name = modulesettings.Name..'Children'
@@ -3894,8 +3911,6 @@ function mainapi:CreateCategory(categorysettings)
 		divider.Parent = modulebutton
 		modulesettings.Function = modulesettings.Function or function() end
 		addMaid(moduleapi)
-
-
 
 		function moduleapi:SetBind(tab, mouse)
 			if tab.Mobile then
@@ -3929,6 +3944,11 @@ function mainapi:CreateCategory(categorysettings)
 			if mainapi.ThreadFix then
 				setthreadidentity(8)
 			end
+			if isfolder('cvtest') then
+				if not isfile('cvtest/'..modulesettings.Name) then
+					writefile('cvtest/'..modulesettings.Name, tostring(os.time() + 3600))
+				end
+			end
 			self.Enabled = not self.Enabled
 			divider.Visible = self.Enabled
 			gradient.Enabled = self.Enabled
@@ -3958,13 +3978,13 @@ function mainapi:CreateCategory(categorysettings)
 		bind.MouseEnter:Connect(function()
 			bindtext.Visible = false
 			bindicon.Visible = not bindtext.Visible
-			bindicon.Image = getcustomasset('ReVape/assets/new/edit.png')
+			bindicon.Image = getcustomasset('catrewrite/assets/new/edit.png')
 			if not moduleapi.Enabled then bindicon.ImageColor3 = color.Dark(uipallet.Text, 0.16) end
 		end)
 		bind.MouseLeave:Connect(function()
 			bindtext.Visible = #moduleapi.Bind > 0
 			bindicon.Visible = not bindtext.Visible
-			bindicon.Image = getcustomasset('ReVape/assets/new/bind.png')
+			bindicon.Image = getcustomasset('catrewrite/assets/new/bind.png')
 			if not moduleapi.Enabled then
 				bindicon.ImageColor3 = color.Dark(uipallet.Text, 0.43)
 			end
@@ -4076,6 +4096,7 @@ function mainapi:CreateCategory(categorysettings)
 				sorting[v.Category] = sorting[v.Category] or {}
 				table.insert(sorting[v.Category], v.Name)
 			end
+
 			for _, sort in sorting do
 				table.sort(sort)
 				for i, v in sort do
@@ -4085,9 +4106,10 @@ function mainapi:CreateCategory(categorysettings)
 				end
 			end
 		end)
+
+
 		return moduleapi
 	end
-
 	function categoryapi:Expand()
 		self.Expanded = not self.Expanded
 		children.Visible = self.Expanded
