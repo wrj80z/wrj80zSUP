@@ -6212,6 +6212,7 @@ run(function()
     }
 
     local function removeParticle(obj)
+		if obj.Parent.Name == 'ProjectileTargeting' then return end
         if particleTypes[obj.ClassName] then
             if particleOriginal[obj] == nil then
                 particleOriginal[obj] = obj.Enabled
