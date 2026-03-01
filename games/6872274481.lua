@@ -18769,7 +18769,7 @@ run(function()
 	end
 
     EAW = vape.Categories.AltFarm:CreateModule({
-		Name = "ElektraAutoWin",
+		Name = "KKK",
 		Tooltip = 'must have elektra to use this',
 		Function = function(callback) 
 			if callback then
