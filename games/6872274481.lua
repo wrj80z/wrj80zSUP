@@ -21539,7 +21539,7 @@ run(function()
 			end)
 
 			pcall(function()
-				RamSaverSets.RenderingLevel = settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
+				RamSaverSets.RenderingLevel = settings().Rendering.QualityLevel
 				settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
 			end)
 
