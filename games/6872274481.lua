@@ -18683,7 +18683,7 @@ run(function()
 					obj:Destroy()
 				end))
 				EAW:Clean(lplr.PlayerGui.ChildAdded:Connect(function(obj)
-					obj:Destroy()
+					--obj:Destroy()
 					Percent:SetAttribute("Percent",100)
 					msg.Text = 'Match ended. ReTeleporting to another Empty Game...'
 					task.wait(0.5)
