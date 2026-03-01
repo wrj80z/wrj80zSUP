@@ -20977,7 +20977,7 @@ run(function()
 					if remoteName == remotes.AttackEntity then
 						return {
 							instance = call.instance,
-							SendToServer = function(...)
+							SendToServer = function(_, attackTable, ...)
 								local plrs = entitylib.AllPosition({
 									Range = 20,
 									Wallcheck = Targets.Walls.Enabled,
@@ -20991,7 +20991,7 @@ run(function()
 										bedwars.AbilityController:useAbility('midnight')
 									end
 								end
-								return call:SendToServer(...)
+								return call:SendToServer(attackTable, ...)
 							end
 						}
 					end
