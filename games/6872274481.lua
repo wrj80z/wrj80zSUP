@@ -20510,7 +20510,7 @@ run(function()
 		Tooltip = 'makes you play better then purvy in ginger',
 		Alias = {'Kit',store.equippedKit},
 		Function = function(callback)
-			if store.equippedKit ~= "gingerbread_man' then
+			if store.equippedKit ~= "gingerbread_man" then
 				vape:CreateNotification("AutoPyro", "Kit required only!", 8, "warning")
 				return
 			end
