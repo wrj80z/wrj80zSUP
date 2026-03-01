@@ -3842,7 +3842,7 @@ function mainapi:CreateCategory(categorysettings)
 		bindicon.Size = UDim2.fromOffset(12, 12)
 		bindicon.Position = UDim2.new(0.5, -6, 0, 5)
 		bindicon.BackgroundTransparency = 1
-		bindicon.Image = getcustomasset('catrewrite/assets/new/bind.png')
+		bindicon.Image = getcustomasset('ReVape/assets/new/bind.png')
 		bindicon.ImageColor3 = color.Dark(uipallet.Text, 0.43)
 		bindicon.Parent = bind
 		local bindtext = Instance.new('TextLabel')
