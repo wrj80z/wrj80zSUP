@@ -20687,7 +20687,7 @@ run(function()
 								NPCs = Targets.NPCs.Enabled,
 							})
 							if plrs then
-								local RefIDS = require(replicatedStorage.TS.combat.["projectile-util"]).ProjectileUtil
+								local RefIDS = require(replicatedStorage.TS.combat["projectile-util"]).ProjectileUtil
 								local tsa = require(replicatedStorage.TS.util["typesafe-attributes"]).GetAttribute
 								local v81 = gameCamera.CFrame.LookVector
 								if bedwars.CameraPerspectiveController:getCameraPerspective() == 1 then
@@ -20857,7 +20857,7 @@ run(function()
 							NPCs = Targets.NPCs.Enabled,
 						})
 						if plrs then
-							local RefIDS = require(replicatedStorage.TS.combat.["projectile-util"]).ProjectileUtil
+							local RefIDS = require(replicatedStorage.TS.combat["projectile-util"]).ProjectileUtil
 							local tsa = require(replicatedStorage.TS.util["typesafe-attributes"]).GetAttribute
 							local v81 = gameCamera.CFrame.LookVector
 							if bedwars.CameraPerspectiveController:getCameraPerspective() == 1 then
@@ -20901,7 +20901,7 @@ run(function()
 				bedwars.BlockKickerKitController.onAbilityUsed = function(arg1, arg2, arg3)
 					local tsa = require(replicatedStorage.TS.util["typesafe-attributes"]).GetAttribute
 					local bkka = require(replicatedStorage.TS.games.bedwars.kit.kits["block-kicker"]["block-kicker-kit-attributes"]).BlockKickerKitAttributes
-					local RefIDS = require(replicatedStorage.TS.combat.["projectile-util"]).ProjectileUtil
+					local RefIDS = require(replicatedStorage.TS.combat["projectile-util"]).ProjectileUtil
 					if arg2 == lplr.Character then
 						local v78 = playersService:GetPlayerFromCharacter(arg2)
 						if v78 then
