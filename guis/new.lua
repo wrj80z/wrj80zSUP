@@ -1,3 +1,4 @@
+
 local mainapi = {
 	Categories = {},
 	GUIColor = {
@@ -22,8 +23,8 @@ local mainapi = {
 	ToggleNotifications = {},
     ColoredNotifications = {},
 	Fonts = {},
-	Version = '1.0.6',
-	Discord = "@20mop",
+	Version = '1.0.7',
+	Discord = "@20mp",
 	role = "",
 	user = "",
 	SC = false,
@@ -202,6 +203,17 @@ local function addCorner(parent, radius)
 	corner.Parent = parent
 
 	return corner
+end
+
+local function safecall(func, ...)
+	local args = {...}
+	xpcall(function()
+		func(unpack(args))
+	end, function(err)
+		if shared.Dev then
+			warn(err)
+		end
+	end)
 end
 
 local function addCloseButton(parent, offset)
@@ -872,7 +884,7 @@ components = {
 				})
 			end
 		
-			optionsettings.Function(self.Hue, self.Sat, self.Value, self.Opacity)
+			safecall(optionsettings.Function, self.Hue, self.Sat, self.Value, self.Opacity)
 		end
 		
 		function optionapi:Toggle(db)
@@ -1081,7 +1093,7 @@ components = {
 				dropdownchildren = nil
 				dropdown.Size = UDim2.new(1, 0, 0, 40)
 			end
-			optionsettings.Function(self.Value, mouse)
+			safecall(optionsettings.Function, self.Value, mouse)
 		end
 		
 		button.MouseButton1Click:Connect(function()
@@ -1169,12 +1181,12 @@ components = {
 				fontbox.Object.Visible = val == 'Custom' and fontdropdown.Object.Visible
 				if val ~= 'Custom' then
 					optionapi.Value = Font.fromEnum(Enum.Font[val])
-					optionsettings.Function(optionapi.Value)
+					safecall(optionsettings.Function, optionapi.Value)
 				else
 					pcall(function()
 						optionapi.Value = Font.fromId(tonumber(fontbox.Value))
 					end)
-					optionsettings.Function(optionapi.Value)
+					safecall(optionsettings.Function, optionapi.Value)
 				end
 			end,
 			Darker = optionsettings.Darker,
@@ -1189,7 +1201,7 @@ components = {
 					pcall(function()
 						optionapi.Value = Font.fromId(tonumber(fontbox.Value))
 					end)
-					optionsettings.Function(optionapi.Value)
+					safecall(optionsettings.Function, optionapi.Value)
 				end
 			end,
 			Visible = false,
@@ -1315,7 +1327,7 @@ components = {
 			})
 			valuebutton.Text = self.Value..(optionsettings.Suffix and ' '..(type(optionsettings.Suffix) == 'function' and optionsettings.Suffix(self.Value) or optionsettings.Suffix) or '')
 			if check or final then
-				optionsettings.Function(value, final)
+				safecall(optionsettings.Function, value, final)
 			end
 		end
 		
@@ -1550,7 +1562,7 @@ components = {
 					text = text == 'none' and 'behind walls' or text..', behind walls'
 				end
 				items.Text = 'Ignore '..text
-				optionsettings.Function()
+				safecall(optionsettings.Function)
 			end
 		}, window, {Options = {}})
 		optionapi.Invisible.Object.Position = UDim2.fromOffset(0, 81)
@@ -1565,7 +1577,7 @@ components = {
 					text = text == 'none' and 'behind walls' or text..', behind walls'
 				end
 				items.Text = 'Ignore '..text
-				optionsettings.Function()
+				safecall(optionsettings.Function)
 			end
 		}, window, {Options = {}})
 		optionapi.Walls.Object.Position = UDim2.fromOffset(0, 111)
@@ -1666,7 +1678,7 @@ components = {
 				tooltipicon.ImageColor3 = uipallet.Text
 				tooltipicon.Parent = optionsettings.IconParent
 			end
-			optionsettings.Function(self.Enabled)
+			safecall(optionsettings.Function, self.Enabled)
 		end
 		
 		targetbutton.MouseEnter:Connect(function()
@@ -1759,7 +1771,7 @@ components = {
 		function optionapi:SetValue(val, enter)
 			self.Value = val
 			box.Text = val
-			optionsettings.Function(enter)
+			safecall(optionsettings.Function, enter)
 		end
 		
 		textbox.MouseButton1Click:Connect(function()
@@ -3728,6 +3740,8 @@ function mainapi:CreateCategory(categorysettings)
 			Enabled = false,
 			Options = {},
 			Bind = {},
+			Tags = modulesettings.Tags or {},
+			Alias = modulesettings.Alias or {},
 			Index = getTableSize(mainapi.Modules),
 			ExtraText = modulesettings.ExtraText,
 			Name = modulesettings.Name,
@@ -3747,6 +3761,46 @@ function mainapi:CreateCategory(categorysettings)
 		modulebutton.TextSize = 14
 		modulebutton.FontFace = uipallet.Font
 		modulebutton.Parent = children
+
+		modulesettings.Tags = modulesettings.Tags or {}
+		table.insert(modulesettings.Tags, 'matched')
+		
+		if modulesettings.Tags and typeof(modulesettings.Tags) then
+			for i, tag in modulesettings.Tags do
+				tag = tag:upper()
+
+				local size = getfontsize(removeTags(tag), 12, uipallet.Font, Vector2.new(100000, 100000))
+				local indicator = Instance.new('TextLabel')
+				indicator.LayoutOrder = i - 1
+				indicator.Parent = indicatorholder
+				indicator.Size = UDim2.new(0, size.X + 4, 0, 21)
+				indicator.BackgroundColor3 = Color3.new(1, 1, 1)
+				indicator.TextSize = 14
+				indicator.TextTransparency = 1
+				indicator.Text = tag
+				indicator.Name = tag
+				indicator.Position = UDim2.new()
+				indicator.TextColor3 = Color3.new(0, 0, 0)
+				indicator.FontFace = uipallet.Font
+
+				addCorner(indicator, UDim.new(0, 5))
+
+				local text = indicator:Clone()
+				text.Parent = indicator
+				text.Position = UDim2.new()
+				text.Size = UDim2.fromScale(1, 1)
+				text.BackgroundTransparency = 1
+				text.Name = 'Text'
+				text.AnchorPoint = Vector2.new()
+				text.TextSize = 12
+				text.ZIndex = 500
+				text.TextTransparency = 0
+				table.insert(moduleapi.Tags, indicator)
+
+				indicator.Visible = tag ~= 'MATCHED'
+			end
+		end
+
 		local gradient = Instance.new('UIGradient')
 		gradient.Rotation = 90
 		gradient.Enabled = false
@@ -3840,6 +3894,8 @@ function mainapi:CreateCategory(categorysettings)
 		divider.Parent = modulebutton
 		modulesettings.Function = modulesettings.Function or function() end
 		addMaid(moduleapi)
+
+
 
 		function moduleapi:SetBind(tab, mouse)
 			if tab.Mobile then
@@ -4012,21 +4068,23 @@ function mainapi:CreateCategory(categorysettings)
 		moduleapi.Object = modulebutton
 		mainapi.Modules[modulesettings.Name] = moduleapi
 
-		local sorting = {}
-		for _, v in mainapi.Modules do
-			sorting[v.Category] = sorting[v.Category] or {}
-			table.insert(sorting[v.Category], v.Name)
-		end
+		local caller = (table.find({'Xeno', 'Solara'}, ({identifyexecutor()})[1])) and task.spawn or function(f) return f() end
 
-		for _, sort in sorting do
-			table.sort(sort)
-			for i, v in sort do
-				mainapi.Modules[v].Index = i
-				mainapi.Modules[v].Object.LayoutOrder = i
-				mainapi.Modules[v].Children.LayoutOrder = i
+		caller(function()
+			local sorting = {}
+			for _, v in mainapi.Modules do
+				sorting[v.Category] = sorting[v.Category] or {}
+				table.insert(sorting[v.Category], v.Name)
 			end
-		end
-
+			for _, sort in sorting do
+				table.sort(sort)
+				for i, v in sort do
+					mainapi.Modules[v].Index = i
+					mainapi.Modules[v].Object.LayoutOrder = i
+					mainapi.Modules[v].Children.LayoutOrder = i
+				end
+			end
+		end)
 		return moduleapi
 	end
 
@@ -4837,11 +4895,12 @@ function mainapi:CreateCategoryList(categorysettings)
 end
 
 function mainapi:CreateSearch()
+	local xoffset = inputService.TouchEnabled and 0.3 or 0.5
 	local searchbkg = Instance.new('Frame')
 	searchbkg.Name = 'Search'
 	searchbkg.Size = UDim2.fromOffset(220, 37)
-	searchbkg.Position = UDim2.new(0.5, 0, 0, 13)
-	searchbkg.AnchorPoint = Vector2.new(0.5, 0)
+	searchbkg.Position = UDim2.new(xoffset, 0, 0, 13)
+	searchbkg.AnchorPoint = Vector2.new(xoffset, 0)
 	searchbkg.BackgroundColor3 = color.Dark(uipallet.Main, 0.02)
 	searchbkg.Parent = clickgui
 	local searchicon = Instance.new('ImageLabel')
@@ -4849,7 +4908,7 @@ function mainapi:CreateSearch()
 	searchicon.Size = UDim2.fromOffset(14, 14)
 	searchicon.Position = UDim2.new(1, -23, 0, 11)
 	searchicon.BackgroundTransparency = 1
-	searchicon.Image = getcustomasset('ReVape/assets/new/search.png')
+	searchicon.Image = getcustomasset('catrewrite/assets/new/search.png')
 	searchicon.ImageColor3 = color.Light(uipallet.Main, 0.37)
 	searchicon.Parent = searchbkg
 	local legiticon = Instance.new('ImageButton')
@@ -4857,7 +4916,7 @@ function mainapi:CreateSearch()
 	legiticon.Size = UDim2.fromOffset(29, 16)
 	legiticon.Position = UDim2.fromOffset(8, 11)
 	legiticon.BackgroundTransparency = 1
-	legiticon.Image = getcustomasset('ReVape/assets/new/legit.png')
+	legiticon.Image = getcustomasset('catrewrite/assets/new/legit.png')
 	legiticon.Parent = searchbkg
 	local legitdivider = Instance.new('Frame')
 	legitdivider.Name = 'LegitDivider'
@@ -4912,6 +4971,14 @@ function mainapi:CreateSearch()
 		self.Legit.Window.Visible = true
 		self.Legit.Window.Position = UDim2.new(0.5, -350, 0.5, -194)
 	end)
+	local function hasAlias(alias, text)
+		for _, v in alias do
+			if text:lower():gsub(' ', ''):find(({v:lower():gsub(' ', '')})[1]) or v:lower():gsub(' ', ''):find(({text:lower():gsub(' ', '')})[1]) then
+				return true
+			end
+		end
+		return false
+	end
 	search:GetPropertyChangedSignal('Text'):Connect(function()
 		for _, v in children:GetChildren() do
 			if v:IsA('TextButton') then
@@ -4921,11 +4988,32 @@ function mainapi:CreateSearch()
 		if search.Text == '' then return end
 
 		for i, v in self.Modules do
-			if i:lower():find(search.Text:lower()) then
+			local hasAlias = hasAlias(v.Alias, search.Text)
+			if i:lower():gsub(' ', ''):find(search.Text:lower():gsub(' ', '')) or hasAlias then
 				local button = v.Object:Clone()
+				for _, v in button.Indicators:GetChildren() do
+					if v:IsA('TextLabel') and v.Name ~= 'MATCHED' then
+						v.Visible = false
+					end
+				end
 				button.Bind:Destroy()
+				button.Indicators.MATCHED.Visible = hasAlias
 				button.MouseButton1Click:Connect(function()
 					v:Toggle()
+					v.Object.Parent.Parent.Visible = true
+					local frame = v.Object.Parent
+					local highlight = Instance.new('Frame')
+					highlight.Size = UDim2.fromScale(1, 1)
+					highlight.BackgroundColor3 = Color3.new(1, 1, 1)
+					highlight.BackgroundTransparency = 0.6
+					highlight.BorderSizePixel = 0
+					highlight.Parent = v.Object
+					tween:Tween(highlight, TweenInfo.new(0.5), {
+						BackgroundTransparency = 1
+					})
+					task.delay(0.5, highlight.Destroy, highlight)
+
+					frame.CanvasPosition = Vector2.new(0, (v.Object.LayoutOrder * 40) - (math.min(frame.CanvasSize.Y.Offset, 600) / 2))
 				end)
 
 				button.MouseButton2Click:Connect(function()
