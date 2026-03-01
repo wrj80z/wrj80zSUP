@@ -88,9 +88,7 @@ local color = vape.Libraries.color
 local whitelist = vape.Libraries.whitelist
 local prediction = vape.Libraries.prediction
 local oldpred = loadstring(downloadFile('ReVape/libraries/oldpred.lua'), 'oldpred')()
-local cyanpred = loadstring(downloadFile('ReVape/libraries/cyanpred.lua'), 'cyanpred')()
-local synpred = loadstring(downloadFile('ReVape/libraries/synpred.lua'), 'synpred')()
-local zikopred = loadstring(downloadFile('ReVape/libraries/zikopred.lua'), 'zikopred')()
+
 local getfontsize = vape.Libraries.getfontsize
 local getcustomasset = vape.Libraries.getcustomasset
 local hash = loadstring(downloadFile('ReVape/libraries/hash.lua'), 'hash')()
@@ -3277,12 +3275,16 @@ run(function()
 						local targetChar = plr.Character or plr
 						if not targetChar then return end
 						calc = prediction.SolveTrajectory(newlook.p,projSpeed,gravity,targetPART.Position,targetPART.Velocity,playerGravity,plr.HipHeight,plr.Jumping and 42.6 or nil,rayCheck,targetChar,targetPART)
-					elseif PAMode.Value == 'Cyan' then						
-						calc = cyanpred.SolveTrajectory(newlook.p,projSpeed,gravity,targetPART.Position,targetPART.Velocity,playerGravity,plr.HipHeight,plr.Jumping and 42.6 or nil,rayCheck)
-					elseif PAMode.Value == 'Syn' then						
-						calc = synpred.SolveTrajectory(newlook.p,projSpeed,gravity,targetPART.Position,targetPART.Velocity,playerGravity,plr.HipHeight,plr.Jumping and 42.6 or nil,rayCheck)
-					elseif PAMode.Value == 'Ziko' then						
-						calc = zikopred.SolveTrajectory(newlook.p,projSpeed,gravity,targetPART.Position,targetPART.Velocity,playerGravity,plr.HipHeight,plr.Jumping and 42.6 or nil,rayCheck,targetPART.AssemblyLinearVelocity)
+					elseif PAMode.Value == 'Cyan' then
+												local targetChar = plr.Character or plr
+						if not targetChar then return end						
+						calc = prediction.SolveTrajectory(newlook.p,projSpeed,gravity,targetPART.Position,targetPART.Velocity,playerGravity,plr.HipHeight,plr.Jumping and 42.6 or nil,rayCheck,targetChar,targetPART)
+					elseif PAMode.Value == 'Syn' then
+												local targetChar = plr.Character or plr
+						if not targetChar then return end						
+						calc = prediction.SolveTrajectory(newlook.p,projSpeed,gravity,targetPART.Position,targetPART.Velocity,playerGravity,plr.HipHeight,plr.Jumping and 42.6 or nil,rayCheck,targetChar,targetPART)
+					elseif PAMode.Value == 'Ziko' then					
+						calc = prediction.SolveTrajectory(newlook.p,projSpeed,gravity,targetPART.Position,targetPART.Velocity,playerGravity,plr.HipHeight,plr.Jumping and 42.6 or nil,rayCheck)
 					elseif PAMode.Value == 'Xylex' then						
 						calc = oldpred.SolveTrajectory(newlook.p,projSpeed,gravity,targetPART.Position,targetPART.Velocity,playerGravity,plr.HipHeight,plr.Jumping and 42.6 or nil,rayCheck)
 					else
