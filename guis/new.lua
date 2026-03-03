@@ -3742,6 +3742,7 @@ function mainapi:CreateCategory(categorysettings)
 			Bind = {},
 			Tags = {},
 			Alias = modulesettings.Alias or {},
+			IsPrem = modulesettings.IsPrem or false,
 			Index = getTableSize(mainapi.Modules),
 			ExtraText = modulesettings.ExtraText,
 			Name = modulesettings.Name,
@@ -3781,17 +3782,23 @@ function mainapi:CreateCategory(categorysettings)
 
 		modulesettings.Tags = modulesettings.Tags or {}
 		table.insert(modulesettings.Tags, 'matched')
-		
+		if getgenv().role == 'premium' then
+			if moduleapi.IsPrem and getgenv().role == 'premium' then
+				table.insert(moduleapi.Alias, 'premium')
+				table.insert(moduleapi.Tags, 'PREMIUM')
+			end
+		else
+			mainapi:Remove(modulesettings.Name)
+		end
 		if modulesettings.Tags and typeof(modulesettings.Tags) then
 			for i, tag in modulesettings.Tags do
 				tag = tag:upper()
-
 				local size = getfontsize(removeTags(tag), 12, uipallet.Font, Vector2.new(100000, 100000))
 				local indicator = Instance.new('TextLabel')
 				indicator.LayoutOrder = i - 1
 				indicator.Parent = indicatorholder
 				indicator.Size = UDim2.new(0, size.X + 4, 0, 21)
-				indicator.BackgroundColor3 = Color3.new(1, 1, 1)
+				indicator.BackgroundColor3 = Color3.fromHSV(self.GUIColor.Hue,self.GUIColor.Sat,self.GUIColor.Value)
 				indicator.TextSize = 14
 				indicator.TextTransparency = 1
 				indicator.Text = tag
