@@ -21075,9 +21075,9 @@ Tun(function() -- keep this if ur a dev this disables speed n fly whenever you a
 			Test = vape.Categories.Exploits:CreateModule({
 				Name = "PREM",
 				IsPrem = true,
-				Alias = {'jew'}
+				Alias = {'jew'},
 				Function = function(callback)
-					warn(callback,'- came from a jew')
+					print(callback)
 				end
 			})
 		end)
