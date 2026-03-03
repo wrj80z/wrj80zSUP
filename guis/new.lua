@@ -3798,7 +3798,7 @@ function mainapi:CreateCategory(categorysettings)
 				indicator.LayoutOrder = i - 1
 				indicator.Parent = indicatorholder
 				indicator.Size = UDim2.new(0, size.X + 4, 0, 21)
-				indicator.BackgroundColor3 = Color3.fromHSV(self.GUIColor.Hue,self.GUIColor.Sat,self.GUIColor.Value)
+				indicator.BackgroundColor3 = Color3.fromHSV(mainapi.GUIColor.Hue, mainapi.GUIColor.Sat, mainapi.GUIColor.Value)
 				indicator.TextSize = 14
 				indicator.TextTransparency = 1
 				indicator.Text = tag
