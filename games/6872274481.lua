@@ -8801,6 +8801,8 @@ run(function()
 
 								if delta.Magnitude > AttackRange.Value then continue end
 								if SyncHit.Enabled and ChargeTime.Value > 0 then
+									if (workspace:GetServerTimeNow() - bedwars.SwordController.lastAttack) < ChargeTime.Value then continue end
+								else
 									if (tick() - swingCooldown) < ChargeTime.Value then continue end
 								end
 
