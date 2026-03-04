@@ -30,6 +30,7 @@ local mainapi = {
 	SC = false,
 	HideNofis = false,
 	Windows = {},
+	GlobalTags = {},
 }
 local cloneref = cloneref or function(obj)
 	return obj
@@ -3818,6 +3819,7 @@ function mainapi:CreateCategory(categorysettings)
 				text.TextTransparency = 0
 				table.insert(moduleapi.Tags, indicator)
 				indicator.Visible = tag ~= 'MATCHED'
+				table.insert(mainapi.GlobalTags, indicator)
 			end
 		end
 		local gradient = Instance.new('UIGradient')
@@ -7260,6 +7262,12 @@ function mainapi:UpdateGUI(hue, sat, val, default)
 					option:Color(hue, sat, val, rainbow)
 				end
 			end
+		end
+	end
+
+	for _, int in mainapi.GlobalTags do
+		if int then
+			int.BackgroundColor3 = rainbow and Color3.fromHSV(mainapi:Color((hue - (i * 0.075)) % 1)) or Color3.fromHSV(hue, sat, val)
 		end
 	end
 end
