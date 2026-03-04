@@ -3809,9 +3809,7 @@ function mainapi:CreateCategory(categorysettings)
 				indicator.Position = UDim2.new()
 				indicator.TextColor3 = Color3.new(0, 0, 0)
 				indicator.FontFace = uipallet.Font
-
 				addCorner(indicator, UDim.new(0, 5))
-
 				local text = indicator:Clone()
 				text.Parent = indicator
 				text.Position = UDim2.new()
@@ -3823,11 +3821,7 @@ function mainapi:CreateCategory(categorysettings)
 				text.ZIndex = 500
 				text.TextTransparency = 0
 				table.insert(moduleapi.Tags, indicator)
-				if tag == 'MATCHED' then
-					indicator.Visible = false
-				else
-					indicator.Visible = true
-				end
+				indicator.Visible = tag ~= 'MATCHED'
 			end
 		end
 		
