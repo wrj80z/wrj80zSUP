@@ -3790,7 +3790,7 @@ function mainapi:CreateCategory(categorysettings)
 			end
 		else
 			print('removed')
-			self:Remove(modulesettings.Name)
+			mainapi:Remove(modulesettings.Name)
 		end
 		if modulesettings.Tags and typeof(modulesettings.Tags) then
 			for i, tag in modulesettings.Tags do
