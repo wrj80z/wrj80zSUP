@@ -21069,7 +21069,8 @@ Tun(function() -- keep this if ur a dev this disables speed n fly whenever you a
 			return false
 		end
 	end
-	if shared.Dev then
+end)
+if shared.Dev then
 		run(function()
 			local Test
 			Test = vape.Categories.Exploits:CreateModule({
@@ -21082,4 +21083,3 @@ Tun(function() -- keep this if ur a dev this disables speed n fly whenever you a
 			})
 		end)
 	end
-end)
