@@ -21824,6 +21824,49 @@ run(function()
 			end
 		end
 	})
+	Range = AutoNahla:CreateSlider({
+		Name = "Distance",
+		Min = 0,
+		Max = 16,
+		Default = 12,
+		Suffix = 'studs',
+		Darker = true,
+	})
+	AutoHeal = AutoNahla:CreateToggle({
+		Name = "Auto Heal",
+		Default = true,
+		Function = function(V)
+			Range.Object.Visible = V
+		end
+	})
+	RefreshTick = AutoNahla:CreateSlider({
+		Name = "Refresh Tick",
+		Min = 0,
+		Max = 16,
+		Decimal = 5,
+		Default = 3.05,
+		Visible = false,
+		Suffix = 'hz'
+	})
+	AutoSwap = AutoNahla:CreateToggle({
+		Name = "Auto Swap",
+		Default = false,
+		Function = function(V)
+			RefreshTick.Object.Visible = V
+		end
+	})
+	Threshold = AutoNahla:CreateSlider({
+		Name = "Threshold",
+		Min = 0,
+		Max = 3,
+		Default = 0.045,
+		Visible = true,
+		Decimal = 100
+	})
+	Limits = AutoNahla:CreateToggle({
+		Name = "Limit to items",
+		Default = true,
+	})
 end)
 
 Tun(function() -- keep this if ur a dev this disables speed n fly whenever you anti cheat
