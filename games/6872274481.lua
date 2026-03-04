@@ -8800,7 +8800,7 @@ run(function()
 								end
 
 								if delta.Magnitude > AttackRange.Value then continue end
-								if SyncHitTime.Enabled and ChargeTime.Value > 0 then
+								if SyncHit.Enabled and ChargeTime.Value > 0 then
 									if (tick() - swingCooldown) < ChargeTime.Value then continue end
 								end
 
