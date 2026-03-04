@@ -1,3 +1,4 @@
+local ARGS = ...
 repeat task.wait() until game:IsLoaded()
 if shared.vape then shared.vape:Uninject() end
 local WL = false
@@ -51,7 +52,11 @@ local function downloadFile(path, func)
 	return (func or readfile)(path)
 end
 local function escape(s)
-    return s and s:gsub("\\", "\\\\"):gsub('"', '\\"') or ""
+	local json = '{'
+	for i, v in tab do
+		json = `{json}\n					    {i} = {typeof(v) == 'string' and '"'.. v.. '"' or v},`
+	end
+	return `{json}\n					}`
 end
 local function finishLoading()
 	vape.Init = nil
@@ -70,29 +75,18 @@ local function finishLoading()
 				local teleportScript =[[
 					shared.vapereload = true
 					if shared.VapeDeveloper then
-						loadstring(readfile('ReVape/loader.lua'), 'loader')()
+						loadstring(readfile('ReVape/loader.lua'), 'loader')(data)
 					else
-						loadstring(game:HttpGet('https://raw.githubusercontent.com/wrj80z/wrj80zSUP/'..readfile('ReVape/profiles/commit.txt')..'/loader.lua', true), 'loader')()
+						loadstring(game:HttpGet('https://raw.githubusercontent.com/wrj80z/wrj80zSUP/'..readfile('ReVape/profiles/commit.txt')..'/loader.lua', true), 'loader')(data)
 					end
 				]]
 				if shared.VapeDeveloper then
 					teleportScript = 'shared.VapeDeveloper = true\n'..teleportScript
 				end
 				if shared.VapeCustomProfile then
-				    teleportScript = 'shared.VapeCustomProfile = "'..escape(shared.VapeCustomProfile)..'"\n'..teleportScript
+					teleportScript = 'shared.VapeCustomProfile = "'..shared.VapeCustomProfile..'"\n'..teleportScript
 				end
-				if getgenv().TestMode then
-				    teleportScript = 'getgenv().TestMode = "'..escape(getgenv().APIKEY)..'"\n'..teleportScript
-				end
-				if getgenv().Closet then
-				    teleportScript = 'getgenv().Closet = "'..escape(getgenv().APIKEY)..'"\n'..teleportScript
-				end			
-				if getgenv().APIKEY then
-				    teleportScript = 'getgenv().APIKEY = "'..escape(getgenv().APIKEY)..'"\n'..teleportScript
-				end		
-				if getgenv().WLUSER then
-				    teleportScript = 'getgenv().WLUSER = "'..escape(getgenv().WLUSER)..'"\n'..teleportScript
-				end		
+				teleportScript = teleportScript:gsub('data', escape(ARGS))
 				vape:Save()
 				queue_on_teleport(teleportScript)
 			end
@@ -102,11 +96,10 @@ local function finishLoading()
 	if not shared.vapereload then
 		if not vape.Categories then return end
 		if vape.Categories.Main.Options['GUI bind indicator'].Enabled then
-			if getgenv().WLUSER then
-				vape:CreateNotification('Finished Loading', `wsg {getgenv().WLUSER} you are currently whitelisted. `..(vape.VapeButton and 'Press the button in the top right to open GUI' or 'Press '..table.concat(vape.Keybind, ' + '):upper()..' to open GUI'), 5)
-			else
-				vape:CreateNotification('Finished Loading', vape.VapeButton and 'Press the button in the top right to open GUI' or 'Press '..table.concat(vape.Keybind, ' + '):upper()..' to open GUI', 5)
-			end
+			task.wait(0.5)
+			vape:CreateNotification('Finished Loading', vape.VapeButton and 'Press the button in the top right to open GUI' or 'Press '..table.concat(vape.Keybind, ' + '):upper()..' to open GUI', 5)
+			task.wait(0.75)
+			vape:CreateNotification('Onyx', `Initalized as {getgenv().username} with {getgenv().role}`, 5, 'info')
 		end
 	end
 end
