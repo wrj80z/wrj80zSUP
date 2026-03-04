@@ -81,27 +81,40 @@ function front:Login()
         end
         if post.StatusCode == 403 then
             vape:CreateNotification("Onyx", "API HWID Mis-Match. Guest mode. Code 403", 7,'warning')
-            role = "guest"
-            return
+	        token = "FAILED_TO_LOAD_404_ERROR"
+	        getgenv().onyx_token = token
+	        role = "guest"
+	        getgenv().role = role
+			getgenv().username = 'user'
+            return false
         end
         if post.StatusCode ~= 200 then
             vape:CreateNotification("Onyx", `API Unreachable. Guest mode. Code {post.StatusCode or 1101}`, 7,'warning')
-            role = "guest"
-            return
+	        token = "FAILED_TO_LOAD_404_ERROR"
+	        getgenv().onyx_token = token
+	        role = "guest"
+	        getgenv().role = role
+			getgenv().username = 'user'
+            return false
         end
         local decoded = decodeSafe(post.Body)
         if not decoded or not decoded.success then
             vape:CreateNotification("Onyx", `Bad login response. Guest mode. Code {post.StatusCode or 1101}`, 7,'warning')
-            role = "guest"
-            return
+	        token = "FAILED_TO_LOAD_404_ERROR"
+	        getgenv().onyx_token = token
+	        role = "guest"
+	        getgenv().role = role
+			getgenv().username = 'user'
+            return false
         end
         token = decoded.token
         getgenv().onyx_token = token
-        role = decoded.role or "user"
+        role = decoded.role or "guest"
         getgenv().role = role
+		getgenv().username = U
     end)
 
-    return role, U, P, token
+    return true
 end
 
 function front:ResetHWID()
