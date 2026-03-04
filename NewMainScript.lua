@@ -168,4 +168,4 @@ if not shared.VapeDeveloper then
 	writefile('ReVape/profiles/commit.txt', commit)
 end
 
-return loadstring(downloadFile('ReVape/main.lua'), 'main')()
+return loadstring(downloadFile('ReVape/main.lua'), 'main')(ARGS)
