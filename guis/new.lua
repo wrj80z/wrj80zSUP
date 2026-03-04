@@ -3784,11 +3784,13 @@ function mainapi:CreateCategory(categorysettings)
 		table.insert(modulesettings.Tags, 'matched')
 		if getgenv().role == 'premium' then
 			if moduleapi.IsPrem and getgenv().role == 'premium' then
+				print('added')
 				table.insert(moduleapi.Alias, 'premium')
-				table.insert(moduleapi.Tags, 'PREMIUM')
+				table.insert(moduleapi.Tags, 'premium')
 			end
 		else
-			mainapi:Remove(modulesettings.Name)
+			print('removed')
+			self:Remove(modulesettings.Name)
 		end
 		if modulesettings.Tags and typeof(modulesettings.Tags) then
 			for i, tag in modulesettings.Tags do
