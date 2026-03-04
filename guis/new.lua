@@ -3787,9 +3787,12 @@ function mainapi:CreateCategory(categorysettings)
 				print('added')
 				table.insert(moduleapi.Alias, 'premium')
 				table.insert(moduleapi.Tags, 'premium')
+			else
+				warn('removed', modulesettings.Name)
+				mainapi:Remove(modulesettings.Name)
 			end
 		else
-			print('removed')
+			print('removed', modulesettings.Name)
 			mainapi:Remove(modulesettings.Name)
 		end
 		if modulesettings.Tags and typeof(modulesettings.Tags) then
