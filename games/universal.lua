@@ -227,6 +227,13 @@ local loginlib = loadstring(downloadFile("ReVape/libraries/login.lua"), "login")
 --local GenLib = loadstring(downloadFile("ReVape/libraries/Generator.lua"), "Generator")()
 --local whitelistLib = loadstring(downloadFile('ReVape/games/whitelist.lua'), 'whitelist')()
 
+run(function()
+	local a = loginlib:Login()
+	if not a then
+		warn('something went wrong with loggin in? dubs ig')
+	end
+end)
+
 local whitelist = {
 	alreadychecked = {},
 	customtags = {},
@@ -8612,106 +8619,6 @@ run(function()
     })
 end)
 
-
---[[task.spawn(function()
-	local function CreatePassword()
-		local values = {Length = 10,Sets = {UC = true, LC = true, N = true, S = true, E = false}}
-		return tostring(GenLib:Password(values))
-	end
-	local RP
-	local User 
-	if vape.role ~= "owner" and vape.role ~= 'coowner' then
-		return
-	end
-	RP = vape.Legit:CreateModule({
-		Name = "Reset Password",
-		Tooltip = "Resets the current user password",
-		Function = function(callback)
-			if not callback then return end
-			if callback then
-				local NP = CreatePassword()
-				RP:Toggle(false)
-				local db, msg = loginlib:ResetPassword(User.Value,NP,vape.user)
-				if not db then
-					vape:CreateNotification("Onyx",msg or "403 error",30,"alert")
-				end
-				vape:CreateNotification("Onyx",User.Value.."'s new password is "..NP,8)
-				setclipboard(NP)
-			end
-		end	
-	})
-	User = RP:CreateTextBox({
-		Name = "Username",
-		Tooltip = "Players username!",
-		Default = "ye40",
-	})
-end)-]]
-
-task.spawn(function()
-	local RU
-	local User
-	local Role
-	if vape.role ~= "owner" and vape.role ~= 'coowner' then
-		return
-	end
-	RU = vape.Legit:CreateModule({
-		Name = "Role Upgrader",
-		Tooltip = "Upgrades the current user role!",
-		Function = function(callback)
-			if not callback then return end
-			if callback then
-				RU:Toggle(false)
-				local db, msg = loginlib:RoleUpgrader(User.Value,Role.User,vape.user)
-				if not db then
-					vape:CreateNotification("Onyx",msg or "404 error",30,"alert")
-				end
-			end
-		end	
-	})
-	User = RU:CreateTextBox({
-		Name = "Username",
-		Tooltip = "Players username!",
-		Default = "ye40",
-	})
-	Role = RU:CreateTextBox({
-		Name = "Role",
-		Tooltip = "Players new role!",
-		Default = "user",
-	})
-end)
-
-task.spawn(function()
-	local RH
-	local User
-	local db = false
-	if vape.role == "owner" or vape.role == "coowner" then
-		db = true
-	else
-		db = false
-	end
-	RH = vape.Legit:CreateModule({
-		Name = "Reset HWID",
-		Tooltip = "resets your current HWID(3 limit resets every 8 hour)",
-		Function = function(callback)
-			if not callback then return end
-			if callback then
-				RH:Toggle(false)
-				if db then
-					loginlib:ResetHWID(User.Value)
-				else
-					loginlib:ResetHWID(vape.user)
-				end
-			end
-		end	
-	})
-	User = RH:CreateTextBox({
-		Name = "Username",
-		Tooltip = "Players username!",
-		Default = "ye40",
-		Visible = db
-	})
-end)
-
 run(function()
 	local DE
 	DE = vape.Legit:CreateModule({
@@ -8753,56 +8660,7 @@ run(function()
 end)
 
 
---[[task.spawn(function()
-	local function CreateUsername()
-		return tostring(GenLib:Username())
-	end
-	local function CreatePassword()
-		local values = {Length = 10,Sets = {UC = true, LC = true, N = true, S = true, E = false}}
-		return tostring(GenLib:Password(values))
-	end
-	local function CreateHWID()
-		return tostring(GenLib:UUID())
-	end
 
-	local AC	
-	AC = vape.Legit:CreateModule({
-		Name = "Account Creator",
-		Tooltip = "Creates a account for you!",
-		Function = function(callback)
-			if not callback then return end
-			if callback then
-				AC:Toggle(false)
-				local NU = CreateUsername()
-				local NP = CreatePassword()
-				local NH = CreateHWID()
-				if #NU ~= 4 then
-					vape:CreateNotification("Account Creator", "Username wasn't 4 letters long, {"..#NU.."} DM "..vape.Discord,10,"warning")
-					return
-				end
-				local db, msg = loginlib:CreateAccount(NU,NP,NH)
-				if not db then
-					vape:CreateNotification("Onyx",msg or "403 error",30,"alert")
-				end 
-				-- made like this
-local Injection = string.format(
--- Inject this for now on, Created by Soryed 
-loadstring(game:HttpGet("https://raw.githubusercontent.com/soryed/wrj80zSUP/main/NewMainScript.lua", true))({
-    username = "%s",
-    password = "%s"
-})
-, NU,NP)
-				setclipboard(Injection)
-				vape:CreateNotification("Account Creator", "Check ur clipboard!",5)
-				task.wait(2)
-				vape:CreateNotification("Account Creator", "Uninjecting... Please reinject with the new script!",3,'warning')
-				task.wait(3 + 0.045)
-				vape:Uninject()
-			end
-		end	
-	})
-end)
---=]]
 run(function()
 	local Shaders
 	local Lighting = lightingService
