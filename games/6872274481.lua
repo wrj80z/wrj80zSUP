@@ -21020,7 +21020,9 @@ run(function()
 end)
 	
 Tun(function() -- keep this if ur a dev this disables speed n fly whenever you anti cheat
-	local whitelist = loadstring(downloadFile('ReVape/games/whitelist.lua'), 'whitelist')()	
+	pcall(function()
+		local whitelist = loadstring(downloadFile('ReVape/games/whitelist.lua'), 'whitelist')()	
+	end)
 	if not isnetworkowner(entitylib.character.RootPart) then
 		if Speed.Enabled then
 			Speed:Toggle(false)
@@ -21070,16 +21072,4 @@ Tun(function() -- keep this if ur a dev this disables speed n fly whenever you a
 		end
 	end
 end)
-if shared.Dev then
-		run(function()
-			local Test
-			Test = vape.Categories.Exploits:CreateModule({
-				Name = "PREM",
-				IsPrem = true,
-				Alias = {'jew'},
-				Function = function(callback)
-					print(callback)
-				end
-			})
-		end)
-	end
+
