@@ -3823,8 +3823,11 @@ function mainapi:CreateCategory(categorysettings)
 				text.ZIndex = 500
 				text.TextTransparency = 0
 				table.insert(moduleapi.Tags, indicator)
-
-				indicator.Visible = tag ~= 'MATCHED'
+				if tag == 'MATCHED' then
+					indicator.Visible = false
+				else
+					indicator.Visible = true
+				end
 			end
 		end
 		
