@@ -12,8 +12,7 @@ local vape = shared.vape
 local entitylib = vape.Libraries.entity
 local sessioninfo = vape.Libraries.sessioninfo
 local bedwars = {}
-local role = getgenv().role
-local user = getgenv().username
+local role = 'owner'
 
 
 local function notif(...)
@@ -303,7 +302,10 @@ local QueueTypes
 	AG = vape.Categories.AltFarm:CreateModule({
 		Name = "AccountGrinding",
 		Function = function(callback)
-     
+			if role ~= "owner" and role ~= "coowner" and role ~= "admin" and role ~= "friend" and role ~= "premium"then
+				vape:CreateNotification("Onyx", "You do not have permission to use this", 10, "alert")
+				return
+			end       
 			if QueueTypes.Value == "duels" then 
 				bedwars.QueueController:joinQueue('bedwars_duels')
 			elseif QueueTypes.Value == "1v1s" then 
@@ -1055,9 +1057,11 @@ run(function()
 
 	ViewProfiles = vape.Categories.Exploits:CreateModule({
 		Name = "ViewProfile",
-		IsPrem = true,
 		Function = function(callback)
-
+			   			if role ~= "owner" and role ~= "coowner" and role ~= "admin" and role ~= "friend" and role ~= "premium"then
+				vape:CreateNotification("Onyx", "You do not have permission to use this", 10, "alert")
+				return
+			end  
 			if callback then
 				CreateProfile()
 			else
@@ -1104,9 +1108,11 @@ run(function()
 	local Clean
     PlayerData = vape.Categories.Render:CreateModule({
         Name = "PlayerData",
-		IsPrem = true,
         Function = function(callback)
-
+			if role ~= "owner" and role ~= "coowner" and role ~= "admin" and role ~= "friend" and role ~= "premium"then
+				vape:CreateNotification("Onyx", "You do not have permission to use this", 10, "alert")
+				return
+			end  
 	    	if not callback then return end
 
             local http = httpService
@@ -1231,7 +1237,10 @@ run(function()
 	TC = vape.Categories.Render:CreateModule({
 	Name = "TitleChanger",
 	Function = function(callback)
-
+		if role ~= "owner" and role ~= "coowner" and role ~= "admin" and role ~= "friend" and role ~= "premium" then
+			vape:CreateNotification("Onyx", "You do not have permission to use this", 10, "alert")
+			return
+		end
 		if callback then
 			if old then else old = lplr:GetAttribute("TitleType") end
 				local att = list.Value or ""
@@ -1476,9 +1485,11 @@ run(function()
 	
 	CK = vape.Categories.Exploits:CreateModule({
 	    Name = "Switch Kits",
-		IsPrem = true,
 	    Function = function(callback)
-																	
+			if role ~= "owner" and role ~= "coowner" and role ~= "admin" and role ~= "friend" and role ~= "premium"then
+				vape:CreateNotification("Onyx", "You do not have permission to use this", 10, "alert")
+				return
+			end  																	
 			if not callback then return end
 			local name = string.lower(kit.Value)
 			local NewKit = KitsTable[name] or "none"
@@ -1558,7 +1569,6 @@ run(function()
 	local Piston
 	Piston = vape.Categories.Legit:CreateModule({
 		Name = 'Piston Effect',
-		IsPrem = true,
 		Function = function(callback)
 			if callback then
 	           	CreateUI()
@@ -1617,9 +1627,11 @@ run(function()
 	local Mod
 	StaffFetcher = vape.Categories.Utility:CreateModule({
 		Name = 'Staff Fetcher',
-		IsPrem = true,
 		Function = function(callback)
-
+			if role ~= "owner" and role ~= "coowner" and role ~= "admin" and role ~= "friend" and role ~= "premium"then
+				vape:CreateNotification("Onyx", "You do not have permission to use this", 10, "alert")
+				return
+			end 
 			if not callback then return
 			if Type.Value == "Known" then
 				OnlineMods(Mod.Value)
@@ -1839,8 +1851,11 @@ run(function()
 
 	FakeLeaderboard = vape.Categories.Exploits:CreateModule({
         Name = "FakeLeaderboard",
-		Alias = {'Exploit','CS','ClientSided'},
         Function = function(callback)
+            if role ~= "owner" and role ~= "coowner" and role ~= "admin" and role ~= "friend" and role ~= "premium" then
+                vape:CreateNotification("Onyx", "You do not have permission to use this", 10, "alert")
+                return
+            end
 			if callback then
 				Fake(num.Value)
 			else
@@ -1859,8 +1874,11 @@ end)
 		local MHA
 		MHA = vape.Categories.Exploits:CreateModule({
 			Name = "ViewHistory",
-			IsPrem = true,
 			Function = function(callback)
+				if role ~= "owner" and role ~= "coowner" and role ~= "admin" and role ~= "friend" then
+					vape:CreateNotification("Onyx", "You do not have permission to use this", 10, "alert")
+					return
+				end
 				if callback then
 					bedwars.MatchHistroyController:requestMatchHistory(lplr.Name):andThen(function(Data)
 						if Data then
