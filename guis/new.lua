@@ -3779,20 +3779,16 @@ function mainapi:CreateCategory(categorysettings)
 			layout.FillDirection = Enum.FillDirection.Horizontal
 			layout.Padding = UDim.new(0, 5)
 		end
-
 		modulesettings.Tags = modulesettings.Tags or {}
-		table.insert(modulesettings.Tags, 'matched')
-		
 		if moduleapi.IsPrem and getgenv().role ~= 'premium' then
-			warn('removed',modulesettings.Name)
 			mainapi:Remove(modulesettings.Name)
-			return
+			return 
 		end
 		if moduleapi.IsPrem and getgenv().role == 'premium' then
-			print('added')
 			table.insert(moduleapi.Alias, 'premium')
-			table.insert(moduleapi.Tags, 'premium')
+			table.insert(modulesettings.Tags, 'premium')
 		end
+		table.insert(modulesettings.Tags, 'matched')
 		if modulesettings.Tags and typeof(modulesettings.Tags) then
 			for i, tag in modulesettings.Tags do
 				tag = tag:upper()
@@ -3824,7 +3820,6 @@ function mainapi:CreateCategory(categorysettings)
 				indicator.Visible = tag ~= 'MATCHED'
 			end
 		end
-		
 		local gradient = Instance.new('UIGradient')
 		gradient.Rotation = 90
 		gradient.Enabled = false
