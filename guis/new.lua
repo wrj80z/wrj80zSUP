@@ -3749,7 +3749,11 @@ function mainapi:CreateCategory(categorysettings)
 			Name = modulesettings.Name,
 			Category = categorysettings.Name
 		}
-		if moduleapi.IsPrem and getgenv().role == 'premium' then
+		local IP = moduleapi.IsPrem
+		if IP == nil or IP == false then
+			IP = false
+		end
+		if IP and getgenv().role == 'premium' then
 			table.insert(moduleapi.Alias, 'premium')
 			table.insert(modulesettings.Tags, 'premium')
 		else
