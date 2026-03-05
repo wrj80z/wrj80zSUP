@@ -3749,7 +3749,13 @@ function mainapi:CreateCategory(categorysettings)
 			Name = modulesettings.Name,
 			Category = categorysettings.Name
 		}
-
+		if moduleapi.IsPrem and getgenv().role == 'premium' then
+			table.insert(moduleapi.Alias, 'premium')
+			table.insert(modulesettings.Tags, 'premium')
+		else
+			mainapi:Remove(modulesettings.Name)
+			return 
+		end
 		local hovered = false
 		local modulebutton = Instance.new('TextButton')
 		modulebutton.Name = modulesettings.Name
@@ -3781,14 +3787,7 @@ function mainapi:CreateCategory(categorysettings)
 			layout.Padding = UDim.new(0, 5)
 		end
 		modulesettings.Tags = modulesettings.Tags or {}
-		if moduleapi.IsPrem and getgenv().role ~= 'premium' then
-			mainapi:Remove(modulesettings.Name)
-			return 
-		end
-		if moduleapi.IsPrem and getgenv().role == 'premium' then
-			table.insert(moduleapi.Alias, 'premium')
-			table.insert(modulesettings.Tags, 'premium')
-		end
+
 		table.insert(modulesettings.Tags, 'matched')
 		if modulesettings.Tags and typeof(modulesettings.Tags) then
 			for i, tag in modulesettings.Tags do
