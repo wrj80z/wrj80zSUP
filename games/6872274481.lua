@@ -19765,7 +19765,6 @@ run(function()
 	end
 
 	local function AutoPurchaseFunc(curr,pr)
-		task.wait(AutoPurchaseDelay.Value - math.random())
 		bedwars.Client:Get(remotes.PurchaseItem):CallServerAsync({
 			shopItem = {
 				currency = tostring(curr),
@@ -19791,7 +19790,6 @@ run(function()
 	end
 
 	local function AutoSellFunc(curr,pr)
-		task.wait(math.random())
 		bedwars.Client:Get(remotes.PurchaseItem):CallServerAsync({
 			shopItem = {
 				itemType = "chicken_shop_item",
@@ -19851,8 +19849,6 @@ run(function()
 						end
 					end, Range.Value, false)
 				end				
-				repeat
-
 
 					local shop = GetNearestShopKeeper()
 					if shop then
@@ -19882,9 +19878,6 @@ run(function()
 							end
 						end
 					end
-
-					task.wait(0.1)
-				until not AutoTal.Enabled
 			else
 				if old then
 					bedwars.TaliyahController.updateTree = old
