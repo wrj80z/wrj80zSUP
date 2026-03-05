@@ -3783,6 +3783,7 @@ function mainapi:CreateCategory(categorysettings)
 		modulesettings.Tags = modulesettings.Tags or {}
 		if moduleapi.IsPrem and getgenv().role ~= 'premium' then
 			mainapi:Remove(modulesettings.Name)
+			modulebutton:Destroy()
 			return 
 		end
 		if moduleapi.IsPrem and getgenv().role == 'premium' then
