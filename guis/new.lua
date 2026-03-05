@@ -3734,6 +3734,7 @@ function mainapi:CreateCategory(categorysettings)
 	windowlist.SortOrder = Enum.SortOrder.LayoutOrder
 	windowlist.HorizontalAlignment = Enum.HorizontalAlignment.Center
 	windowlist.Parent = children
+
 	function categoryapi:CreateModule(modulesettings)
 		mainapi:Remove(modulesettings.Name)
 		local moduleapi = {
@@ -3748,19 +3749,7 @@ function mainapi:CreateCategory(categorysettings)
 			Name = modulesettings.Name,
 			Category = categorysettings.Name
 		}
-		local IP = moduleapi.IsPrem
-		if IP == nil or IP == false then
-			IP = false
-		end
-		if IP then
-			if getgenv().role == 'premium' then
-				table.insert(moduleapi.Alias, 'premium')
-				table.insert(modulesettings.Tags, 'premium')
-			else
-				mainapi:Remove(modulesettings.Name)
-				return 
-			end
-		end
+
 		local hovered = false
 		local modulebutton = Instance.new('TextButton')
 		modulebutton.Name = modulesettings.Name
@@ -3768,7 +3757,7 @@ function mainapi:CreateCategory(categorysettings)
 		modulebutton.BackgroundColor3 = uipallet.Main
 		modulebutton.BorderSizePixel = 0
 		modulebutton.AutoButtonColor = false
-		modulebutton.Text = '            '..({modulesettings.Name:gsub(' ', '')})[1]
+		modulebutton.Text = '            '..({modulesettings.Name:gsub(' ', '')})[1]
 		modulebutton.TextXAlignment = Enum.TextXAlignment.Left
 		modulebutton.TextColor3 = color.Dark(uipallet.Text, 0.16)
 		modulebutton.TextSize = 14
@@ -3792,7 +3781,14 @@ function mainapi:CreateCategory(categorysettings)
 			layout.Padding = UDim.new(0, 5)
 		end
 		modulesettings.Tags = modulesettings.Tags or {}
-
+		if moduleapi.IsPrem and getgenv().role ~= 'premium' then
+			mainapi:Remove(modulesettings.Name)
+			return 
+		end
+		if moduleapi.IsPrem and getgenv().role == 'premium' then
+			table.insert(moduleapi.Alias, 'premium')
+			table.insert(modulesettings.Tags, 'premium')
+		end
 		table.insert(modulesettings.Tags, 'matched')
 		if modulesettings.Tags and typeof(modulesettings.Tags) then
 			for i, tag in modulesettings.Tags do
@@ -3947,6 +3943,7 @@ function mainapi:CreateCategory(categorysettings)
 				bind.Size = UDim2.fromOffset(math.max(getfontsize(bindtext.Text, bindtext.TextSize, bindtext.Font).X + 10, 20), 21)
 			end
 		end
+
 		function moduleapi:Toggle(multiple)
 			if mainapi.ThreadFix then
 				setthreadidentity(8)
