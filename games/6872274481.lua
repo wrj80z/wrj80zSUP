@@ -20583,9 +20583,9 @@ run(function()
 						_G.AutoTerraSets.AutoAimThread = nil
 					end
 					_G.AutoTerraSets.AutoAimThread = task.spawn(function()
-						G.AutoTerraSets.AutoAim.AutoAimOldFunc = bedwars.Client.Get
+						_G.AutoTerraSets.AutoAim.AutoAimOldFunc = bedwars.Client.Get
 						bedwars.Client.Get = function(self, remoteName)
-							local call = G.AutoTerraSets.AutoAim.AutoAimOldFunc(self, remoteName)
+							local call = _G.AutoTerraSets.AutoAim.AutoAimOldFunc(self, remoteName)
 							if remoteName == remotes.KickBlock then
 								return {
 									instance = call.instance,
@@ -20635,9 +20635,9 @@ run(function()
 					_G.AutoTerraSets.AutoAimThread = nil
 				end
 				_G.AutoTerraSets.AutoAimThread = task.spawn(function()
-					G.AutoTerraSets.AutoAim.AutoAimOldFunc = bedwars.Client.Get
+					_G.AutoTerraSets.AutoAim.AutoAimOldFunc = bedwars.Client.Get
 					bedwars.Client.Get = function(self, remoteName)
-						local call = G.AutoTerraSets.AutoAim.AutoAimOldFunc(self, remoteName)
+						local call = _G.AutoTerraSets.AutoAim.AutoAimOldFunc(self, remoteName)
 						if remoteName == remotes.KickBlock then
 							return {
 								instance = call.instance,
@@ -20665,9 +20665,9 @@ run(function()
 					task.cancel(_G.AutoTerraSets.AutoAimThread)
 					_G.AutoTerraSets.AutoAimThread = nil
 				end
-				if G.AutoTerraSets.AutoAim.AutoAimOldFunc then
-					bedwars.Client.Get = G.AutoTerraSets.AutoAim.AutoAimOldFunc
-					G.AutoTerraSets.AutoAim.AutoAimOldFunc = nil
+				if _G.AutoTerraSets.AutoAim.AutoAimOldFunc then
+					bedwars.Client.Get = _G.AutoTerraSets.AutoAim.AutoAimOldFunc
+					_G.AutoTerraSets.AutoAim.AutoAimOldFunc = nil
 				end
 			end
 		end
