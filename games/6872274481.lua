@@ -19861,7 +19861,7 @@ run(function()
 
 						if AutoPurchase.Enabled then
 							
-							while AutoPurchase.Enabled and AutoTal.Enabled and curr >= tonumber(pr) do
+							while AutoPurchase.Enabled and AutoTal.Enabled do
 								AutoPurchaseFunc(curr, pr)
 								task.wait(AutoPurchaseDelay.Value)
 							end
