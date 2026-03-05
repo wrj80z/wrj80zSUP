@@ -20448,7 +20448,7 @@ run(function()
 	local Range
 	local NoSlow
 	local Targets
-	_G.AutoTerraSets = {
+	local AutoTerraSets = {
 		old = nil,
 		StompThread = nil,
 		KickThread = nil,
@@ -20465,7 +20465,7 @@ run(function()
 			end
 			if callback then
 				if NoSlow.Enabled then
-					_G.AutoTerraSets.old = bedwars.BlockKickerKitController.onAbilityUsed
+					AutoTerraSets.old = bedwars.BlockKickerKitController.onAbilityUsed
 					bedwars.BlockKickerKitController.onAbilityUsed = function(arg1, arg2, arg3)
 						local tsa = require(replicatedStorage.TS.util["typesafe-attributes"]).GetAttribute
 						local bkka = require(replicatedStorage.TS.games.bedwars.kit.kits["block-kicker"]["block-kicker-kit-attributes"]).BlockKickerKitAttributes
@@ -20516,11 +20516,11 @@ run(function()
 					end
 				end
 				if AutoStomp.Enabled then
-					if _G.AutoTerraSets.StompThread then
-						task.cancel(_G.AutoTerraSets.StompThread)
-						_G.AutoTerraSets.StompThread = nil
+					if AutoTerraSets.StompThread then
+						task.cancel(AutoTerraSets.StompThread)
+						AutoTerraSets.StompThread = nil
 					end
-					_G.AutoTerraSets.StompThread = task.spawn(function()
+					AutoTerraSets.StompThread = task.spawn(function()
 						repeat
 							task.spawn(function()
 								repeat
@@ -20534,11 +20534,11 @@ run(function()
 					end)
 				end
 				if AutoKick.Enabled then
-					if _G.AutoTerraSets.KickThread then
-						task.cancel(_G.AutoTerraSets.KickThread)
-						_G.AutoTerraSets.KickThread = nil
+					if AutoTerraSets.KickThread then
+						task.cancel(AutoTerraSets.KickThread)
+						AutoTerraSets.KickThread = nil
 					end
-					_G.AutoTerraSets.KickThread = task.spawn(function()
+					AutoTerraSets.KickThread = task.spawn(function()
 						repeat
 							local plrs = entitylib.AllPosition({
 								Range = Range.Value,
@@ -20578,14 +20578,14 @@ run(function()
 					end)
 				end
 				if AutoAim.Enabled then
-					if _G.AutoTerraSets.AutoAimThread then
-						task.cancel(_G.AutoTerraSets.AutoAimThread)
-						_G.AutoTerraSets.AutoAimThread = nil
+					if AutoTerraSets.AutoAimThread then
+						task.cancel(AutoTerraSets.AutoAimThread)
+						AutoTerraSets.AutoAimThread = nil
 					end
-					_G.AutoTerraSets.AutoAimThread = task.spawn(function()
-						_G.AutoTerraSets.AutoAim.AutoAimOldFunc = bedwars.Client.Get
+					AutoTerraSets.AutoAimThread = task.spawn(function()
+						AutoTerraSets.AutoAim.AutoAimOldFunc = bedwars.Client.Get
 						bedwars.Client.Get = function(self, remoteName)
-							local call = _G.AutoTerraSets.AutoAim.AutoAimOldFunc(self, remoteName)
+							local call = AutoTerraSets.AutoAim.AutoAimOldFunc(self, remoteName)
 							if remoteName == remotes.KickBlock then
 								return {
 									instance = call.instance,
@@ -20630,14 +20630,14 @@ run(function()
 		Name = "Auto Aim",
 		Function = function(v)
 			if v then
-				if _G.AutoTerraSets.AutoAimThread then
-					task.cancel(_G.AutoTerraSets.AutoAimThread)
-					_G.AutoTerraSets.AutoAimThread = nil
+				if AutoTerraSets.AutoAimThread then
+					task.cancel(AutoTerraSets.AutoAimThread)
+					AutoTerraSets.AutoAimThread = nil
 				end
-				_G.AutoTerraSets.AutoAimThread = task.spawn(function()
-					_G.AutoTerraSets.AutoAim.AutoAimOldFunc = bedwars.Client.Get
+				AutoTerraSets.AutoAimThread = task.spawn(function()
+					AutoTerraSets.AutoAim.AutoAimOldFunc = bedwars.Client.Get
 					bedwars.Client.Get = function(self, remoteName)
-						local call = _G.AutoTerraSets.AutoAim.AutoAimOldFunc(self, remoteName)
+						local call = AutoTerraSets.AutoAim.AutoAimOldFunc(self, remoteName)
 						if remoteName == remotes.KickBlock then
 							return {
 								instance = call.instance,
@@ -20661,13 +20661,13 @@ run(function()
 					end
 				end)
 			else
-				if _G.AutoTerraSets.AutoAimThread then
-					task.cancel(_G.AutoTerraSets.AutoAimThread)
-					_G.AutoTerraSets.AutoAimThread = nil
+				if AutoTerraSets.AutoAimThread then
+					task.cancel(AutoTerraSets.AutoAimThread)
+					AutoTerraSets.AutoAimThread = nil
 				end
-				if _G.AutoTerraSets.AutoAim.AutoAimOldFunc then
-					bedwars.Client.Get = _G.AutoTerraSets.AutoAim.AutoAimOldFunc
-					_G.AutoTerraSets.AutoAim.AutoAimOldFunc = nil
+				if AutoTerraSets.AutoAim.AutoAimOldFunc then
+					bedwars.Client.Get = AutoTerraSets.AutoAim.AutoAimOldFunc
+					AutoTerraSets.AutoAim.AutoAimOldFunc = nil
 				end
 			end
 		end
@@ -20676,11 +20676,11 @@ run(function()
 		Name = "Auto Stomp",
 		Function = function(v)
 			if v then
-				if _G.AutoTerraSets.StompThread then
-					task.cancel(_G.AutoTerraSets.StompThread)
-					_G.AutoTerraSets.StompThread = nil
+				if AutoTerraSets.StompThread then
+					task.cancel(AutoTerraSets.StompThread)
+					AutoTerraSets.StompThread = nil
 				end
-				_G.AutoTerraSets.StompThread = task.spawn(function()
+				AutoTerraSets.StompThread = task.spawn(function()
 					repeat
 						task.spawn(function()
 							repeat
@@ -20693,9 +20693,9 @@ run(function()
 					until not v or not AutoTerra.Enabled
 				end)
 			else
-				if _G.AutoTerraSets.StompThread then
-					task.cancel(_G.AutoTerraSets.StompThread)
-					_G.AutoTerraSets.StompThread = nil
+				if AutoTerraSets.StompThread then
+					task.cancel(AutoTerraSets.StompThread)
+					AutoTerraSets.StompThread = nil
 				end
 			end
 		end
@@ -20704,11 +20704,11 @@ run(function()
 		Name = "Auto Kick",
 		Function = function(v)
 			if v then
-				if _G.AutoTerraSets.KickThread then
-					task.cancel(_G.AutoTerraSets.KickThread)
-					_G.AutoTerraSets.KickThread = nil
+				if AutoTerraSets.KickThread then
+					task.cancel(AutoTerraSets.KickThread)
+					AutoTerraSets.KickThread = nil
 				end
-				_G.AutoTerraSets.KickThread = task.spawn(function()
+				AutoTerraSets.KickThread = task.spawn(function()
 					repeat
 						local plrs = entitylib.AllPosition({
 							Range = Range.Value,
@@ -20747,9 +20747,9 @@ run(function()
 					until not v or not AutoTerra.Enabled
 				end)
 			else
-				if _G.AutoTerraSets.KickThread then
-					task.cancel(_G.AutoTerraSets.KickThread)
-					_G.AutoTerraSets.KickThread = nil
+				if AutoTerraSets.KickThread then
+					task.cancel(AutoTerraSets.KickThread)
+					AutoTerraSets.KickThread = nil
 				end
 			end
 		end
@@ -20758,7 +20758,7 @@ run(function()
 		Name = "NoSlow",
 		Function = function(v)
 			if v then
-				_G.AutoTerraSets.old = bedwars.BlockKickerKitController.onAbilityUsed
+				AutoTerraSets.old = bedwars.BlockKickerKitController.onAbilityUsed
 				bedwars.BlockKickerKitController.onAbilityUsed = function(arg1, arg2, arg3)
 					local tsa = require(replicatedStorage.TS.util["typesafe-attributes"]).GetAttribute
 					local bkka = require(replicatedStorage.TS.games.bedwars.kit.kits["block-kicker"]["block-kicker-kit-attributes"]).BlockKickerKitAttributes
@@ -20808,8 +20808,8 @@ run(function()
 					end
 				end
 			else
-				bedwars.BlockKickerKitController.onAbilityUsed = _G.AutoTerraSets.old
-				_G.AutoTerraSets.old = nil
+				bedwars.BlockKickerKitController.onAbilityUsed = AutoTerraSets.old
+				AutoTerraSets.old = nil
 			end
 		end
 	})
