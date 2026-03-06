@@ -21933,6 +21933,8 @@ run(function()
 	local a = true
 	local TriggerAlarmed = false
 
+	local highlighted = {}
+	
 	local function getBed()
 		if entitylib.isAlive then
 			local id = lplr.Character:GetAttribute('Team')
@@ -22145,9 +22147,11 @@ run(function()
 		Name = "Show Alarm",
 		Default = true,
 		Function = function()
-			BedAlarm:Toggle()
-			task.wait()
-			BedAlarm:Toggle()
+			if BedAlarm.Enabled then
+				BedAlarm:Toggle()
+				task.wait()
+				BedAlarm:Toggle()
+			end
 		end
 	})
 	Range = BedAlarm:CreateSlider({
