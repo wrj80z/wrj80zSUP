@@ -62,12 +62,12 @@ end
 local function finishLoading()
 	vape.Init = nil
 	vape:Load()
-	task.spawn(function()
+	vape:Clean(task.spawn(function()
 		repeat
-			vape:Save()
+			pcall(function() vape:Save() end)
 			task.wait(10)
-		until not vape.Loaded
-	end)
+		until false
+	end))
 
 	local teleportedServers = false
 		vape:Clean(playersService.LocalPlayer.OnTeleport:Connect(function()
