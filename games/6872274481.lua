@@ -14445,8 +14445,9 @@ run(function()
 		local obj = replicatedStorage.Assets.Effects.BedAlarm:Clone()
 		obj.Parent = folder
 		obj:PivotTo(CFrame.new(bedpos + Vector3.new(0, 15, 0)))
-		obj:SetAttribute('RotationSpeed', 90)
-		collectionService:AddTag(obj,'RotatingObject')
+		local CollectionService = game:GetService("CollectionService")
+		workspace.OnyxBedAlarm.BedAlarm:SetAttribute('RotationSpeed', 90)
+		CollectionService:AddTag(workspace.OnyxBedAlarm.BedAlarm,'RotatingObject')
 		bedwars.SoundManager:playSound(bedwars.SoundList.BED_ALARM_ACTIVATE, {
 			position = bedpos,
 			rollOffMaxDistance = 70,
@@ -14537,10 +14538,9 @@ run(function()
 				if Alarm.Enabled then
 					AddAlarmOBJ(getBed():GetPivot().Position)
 					task.wait(0.05)
-					local obj = BedAlarmTBS[lplr]
-					obj:SetAttribute('RotationSpeed', 90)
-					collectionService:AddTag(obj,'RotatingObject')
-					print(obj)
+					local CollectionService = game:GetService("CollectionService")
+					workspace.OnyxBedAlarm.BedAlarm:SetAttribute('RotationSpeed', 90)
+					CollectionService:AddTag(workspace.OnyxBedAlarm.BedAlarm,'RotatingObject')
 				end
 				repeat
 					local bed, localpos = getBed(), nil
