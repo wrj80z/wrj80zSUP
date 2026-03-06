@@ -21949,27 +21949,30 @@ run(function()
 	end
 
 	local function AddAlarmOBJ(bedpos)
-		local folder = Instance.new('Folder')
-		folder.Parent = workspace
-		folder.Name = 'OnyxBedAlarm'
-		local obj = replicatedStorage.Assets.Effects.BedAlarm:Clone()
-		obj.Parent = folder
-		obj:PivotTo(CFrame.new(bedpos + Vector3.new(0, 15, 0)))
-		bedwars.SoundManager:playSound(bedwars.SoundList.BED_ALARM_ACTIVATE, {
-			position = bedpos,
-			rollOffMaxDistance = 70,
-			volumeMultiplier = Volume.Value
-		})
-		for i, v in obj:GetDescendants() do
-			bedwars.QueryUtil:setQueryIgnored(v, true)
-		end
-		BedAlarmTBS[lplr] = obj
-		local rotation = 0
-		while ALAR do
-			rotation = rotation + rotspeed * 0.1
-			obj:PivotTo(CFrame.new(bedpos + Vector3.new(0, 15, 0)) * CFrame.Angles(0, math.rad(rotation), 0))
-			task.wait(0.1)
-		end
+	    local folder = Instance.new('Folder')
+	    folder.Parent = workspace
+	    folder.Name = 'OnyxBedAlarm'
+	    local obj = replicatedStorage.Assets.Effects.BedAlarm:Clone()
+	    obj.Parent = folder
+	    obj:PivotTo(CFrame.new(bedpos + Vector3.new(0, 15, 0)))
+	    bedwars.SoundManager:playSound(bedwars.SoundList.BED_ALARM_ACTIVATE, {
+	        position = bedpos,
+	        rollOffMaxDistance = 70,
+	        volumeMultiplier = Volume.Value
+	    })
+	    for i, v in obj:GetDescendants() do
+	        bedwars.QueryUtil:setQueryIgnored(v, true)
+	    end
+	    BedAlarmTBS[lplr] = obj
+	
+	    local rotation = 0
+	    task.spawn(function()
+	        while ALAR do
+	            rotation = rotation + rotspeed
+	            obj:PivotTo(CFrame.new(bedpos + Vector3.new(0, 15, 0)) * CFrame.Angles(0, math.rad(rotation), 0))
+	            task.wait(0.1)
+	        end
+	    end)
 	end
 
 	local function RemoveAlarmOBJ()
@@ -22114,6 +22117,7 @@ run(function()
 									for ent, highlight in pairs(highlighted) do
 										if highlight then
 											highlight:Destroy()
+											hightlight = nil
 										end
 									end
 								end
@@ -22131,6 +22135,7 @@ run(function()
 					for ent, highlight in pairs(highlighted) do
 						if highlight then
 							highlight:Destroy()
+							hightlight = nil
 						end
 					end
 				end
