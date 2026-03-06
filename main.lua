@@ -12,7 +12,7 @@ if table.find({'Volt'}, ({identifyexecutor()})[1]) then
 	WL = false
 end
 if identifyexecutor then
-	if table.find({'Argon'}, ({identifyexecutor()})[1]) then
+	if table.find({'Argon', 'Wave', 'Seliware', 'Volt'}, ({identifyexecutor()})[1]) then
 		getgenv().setthreadidentity = nil
 	end
 end
@@ -69,7 +69,7 @@ local function finishLoading()
 		until not vape.Loaded
 	end)
 
-	local teleportedServers
+	local teleportedServers = false
 		vape:Clean(playersService.LocalPlayer.OnTeleport:Connect(function()
 			if (not teleportedServers) and (not shared.VapeIndependent) then
 				teleportedServers = true
