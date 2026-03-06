@@ -22075,6 +22075,7 @@ run(function()
 										message = '[Bed Alarm]: An intruder is near your bed!',
 									})
 								end
+								print(httpService:JSONEncode(entity))
 								local deltaPos = (localpos - entity.character.RootPart.Position).Magnitude
 								if deltaPos < 30 then
 									bedwars.SoundManager:playSound(bedwars.SoundList.BED_ALARM, {
@@ -22145,8 +22146,9 @@ run(function()
 		Name = "Show Alarm",
 		Default = true,
 		Function = function()
-			BedAlarm:Toggle(false)
-			BedAlarm:Toggle(true)
+			BedAlarm:Toggle()
+			task.wait()
+			BedAlarm:Toggle()
 		end
 	})
 	Range = BedAlarm:CreateSlider({
