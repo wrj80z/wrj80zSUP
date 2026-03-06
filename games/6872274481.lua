@@ -22075,8 +22075,7 @@ run(function()
 										message = '[Bed Alarm]: An intruder is near your bed!',
 									})
 								end
-								print(httpService:JSONEncode(entity))
-								local deltaPos = (localpos - entity.character.RootPart.Position).Magnitude
+								local deltaPos = (localpos - entity.HumanoidRootPart.Position).Magnitude
 								if deltaPos < 30 then
 									bedwars.SoundManager:playSound(bedwars.SoundList.BED_ALARM, {
 										volumeMultiplier = Volume.Value
@@ -22139,7 +22138,7 @@ run(function()
 	})
 	Types = BedAlarm:CreateDropdown({
 		Name = 'Type',
-		List = {'Vape','Bedwars'},
+		List = {'Bedwars','Vape'},
 		Default = 'Bedwars'
 	})
 	Alarm = BedAlarm:CreateToggle({
