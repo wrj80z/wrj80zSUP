@@ -22122,9 +22122,7 @@ run(function()
 					RemoveAlarmOBJ()
 				end
 				if HightlightOption.Enabled then
-					for i, v in highlighted do
-						print(i,v)
-					end
+					print(httpService:JSONEncode(highlighted))
 				end
 			end
 		end,
