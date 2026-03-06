@@ -22109,7 +22109,11 @@ run(function()
 									TriggerAlarmed = false
 								end
 								if HightlightOption.Enabled then
-									print(httpService:JSONEncode(highlighted))
+									for ent, highlight in pairs(highlighted) do
+										if highlight then
+											highlight:Destroy()
+										end
+									end
 								end
 							end
 						end
@@ -22122,7 +22126,11 @@ run(function()
 					RemoveAlarmOBJ()
 				end
 				if HightlightOption.Enabled then
-					print(httpService:JSONEncode(highlighted))
+					for ent, highlight in pairs(highlighted) do
+						if highlight then
+							highlight:Destroy()
+						end
+					end
 				end
 			end
 		end,
