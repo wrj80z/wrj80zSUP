@@ -1,4 +1,26 @@
 local ARGS = ...
+if getgenv().username and ARGS.Username == nil then
+	ARGS.Username = getgenv().username
+	ARGS.Password = getgenv().password
+end
+if typeof(ARGS) ~= "table" then
+	getgenv().username = 'GUEST' 
+	getgenv().password = 'PASSWORD' 
+end
+getgenv().username = ARGS.Username
+getgenv().password = ARGS.Password
+getgenv().WLUSER = ARGS.User
+
+if getgenv().TestMode then
+	getgenv().TestMode  = getgenv().TestMode 
+else
+	getgenv().TestMode = ARGS.TestMode or false
+end
+if getgenv().Closet then
+	getgenv().Closet  = getgenv().Closet
+else
+	getgenv().Closet = ARGS.Closet or false
+end
 repeat task.wait() until game:IsLoaded()
 if shared.vape then shared.vape:Uninject() end
 local WL = false
