@@ -9443,7 +9443,7 @@ run(function()
 							end
 						else
 							if LastAuraTarget and not AfterSwingDone and ASOPT.Enabled and meta then
-								if sword and meta and AfterSwingTick > tick() and AnimDelay < tick() then
+								if sword and meta and AfterSwingTick > tick() then
 									AfterSwingDone = true
 									AnimDelay = tick() + (meta.sword.respectAttackSpeedForEffects and meta.sword.attackSpeed or math.max(ChargeTime.Value, 0.11))
 									bedwars.SwordController:playSwordEffect(meta, false)
