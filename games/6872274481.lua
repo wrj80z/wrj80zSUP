@@ -14528,6 +14528,29 @@ run(function()
 		colors(a)
 	end
 
+	local function UntriggerAlarm()
+		TriggerAlarmed = false
+
+		local obj = BedAlarmTBS[lplr]
+		obj:SetAttribute('RotationSpeed',90)
+		local function colors(t)
+			for i, v in obj.Sides:GetChildren() do
+				if v:IsA("BasePart") then
+					v.Color = Color3.fromRGB(82, 124, 174)
+				end
+			end
+			local inner = obj.Recolor.Inner
+			inner.Color = Color3.fromRGB(33, 84, 185)
+			local outer = obj.Recolor.Outer
+			outer.Color = Color3.fromRGB(82, 124, 174)
+			local bulb = obj.Recolor.Bulb
+			bulb.Color = Color3.fromRGB(0, 16, 176)
+			local glow = obj.Recolor.Bulb.GlowAttachment.Glow
+			local glownew = ColorSequence.new
+			glow.Color = glownew(Color3.fromRGB(0, 60, 255))
+		end
+	end
+
 	BedAlarm = vape.Categories.Exploits:CreateModule({
 		Name = 'BedAlarm',
 		IsPrem = true,
@@ -14607,17 +14630,7 @@ run(function()
 								end
 							else
 								if Alarm.Enabled then
-									local obj = BedAlarmTBS[lplr]
-									TriggerAlarmed = false
-									obj:SetAttribute('RotationSpeed',90)
-
-								end
-								if HightlightOption.Enabled then
-									for i, v in highlighted do
-										if v then
-											v:Destroy()
-										end
-									end
+									UntriggerAlarm()
 								end
 							end
 						end
@@ -14628,13 +14641,6 @@ run(function()
 			else
 				if Alarm.Enabled then
 					RemoveAlarmOBJ()
-				end
-				if HightlightOption.Enabled then
-					for i, v in highlighted do
-						if v then
-							v:Destroy()
-						end
-					end
 				end
 			end
 		end,
