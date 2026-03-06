@@ -14454,15 +14454,8 @@ run(function()
 			bedwars.QueryUtil:setQueryIgnored(v, true)
 		end
 		BedAlarmTBS[lplr] = obj
-
-		local rotation = 0
-		task.spawn(function()
-			while ALAR do
-				rotation = rotation + rotspeed
-				obj:PivotTo(CFrame.new(bedpos + Vector3.new(0, 15, 0)) * CFrame.Angles(0, math.rad(rotation), 0))
-				task.wait(0.1)
-			end
-		end)
+		obj:SetAttribute('RotationSpeed', 90)
+		collectionService:AddTag(obj,'RotatingObject')
 	end
 
 	local function RemoveAlarmOBJ()
@@ -14474,8 +14467,9 @@ run(function()
 
 	local function TriggerAlarm()
 		TriggerAlarmed = true
-		rotspeed = 270
+
 		local obj = BedAlarmTBS[lplr]
+		obj:SetAttribute('RotationSpeed',270)
 		local function colors(t)
 			if TriggerAlarmed == false then
 				return
@@ -14601,7 +14595,10 @@ run(function()
 								end
 							else
 								if Alarm.Enabled then
+									local obj = BedAlarmTBS[lplr]
 									TriggerAlarmed = false
+									obj:SetAttribute('RotationSpeed',90)
+
 								end
 								if HightlightOption.Enabled then
 									for i, v in highlighted do
@@ -14640,8 +14637,10 @@ run(function()
 		Name = "Show Alarm",
 		Default = true,
 		Function = function()
-			BedAlarm:Toggle(false)
-			BedAlarm:Toggle(true)
+			if BedAlarm.Enabled then
+				BedAlarm:Toggle()
+				BedAlarm:Toggle()
+			end
 		end
 	})
 	Range = BedAlarm:CreateSlider({
