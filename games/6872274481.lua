@@ -14445,6 +14445,9 @@ run(function()
 		local obj = replicatedStorage.Assets.Effects.BedAlarm:Clone()
 		obj.Parent = folder
 		obj:PivotTo(CFrame.new(bedpos + Vector3.new(0, 15, 0)))
+		obj:SetAttribute('RotationSpeed', 90)
+		collectionService:AddTag(obj,'RotatingObject')
+		print(obj:GetAttribute('RotationSpeed'))
 		bedwars.SoundManager:playSound(bedwars.SoundList.BED_ALARM_ACTIVATE, {
 			position = bedpos,
 			rollOffMaxDistance = 70,
@@ -14454,8 +14457,7 @@ run(function()
 			bedwars.QueryUtil:setQueryIgnored(v, true)
 		end
 		BedAlarmTBS[lplr] = obj
-		obj:SetAttribute('RotationSpeed', 90)
-		collectionService:AddTag(obj,'RotatingObject')
+
 	end
 
 	local function RemoveAlarmOBJ()
