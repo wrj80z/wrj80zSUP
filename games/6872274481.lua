@@ -21916,4 +21916,285 @@ Tun(function() -- keep this if ur a dev this disables speed n fly whenever you a
 			return false
 		end
 	end
+	if shared.Dev then
+run(function()
+	local BedAlarm
+	local Range
+	local Tick
+	local Volume
+	local HightlightOption
+	local Color
+	local Alarm
+	local Types
+
+	local BedAlarmTBS = {}
+	local rotspeed = 90
+	local ALAR = false
+	local a = true
+	local TriggerAlarmed = false
+
+	local function getBed()
+		if entitylib.isAlive then
+			local id = lplr.Character:GetAttribute('Team')
+			for i,v in collectionService:GetTagged('bed') do
+				if tonumber(id) == tonumber(v:GetAttribute('TeamId')) then
+					return v
+				end
+			end
+		end
+
+		return
+	end
+
+	local function AddAlarmOBJ(bedpos)
+		local folder = Instance.new('Folder')
+		folder.Parent = workspace
+		folder.Name = 'OnyxBedAlarm'
+		local obj = replicatedStorage.Assets.Effects.BedAlarm:Clone()
+		obj.Parent = folder
+		obj:PivotTo(CFrame.new(bedpos + Vector3.new(0, 15, 0)))
+		bedwars.SoundManager:playSound(bedwars.SoundList.BED_ALARM_ACTIVATE, {
+			position = bedpos,
+			rollOffMaxDistance = 70,
+			volumeMultiplier = Volume.Value
+		})
+		for i, v in obj:GetDescendants() do
+			bedwars.QueryUtil:setQueryIgnored(v, true)
+		end
+		BedAlarmTBS[lplr] = obj
+		local rotation = 0
+		while ALAR do
+			rotation = rotation + rotspeed * 0.1
+			obj:PivotTo(CFrame.new(bedpos + Vector3.new(0, 15, 0)) * CFrame.Angles(0, math.rad(rotation), 0))
+			task.wait(0.1)
+		end
+	end
+
+	local function RemoveAlarmOBJ()
+		TriggerAlarmed = false
+		ALAR = false
+		workspace:FindFirstChild("OnyxBedAlarm"):Destroy()
+		BedAlarmTBS[lplr] = nil
+	end
+
+	local function TriggerAlarm()
+		TriggerAlarmed = true
+		rotspeed = 270
+		local obj = BedAlarmTBS[lplr]
+		local function colors(t)
+			if TriggerAlarmed == false then
+				return
+			end
+			for i, v in obj.Sides:GetChildren() do
+				if v:IsA("BasePart") then
+					local v58
+					if t then
+						clr = Color3.fromRGB(226, 88, 88)
+					else
+						clr = Color3.fromRGB(82, 124, 174)
+					end
+					v.Color = clr
+				end
+			end
+			local inner = obj.Recolor.Inner
+			local clrr
+			if t then
+				clrr = Color3.fromRGB(195, 70, 70)
+			else
+				clrr = Color3.fromRGB(33, 84, 185)
+			end
+			inner.Color = clrr
+			local outer = obj.Recolor.Outer
+			local clrrr
+			if t then
+				clrrr = Color3.fromRGB(188, 74, 74)
+			else
+				clrrr = Color3.fromRGB(82, 124, 174)
+			end
+			outer.Color = clrrr
+			local bulb = obj.Recolor.Bulb
+			local clrrrr
+			if t then
+				clrrrr = Color3.fromRGB(195, 70, 70)
+			else
+				clrrrr = Color3.fromRGB(0, 16, 176)
+			end
+			bulb.Color = clrrrr
+			local glow = obj.Recolor.Bulb.GlowAttachment.Glow
+			local glownew = ColorSequence.new
+			local clrrrrr
+			if t then
+				clrrrrr = Color3.fromRGB(255, 0, 0)
+			else
+				clrrrrr = Color3.fromRGB(0, 60, 255)
+			end
+			glow.Color = glownew(clrrrrr)
+		end
+		task.spawn(function()
+			task.wait(0.2)
+			a = not a
+		end)
+		colors(a)
+	end
+
+	BedAlarm = vape.Categories.Exploits:CreateModule({
+		Name = 'BedAlarm',
+		IsPrem = true,
+		Function = function(callback)
+			if callback then
+				local Notifytick = os.clock()
+				local highlighted = {}
+				if Alarm.Enabled then
+					AddAlarmOBJ(getBed():GetPivot().Position)
+				end
+				repeat
+					local bed, localpos = getBed(), nil
+					if bed then
+						localpos = bed:GetPivot().Position
+					end
+
+					if localpos then
+						local entity = localpos and entitylib.EntityPosition({
+							Origin = localpos,
+							Range = Range.Value,
+							Part = 'RootPart',
+							Players = true
+						})
+
+						if os.clock() > Notifytick then
+							if entity then
+								Notifytick = os.clock() + Tick.Value
+								if Types.Value == 'Vape' then
+									vape:CreateNotification("BedAlarm", '[Bed Alarm]: An intruder is near your bed!',12)
+								elseif Types.Value == 'Bedwars' then
+									bedwars.NotificationController:sendInfoNotification({
+										message = '[Bed Alarm]: An intruder is near your bed!',
+									})
+								else
+									bedwars.NotificationController:sendInfoNotification({
+										message = '[Bed Alarm]: An intruder is near your bed!',
+									})
+								end
+								local deltaPos = (localpos - entity.character.RootPart.Position).Magnitude
+								if deltaPos < 30 then
+									bedwars.SoundManager:playSound(bedwars.SoundList.BED_ALARM, {
+										volumeMultiplier = Volume.Value
+									})
+								else
+									bedwars.SoundManager:playSound(bedwars.SoundList.BED_ALARM_TRIGGERED_FAR, {
+										volumeMultiplier = Volume.Value * 0.5
+									})
+								end
+								if HightlightOption.Enabled then
+									local character = entity.Character
+									if not character then return end
+									local highlight = Instance.new("Highlight")
+									highlight.Name = "BedAlarmHighlight"
+									highlight.Adornee = character
+									local hue, sat, val = Color.Hue, Color.Sat, Color.Value
+									local color = Color3.fromHSV(hue, sat, val)
+									highlight.FillColor = color
+									highlight.OutlineColor = color
+									highlight.FillTransparency = 0.5
+									highlight.OutlineTransparency = 0
+									highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+									highlight.Parent = character
+									highlighted[character] = highlight
+								end
+								if Alarm.Enabled then
+									TriggerAlarm()
+								end
+							else
+								if Alarm.Enabled then
+									TriggerAlarmed = false
+								end
+								if HightlightOption.Enabled then
+									for i, v in highlighted do
+										if v then
+											v:Destroy()
+										end
+									end
+								end
+							end
+						end
+					end
+					task.wait(1/60)
+				until not BedAlarm.Enabled
+				table.clear(highlighted)
+			else
+				if Alarm.Enabled then
+					RemoveAlarmOBJ()
+				end
+				if HightlightOption.Enabled then
+					for i, v in highlighted do
+						if v then
+							v:Destroy()
+						end
+					end
+				end
+			end
+		end,
+		Tooltip = 'Notifies when theres an enemy near bed'
+	})
+	Types = BedAlarm:CreateDropdown({
+		Name = 'Type',
+		List = {'Vape','Bedwars'},
+		Default = 'Bedwars'
+	})
+	Alarm = BedAlarm:CreateToggle({
+		Name = "Show Alarm",
+		Default = true,
+		Function = function()
+			BedAlarm:Toggle(false)
+			BedAlarm:Toggle(true)
+		end
+	})
+	Range = BedAlarm:CreateSlider({
+		Name = "Distance",
+		Min = 1,
+		Max = 100,
+		Default = 64,
+				Visible = true,
+		Suffix = function(v)
+			if v == 1 then
+				return 'stud'
+			end
+			return 'studs'
+		end
+	})
+	Tick = BedAlarm:CreateSlider({
+		Name = "Ticks",
+		Min = 0,
+		Max = 12,
+		Decimal = 5,
+		Default = 3.05,
+				Visible = true,
+		Suffix = 'hz'
+	})
+	Volume = BedAlarm:CreateSlider({
+		Name = "Volume Mutipler",
+		Min = 0.1,
+		Max = 2,
+		Default = 1.5,
+				Visible = true,
+		Decimal = 5,
+	})
+	Color = BedAlarm:CreateColorSlider({
+		Name = 'Background Color',
+		DefaultValue = 0,
+		DefaultOpacity = 0.5,
+		Darker = true
+	})
+	HightlightOption = BedAlarm:CreateToggle({
+		Name = "Hightlight players",
+		Default = true,
+				Visible = true,
+		Function = function(callback)
+			if Color.Object then Color.Object.Visible = callback end
+		end
+	})
+
+
+end)
+	end
 end)
