@@ -22109,11 +22109,7 @@ run(function()
 									TriggerAlarmed = false
 								end
 								if HightlightOption.Enabled then
-									for i, v in highlighted do
-										if v then
-											v:Destroy()
-										end
-									end
+									print(httpService:JSONEncode(highlighted))
 								end
 							end
 						end
