@@ -1,18 +1,93 @@
-local accountinfo = {}
-
 local ARGS = ... or {}
+
+local cloneref = cloneref or function(ref: Instance): Instance
+    return ref    
+end
+
+local StarterGui: StarterGui = cloneref(game:GetService('StarterGui'))
+local isfile = isfile or function(file)
+	local suc, res = pcall(function()
+		return readfile(file)
+	end)
+	return suc and res ~= nil and res ~= ''
+end
+local delfile = delfile or function(file)
+	writefile(file, '')
+end
+
 local function TTD()
-    delfolder('ReVape')
+	if not ARGS.ReVapeDev then
+	    if isfolder('ReVape') then
+	        for _, v: string in listfiles('ReVape') do
+	            if not v:find('profiles')  and not v:find('accounts') then
+	                if isfolder(v) then
+	                    delfolder(v)
+	                elseif isfile(v) then
+	                    delfile(v)
+	                end
+	            end
+	        end
+	
+	        if isfolder('ReVape/profiles') and isfile('ReVape/profiles/commit.txt') then
+	            delfile('ReVape/profiles/commit.txt')
+			else
+				StarterGui:SetCore('SendNotification', {
+				    Title = 'Onyx',
+				    Text = 'Issue reinstalling Onyx! dm "20mop" on discord!',
+				    Duration = 20
+				})
+	        end
+	    end
+	end
+end
+local function RTTD()
+	delfolder('ReVape/profiles')
+	delfolder('ReVape/games')
+	delfolder('ReVape/guis')
+	delfolder('ReVape/libraries')
+	delfolder('ReVape/assets')
+	delfile('ReVape/main.lua')
+	return nil
 end
 
 if ARGS.Refresh then
     TTD()
-    if not isfolder('ReVape') then
-        print('Successfully deleted the "ReVape" folder!')
+	task.wait(0.5)
+    if not isfolder('ReVape/games') then
+		StarterGui:SetCore('SendNotification', {
+			Title = 'Onyx',
+			Text = 'Successfully reinstalling Onyx!!',
+			Duration = 12
+		})
     else
-        warn('Had an issue deleting the "ReVape" folder. Please DM the user "20mop" on Discord!')
-    end
+		StarterGui:SetCore('SendNotification', {
+			Title = 'Onyx',
+			Text = 'Issue reinstalling Onyx! dm "20mop" on discord!',
+			Duration = 20
+		})
+	end
+	return nil
 end
+
+if ARGS.ForceRefresh then
+    RTTD()
+	task.wait(0.5)
+   if not isfile('ReVape/main.lua') then
+		StarterGui:SetCore('SendNotification', {
+			Title = 'Onyx',
+			Text = 'Successfully force deleted Onyx!!',
+			Duration = 12
+		})
+    else
+		StarterGui:SetCore('SendNotification', {
+			Title = 'Onyx',
+			Text = 'Issue force deleting Onyx! dm "20mop" on discord!',
+			Duration = 20
+		})
+	end
+	return nil
+end
+
 
 if getgenv().username  and next(ARGS) == nil then
 	ARGS.username = getgenv().username
@@ -25,19 +100,11 @@ end
 getgenv().username = ARGS.username
 getgenv().password = ARGS.password
 getgenv().TestMode = ARGS.TestMode or false
+getgenv().Closet = ARGS.Closet or false
+
+local tweenService = cloneref(game:GetService('TweenService'))
 
 
-local tweenService = game:GetService('TweenService')
-
-local isfile = isfile or function(file)
-	local suc, res = pcall(function()
-		return readfile(file)
-	end)
-	return suc and res ~= nil and res ~= ''
-end
-local delfile = delfile or function(file)
-	writefile(file, '')
-end
 
 local function downloadFile(path, func)
 	if not isfile(path) then
@@ -66,29 +133,13 @@ local function wipeFolder(path)
 end
 
 
-for _, folder in {'ReVape', 'ReVape/games', 'ReVape/profiles', 'ReVape/assets', 'ReVape/libraries', 'ReVape/guis'} do
+for _, folder in {'ReVape', 'ReVape/games', 'ReVape/profiles', 'ReVape/assets', 'ReVape/libraries', 'ReVape/guis', 'ReVape/fonts'} do
 	if not isfolder(folder) then
 		makefolder(folder)
 	end
 	task.wait(0.05)
 end
 
-
-local folders = {'Revape/accounts'}
-
-for _, folder in ipairs(folders) do
-    if not isfolder(folder) then
-        makefolder(folder)
-    end
-    local files = {folder .. '/username.txt', folder .. '/password.txt'}
-    for _, txt in ipairs(files) do
-        if not isfile(txt) then
-            writefile(txt, "")
-        end
-        task.wait(0.05)
-    end
-    task.wait(0.05)
-end
 
 if not shared.VapeDeveloper then
 	local _, subbed = pcall(function() 
