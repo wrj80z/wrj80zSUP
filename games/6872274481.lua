@@ -14542,6 +14542,12 @@ run(function()
 					workspace.OnyxBedAlarm.BedAlarm:SetAttribute('RotationSpeed', 90)
 					CollectionService:AddTag(workspace.OnyxBedAlarm.BedAlarm,'RotatingObject')
 				end
+				task.delay(3,function()
+					local CollectionService = game:GetService("CollectionService")
+					workspace.OnyxBedAlarm.BedAlarm:SetAttribute('RotationSpeed', 90)
+					CollectionService:AddTag(workspace.OnyxBedAlarm.BedAlarm,'RotatingObject')
+					print('hello')
+				end)
 				repeat
 					local bed, localpos = getBed(), nil
 					if bed then
