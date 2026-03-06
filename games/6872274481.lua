@@ -22127,9 +22127,7 @@ run(function()
 				end
 				if HightlightOption.Enabled then
 					for i, v in highlighted do
-						if v then
-							v:Destroy()
-						end
+						print(i,v)
 					end
 				end
 			end
