@@ -52,7 +52,9 @@ local function downloadFile(path, func)
 	end
 	return (func or readfile)(path)
 end
-local function escape(s)
+shared.license = ARGS
+
+local function compileTable(tab)
 	local json = '{'
 	for i, v in tab do
 		json = `{json}\n					    {i} = {typeof(v) == 'string' and '"'.. v.. '"' or v},`
@@ -69,37 +71,36 @@ local function finishLoading()
 		until false
 	end))
 
-	local teleportedServers = false
-		vape:Clean(playersService.LocalPlayer.OnTeleport:Connect(function()
-			if (not teleportedServers) and (not shared.VapeIndependent) then
-				teleportedServers = true
-				local teleportScript =[[
-					shared.vapereload = true
-					if shared.VapeDeveloper then
-						loadstring(readfile('ReVape/loader.lua'), 'loader')(data)
-					else
-						loadstring(game:HttpGet('https://raw.githubusercontent.com/wrj80z/wrj80zSUP/'..readfile('ReVape/profiles/commit.txt')..'/loader.lua', true), 'loader')(data)
-					end
-				]]
+	local teleportedServers
+	vape:Clean(playersService.LocalPlayer.OnTeleport:Connect(function()
+		if (not teleportedServers) and (not shared.VapeIndependent) and vape.AutoTeleport.Enabled then
+			teleportedServers = true
+			local teleportScript = [[
+				shared.vapereload = true
 				if shared.VapeDeveloper then
-					teleportScript = 'shared.VapeDeveloper = true\n'..teleportScript
+					loadstring(readfile('ReVape/loader.lua'), 'loader')(sharedData)
+				else
+					loadstring(game:HttpGet('https://raw.githubusercontent.com/wrj80z/wrj80zSUP/'..readfile('ReVape/profiles/commit.txt')..'/loader.lua', true), 'loader')(sharedData)
 				end
-				if shared.VapeCustomProfile then
-					teleportScript = 'shared.VapeCustomProfile = "'..shared.VapeCustomProfile..'"\n'..teleportScript
-				end
-				teleportScript = teleportScript:gsub('data', escape(ARGS))
-				vape:Save()
-				queue_on_teleport(teleportScript)
+			]]
+			if shared.VapeDeveloper then
+				teleportScript = 'shared.VapeDeveloper = true\n'..teleportScript
 			end
-		end))
-	
+			if shared.VapeCustomProfile then
+				teleportScript = 'shared.VapeCustomProfile = "'..shared.VapeCustomProfile..'"\n'..teleportScript
+			end
+			teleportScript = teleportScript:gsub('sharedData', compileTable(ARGS))
+			vape:Save()
+			queue_on_teleport(teleportScript)
+		end
+	end))
 
 	if not shared.vapereload then
 		if not vape.Categories then return end
 		if vape.Categories.Main.Options['GUI bind indicator'].Enabled then
 			task.wait(0.5)
 			vape:CreateNotification('Finished Loading', vape.VapeButton and 'Press the button in the top right to open GUI' or 'Press '..table.concat(vape.Keybind, ' + '):upper()..' to open GUI', 5)
-			task.wait(0.75)
+			task.wait(0.5)
 			vape:CreateNotification('Onyx', `Initalized as {getgenv().username} with {getgenv().role}`, 5, 'info')
 		end
 	end
@@ -117,56 +118,51 @@ if not isfolder('ReVape/assets/'..gui) then
 	makefolder('ReVape/assets/'..gui)
 end
 vape = loadstring(downloadFile('ReVape/guis/'..gui..'.lua'), 'gui')()
-shared.vape = vape
-
 task.spawn(function()
-	if getgenv().Closet then
-	local LogService = cloneref(game:GetService("LogService"))
-	
-	local function hook(funcName)
-		if typeof(getgenv()[funcName]) == "function" then
-			local old
-			old = hookfunction(getgenv()[funcName], function(...)
-				return nil
+	pcall(function()
+		if getgenv().Closet then
+			local LogService = cloneref(game:GetService("LogService"))
+			
+			local function hook(funcName)
+				if typeof(getgenv()[funcName]) == "function" then
+					local old
+					old = hookfunction(getgenv()[funcName], function(...)
+						return nil
+					end)
+				end
+			end
+			
+			hook("print")
+			hook("warn")
+			hook("error")
+			hook("info")
+			
+			pcall(function()
+				LogService:ClearOutput()
+			end)
+			
+			pcall(function()
+				LogService.MessageOut:Connect(function()
+					LogService:ClearOutput()
+				end)
 			end)
 		end
-	end
-	
-	hook("print")
-	hook("warn")
-	hook("error")
-	hook("info")
-	
-	pcall(function()
-		LogService:ClearOutput()
 	end)
-	
-	pcall(function()
-		LogService.MessageOut:Connect(function()
-			LogService:ClearOutput()
-		end)
-	end)
-	end
 end)
-
+shared.vape = vape
 if not shared.VapeIndependent then
 	loadstring(downloadFile('ReVape/games/universal.lua'), 'universal')()
-	task.spawn(function()
-		if WL then
-			loadstring(downloadFile('ReVape/games/whitelist.lua'), 'whitelist')()
-		else
-			task.wait(0.0005)	
-		end
-	end)
 	if isfile('ReVape/games/'..game.PlaceId..'.lua') then
 		loadstring(readfile('ReVape/games/'..game.PlaceId..'.lua'), tostring(game.PlaceId))(...)
 	else
 		if not shared.VapeDeveloper then
-			local suc, res = pcall(function()
-				return game:HttpGet('https://raw.githubusercontent.com/wrj80z/wrj80zSUP/'..readfile('ReVape/profiles/commit.txt')..'/games/'..game.PlaceId..'.lua', true)
+			local success, result = pcall(function()
+				return game:HttpGet('https://raw.githubusercontent.com/wrj80z/wrj80zSUP/'..readfile('ReVape/profiles/commit.txt')..'/games/'..game.PlaceId..'.lua')
 			end)
-			if suc and res ~= '404: Not Found' then
-				loadstring(downloadFile('ReVape/games/'..game.PlaceId..'.lua'), tostring(game.PlaceId))(...)
+
+			if success and result ~= '404: Not Found' then
+				writefile(`ReVape/games/{game.PlaceId}.lua`, result)
+				loadstring(result, tostring(game.PlaceId))(...)
 			end
 		end
 	end
