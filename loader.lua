@@ -1,5 +1,26 @@
 local ARGS = ... or {}
+if getgenv().username and ARGS.Username == nil then
+	ARGS.Username = getgenv().username
+	ARGS.Password = getgenv().password
+end
+if typeof(ARGS) ~= "table" then
+	getgenv().username = 'GUEST' 
+	getgenv().password = 'PASSWORD' 
+end
+getgenv().username = ARGS.Username
+getgenv().password = ARGS.Password
+getgenv().WLUSER = ARGS.User
 
+if getgenv().TestMode then
+	getgenv().TestMode  = getgenv().TestMode 
+else
+	getgenv().TestMode = ARGS.TestMode or false
+end
+if getgenv().Closet then
+	getgenv().Closet  = getgenv().Closet
+else
+	getgenv().Closet = ARGS.Closet or false
+end
 local cloneref = cloneref or function(ref: Instance): Instance
     return ref    
 end
@@ -33,7 +54,7 @@ local function TTD()
 			else
 				StarterGui:SetCore('SendNotification', {
 				    Title = 'Onyx',
-				    Text = 'Issue reinstalling Onyx! dm "20mop" on discord!',
+				    Text = 'Issue reinstalling Onyx! dm "xlg77" on discord!',
 				    Duration = 20
 				})
 	        end
@@ -62,7 +83,7 @@ if ARGS.Refresh then
     else
 		StarterGui:SetCore('SendNotification', {
 			Title = 'Onyx',
-			Text = 'Issue reinstalling Onyx! dm "20mop" on discord!',
+			Text = 'Issue reinstalling Onyx! dm "xlg77" on discord!',
 			Duration = 20
 		})
 	end
@@ -81,7 +102,7 @@ if ARGS.ForceRefresh then
     else
 		StarterGui:SetCore('SendNotification', {
 			Title = 'Onyx',
-			Text = 'Issue force deleting Onyx! dm "20mop" on discord!',
+			Text = 'Issue force deleting Onyx! dm "xlg77" on discord!',
 			Duration = 20
 		})
 	end
@@ -89,18 +110,8 @@ if ARGS.ForceRefresh then
 end
 
 
-if getgenv().username  and next(ARGS) == nil then
-	ARGS.username = getgenv().username
-	ARGS.password = getgenv().password
-end
-if typeof(ARGS) ~= "table" then
-	getgenv().username = 'GUEST' 
-	getgenv().password = 'PASSWORD' 
-end
-getgenv().username = ARGS.username
-getgenv().password = ARGS.password
-getgenv().TestMode = ARGS.TestMode or false
-getgenv().Closet = ARGS.Closet or false
+
+
 
 local tweenService = cloneref(game:GetService('TweenService'))
 
@@ -157,4 +168,4 @@ if not shared.VapeDeveloper then
 	writefile('ReVape/profiles/commit.txt', commit)
 end
 
-return loadstring(downloadFile('ReVape/main.lua'), 'main')()
+return loadstring(downloadFile('ReVape/main.lua'), 'main')(ARGS)
