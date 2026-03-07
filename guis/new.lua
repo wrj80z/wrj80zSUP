@@ -6184,6 +6184,11 @@ mainapi.MultiKeybind = general:CreateToggle({
 	Name = 'Enable Multi-Keybinding',
 	Tooltip = 'Allows multiple keys to be bound to a module (eg. G + H)'
 })
+mainapi.AutoTeleport = general:CreateToggle({
+	Name = 'Auto Execute',
+	Default = true,
+	Tooltip = 'Automatically re-executes the script on teleport\n(might not work on some executors)'
+})
 general:CreateButton({
 	Name = 'Reset current profile',
 	Function = function()
