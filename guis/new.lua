@@ -7338,7 +7338,7 @@ mainapi:Clean(inputService.InputBegan:Connect(function(inputObj)
 		local toggled = false
 		for i, v in mainapi.Modules do
 			if checkKeybinds(mainapi.HeldKeybinds, v.Bind, inputObj.KeyCode.Name) then
-				if self.HoldKeyBind.Enabled then
+				if mainapi.HoldKeyBind.Enabled then
 					v.HoldCount = v.HoldCount + 1
 					if v.HoldCount == 1 then
 						v:Toggle(true)
@@ -7385,7 +7385,7 @@ mainapi:Clean(inputService.InputEnded:Connect(function(inputObj)
 			table.remove(mainapi.HeldKeybinds, ind)
 		end
 		for i, v in mainapi.Modules do
-			if self.HoldKeyBind.Enabled then
+			if mainapi.HoldKeyBind.Enabled then
 				if table.find(v.Bind, inputObj.KeyCode.Name) then
 					v.HoldCount = math.max(v.HoldCount - 1, 0)
 					if v.HoldCount == 0 then
