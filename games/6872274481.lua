@@ -21210,10 +21210,10 @@ run(function()
 		Alias = {'Kit','Exploit','Regent'},
 		Function = function(callback)
 			if callback then
-				local vacd = require(replicatedStorage.TS.cooldown["cooldown-id"]).CooldownId.VOID_AXE
+				local ids = require(replicatedStorage.TS.cooldown["cooldown-id"]).CooldownId
 				old = bedwars.CooldownController.isOnCooldown
 				bedwars.CooldownController.isOnCooldown = function(self, id)
-					if id == vacd then
+					if id == ids.VOID_AXE then
 						return false
 					end
 					return old(self, id)
