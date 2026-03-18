@@ -31,6 +31,7 @@ local mainapi = {
 	HideNofis = false,
 	Windows = {},
 	GlobalTags = {},
+	HoldKeyBind = {},
 }
 local cloneref = cloneref or function(obj)
 	return obj
@@ -291,20 +292,7 @@ local function addTooltip(gui, text)
 	end)
 end
 
-local function checkKeybinds(compare, target, key)
-	if type(target) == 'table' then
-		if table.find(target, key) then
-			for i, v in target do
-				if not table.find(compare, v) then
-					return false
-				end
-			end
-			return true
-		end
-	end
 
-	return false
-end
 
 local function createDownloader(text)
 	if mainapi.Loaded ~= true then
@@ -3747,7 +3735,8 @@ function mainapi:CreateCategory(categorysettings)
 			Index = getTableSize(mainapi.Modules),
 			ExtraText = modulesettings.ExtraText,
 			Name = modulesettings.Name,
-			Category = categorysettings.Name
+			Category = categorysettings.Name,
+			HoldCount = 0,
 		}
 
 		local hovered = false
@@ -3949,9 +3938,9 @@ function mainapi:CreateCategory(categorysettings)
 			if mainapi.ThreadFix then
 				setthreadidentity(8)
 			end
-			if isfolder('cvtest') then
-				if not isfile('cvtest/'..modulesettings.Name) then
-					writefile('cvtest/'..modulesettings.Name, tostring(os.time() + 3600))
+			if isfolder('OnyxMds') then
+				if not isfile('OnyxMds/'..modulesettings.Name) then
+					writefile('OnyxMds/'..modulesettings.Name, tostring(os.time() + 3600))
 				end
 			end
 			self.Enabled = not self.Enabled
@@ -6182,7 +6171,33 @@ mainapi.Categories.Main:CreateSettingsDivider()
 local general = mainapi.Categories.Main:CreateSettingsPane({Name = 'General'})
 mainapi.MultiKeybind = general:CreateToggle({
 	Name = 'Enable Multi-Keybinding',
-	Tooltip = 'Allows multiple keys to be bound to a module (eg. G + H)'
+	Tooltip = 'Allows multiple keys to be bound to a module (eg. G + H)',
+	Function = function(v)
+		if v then
+			pcall(function()
+				mainapi.MultiKeybind.Name = 'Disable Multi-Keybinding'
+			end)
+		else
+			pcall(function()
+				mainapi.MultiKeybind.Name = 'Enable Multi-Keybinding'
+			end)
+		end
+	end
+})
+mainapi.HoldKeyBind = general:CreateToggle({
+	Name = 'Enable Hold-Keybinding',
+	Tooltip = 'Allows keys to be hold to a module',
+	Function = function(v)
+		if v then
+			pcall(function()
+				mainapi.HoldKeyBind.Name = 'Disable Hold-Keybinding'
+			end)
+		else
+			pcall(function()
+				mainapi.HoldKeyBind.Name = 'Enable Hold-Keybinding'
+			end)
+		end
+	end
 })
 mainapi.AutoTeleport = general:CreateToggle({
 	Name = 'Auto Execute',
@@ -6301,6 +6316,7 @@ guipane:CreateToggle({
 	Default = true,
 	Tooltip = "Displays a message indicating your GUI upon injecting.\nI.E. 'Press RSHIFT to open GUI'"
 })
+
 guipane:CreateToggle({
 	Name = 'Show tooltips',
 	Function = function(enabled)
@@ -7277,6 +7293,20 @@ function mainapi:UpdateGUI(hue, sat, val, default)
 		end
 	end
 end
+local function checkKeybinds(compare, target, key)
+	if type(target) == 'table' then
+		if table.find(target, key) then
+			for i, v in target do
+				if not table.find(compare, v) then
+					return false
+				end
+			end
+			return true
+		end
+	end
+
+	return false
+end
 
 mainapi:Clean(notifications.ChildRemoved:Connect(function()
 	for i, v in notifications:GetChildren() do
@@ -7308,11 +7338,22 @@ mainapi:Clean(inputService.InputBegan:Connect(function(inputObj)
 		local toggled = false
 		for i, v in mainapi.Modules do
 			if checkKeybinds(mainapi.HeldKeybinds, v.Bind, inputObj.KeyCode.Name) then
-				toggled = true
-				if mainapi.ToggleNotifications.Enabled then
-					mainapi:CreateNotification('Module Toggled', i.."<font color='#FFFFFF'> has been </font>"..(not v.Enabled and "<font color='#5AFF5A'>Enabled</font>" or "<font color='#FF5A5A'>Disabled</font>").."<font color='#FFFFFF'>!</font>", 0.75)
+				if self.HoldKeyBind.Enabled then
+					v.HoldCount = v.HoldCount + 1
+					if v.HoldCount == 1 then
+						v:Toggle(true)
+						mainapi:UpdateGUI(mainapi.GUIColor.Hue, mainapi.GUIColor.Sat, mainapi.GUIColor.Value)
+						if mainapi.ToggleNotifications.Enabled then
+							mainapi:CreateNotification('Module Held', i.."<font color='#FFFFFF'> is </font><font color='#5AFF5A'>Active</font><font color='#FFFFFF'> (Hold)</font>", 0.75)
+						end
+					end
+				else
+					toggled = true
+					if mainapi.ToggleNotifications.Enabled then
+						mainapi:CreateNotification('Module Toggled', i.."<font color='#FFFFFF'> has been </font>"..(not v.Enabled and "<font color='#5AFF5A'>Enabled</font>" or "<font color='#FF5A5A'>Disabled</font>").."<font color='#FFFFFF'>!</font>", 0.75)
+					end
+					v:Toggle(true)
 				end
-				v:Toggle(true)
 			end
 		end
 		if toggled then
@@ -7338,12 +7379,26 @@ mainapi:Clean(inputService.InputEnded:Connect(function(inputObj)
 			mainapi.Binding:SetBind(checkKeybinds(mainapi.HeldKeybinds, mainapi.Binding.Bind, inputObj.KeyCode.Name) and {} or mainapi.HeldKeybinds, true)
 			mainapi.Binding = nil
 		end
-	end
 
-	local ind = table.find(mainapi.HeldKeybinds, inputObj.KeyCode.Name)
-	if ind then
-		table.remove(mainapi.HeldKeybinds, ind)
+		local ind = table.find(mainapi.HeldKeybinds, inputObj.KeyCode.Name)
+		if ind then
+			table.remove(mainapi.HeldKeybinds, ind)
+		end
+		for i, v in mainapi.Modules do
+			if self.HoldKeyBind.Enabled then
+				if table.find(v.Bind, inputObj.KeyCode.Name) then
+					v.HoldCount = math.max(v.HoldCount - 1, 0)
+					if v.HoldCount == 0 then
+						v:Toggle(false)													
+						mainapi:UpdateGUI(mainapi.GUIColor.Hue, mainapi.GUIColor.Sat, mainapi.GUIColor.Value)
+						if mainapi.ToggleNotifications.Enabled then
+							mainapi:CreateNotification('Module Released', i.."<font color='#FFFFFF'> is </font><font color='#FF5A5A'>Inactive</font><font color='#FFFFFF'> (Released)</font>", 0.75)
+						end
+					end
+				end
+			end
+		end
 	end
 end))
-
+ 
 return mainapi
