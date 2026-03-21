@@ -207,6 +207,71 @@ local function addCorner(parent, radius)
 	return corner
 end
 
+local function addRatio(parent,values)
+	values.Ratio = values.Ratio or 1
+	values.Type = values.Type or 'FitWithinMaxSize'
+	values.Axis = values.Axis or 'Width'
+
+	local aspect = Instance.new('UIAspectRatioConstraint')
+	aspect.AspectRatio = values.Ratio
+	aspect.AspectType = values.Type
+	aspect.DominantAxis = values.Axis
+	aspect.Parent = parent
+	
+	return aspect
+end
+
+local function addPadding(parent,values)
+	values.Bot = values.Bot or UDim.new(0,0)
+	values.Left = values.Left or UDim.new(0,0)
+	values.Top = values.Top or UDim.new(0,0)
+	values.Right = values.Right or UDim.new(0,0)
+
+	local pad = Instance.new('UIPadding')
+	pad.PaddingBottom = values.Bot
+	pad.PaddingLeft = values.Left
+	pad.PaddingRight = values.Right
+	pad.PaddingTop = values.Top
+	pad.Parent = parent
+
+	return pad
+end
+
+local function addTextSize(parent,values)
+	values.Min = values.Min or 1
+	values.Max = values.Max or 100
+	
+	local textsize = Instance.new('UITextSizeConstraint')
+	textsize.MaxTextSize = values.Max
+	textsize.MinTextSize = values.Min
+	textsize.Parent = parent
+
+	return textsize
+end
+
+local function addStroke(parent,values)
+	values.SM = values.SM or 'Contextual'
+	values.Offest = values.Offset or UDim.new(0,0)
+	values.SP = values.SP or 'Outer'
+	values.Color = values.Color = Color3.fromRGB(200,200,200)
+	values.Line = values.Line or 'Round'
+	values.SS = values.SS or 'FixedSize'
+	values.Thick = values.Thick or 1
+	values.Trans = values.Trans or 0
+
+	local stroke = Instance.new('UIStroke')
+	stroke.ApplyStrokeMode = values.SM
+	stroke.BorderOffest = values.Offest
+	stroke.Color = values.Color
+	stroke.LineJoinMode = values.Line
+	stroke.StrokeSizingMode = values.SS
+	stroke.Thickness = values.Thick
+	stroke.Transparency = values.Trans
+	stroke.Thickness = parent
+
+	return stroke
+end
+
 local function safecall(func, ...)
 	local args = {...}
 	xpcall(function()
@@ -5390,6 +5455,65 @@ function mainapi:CreateLegit()
 	self.Legit = legitapi
 
 	return legitapi
+end
+
+function mainapi:CreateProfileGUI()
+	local profilesapi = {}
+	local instance = Instance
+
+	local window = Instance.new('Frame')
+	window.Name = 'ProfilesUI'
+	window.Size = UDim2.fromScale(0.471,0.586)
+	window.Position = UDim2.fromOffset(845,408)
+	window.AnchorPoint = Vector2.new(0.5, 0.5)
+	window.BackgroundColor3 = uipallet.Main
+	window.Parent = scaledgui
+	addBlur(window)
+	addCorner(window)
+	makeDraggable(window)
+	addRatio(window,{Ratio=1.504})
+	local closewin = addCloseButton(window)
+
+	local icon = instance.new('ImageLabel')
+	icon.Parent = window
+	icon.BackgroundTransparency = 1
+	icon.Position = UDim2.fromScale(16,8)
+	icon.Size = UDim2.fromOffset(0.021,0.048)
+	icon.ZIndex = 99
+	icon.Image = getcustomasset('ReVape/assets/new/profilesicon.png')
+	icon.ScaleType = 'Fit'
+	icon.ImageColor3 = Color3.fromRGB(251,251,251)
+	icon.ImageTransparency = 0.5
+	addRatio(icon,{Ratio=0.667}) -- 67 67 67 67 677777777777777777777777 AAAAAAAAAAAA
+
+	local Divider = instance.new('Frame')
+	Divider.Parent = icon
+
+	local modal = Instance.new('TextButton')
+	modal.Parent = window
+	modal.BackgroundTransparency = 1
+	modal.Modal = true
+	modal.Positon = UDim2.new(0,0,0,0)
+	modal.Size = UDim2.new(0,0,0,0)
+	modal.Text = ''
+	addRatio(modal,{Ratio=179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368}) -- = to nan for some reason but ai
+	addTextSize(modal,{Max=8})
+
+	local title = Instance.new('TextLabel')
+	title.BackgroundTransparency = 1
+	title.Position = UDim2.fromScale(47,12)
+	title.Size = UDim2.new(.929,0,0.04,0)
+	title.Text = 'Public Profiles'
+	title.TextColor3 = Color3.fromRGB(200,200,200)
+	title.TextSize = 13
+	title.TextScaled = true
+	title.TextXAlignment = 'Left'
+	title.Font = Enum.Font.Arial
+	title.Parent = window
+	addRatio(title,{Ratio=34.9})
+	addTextSize(title,{Max=13})
+
+
 end
 
 function mainapi:CreateNotification(title, text, duration, type)
