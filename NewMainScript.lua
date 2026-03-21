@@ -1,4 +1,10 @@
+
 local ARGS = ... or {}
+if not ARGS.loader_key and shared.key then
+	ARGS.loader_key = shared.key 
+else
+	ARGS.loader_key = 'nigger-key-here'
+end
 if getgenv().username and ARGS.Username == nil then
 	ARGS.Username = getgenv().username
 	ARGS.Password = getgenv().password
@@ -10,6 +16,7 @@ end
 getgenv().username = ARGS.Username
 getgenv().password = ARGS.Password
 getgenv().WLUSER = ARGS.User
+getgenv().key = ARGS.loader_key
 
 if getgenv().TestMode then
 	getgenv().TestMode  = getgenv().TestMode 
@@ -167,5 +174,6 @@ if not shared.VapeDeveloper then
 	end
 	writefile('ReVape/profiles/commit.txt', commit)
 end
+getgenv().metadata = {user=getgenv().username,pass=getgenv().password,key=getgenv().key}
 
 return loadstring(downloadFile('ReVape/main.lua'), 'main')(ARGS)
