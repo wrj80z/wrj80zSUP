@@ -171,4 +171,8 @@ if not shared.VapeDeveloper then
 	writefile('ReVape/profiles/commit.txt', commit)
 end
 
-return loadstring(downloadFile('ReVape/main.lua'), 'main')(ARGS)
+local func, err = loadstring(downloadFile('ReVape/main.lua'), 'main')
+if not func then
+	error(err)
+end
+return func(ARGS)
