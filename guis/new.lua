@@ -252,7 +252,6 @@ end
 local function addStroke(parent, values)
 	values.SM = values.SM or Enum.ApplyStrokeMode.Contextual
 	values.Offset = values.Offset or UDim.new(0,0)
-	values.SP = values.SP or Enum.StrokePosition.Outer
 	values.Color = values.Color or Color3.fromRGB(200,200,200)
 	values.Line = values.Line or Enum.LineJoinMode.Round
 	values.SS = values.SS or Enum.StrokeSizingMode.FixedSize
