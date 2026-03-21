@@ -5459,7 +5459,6 @@ end
 
 function mainapi:CreateProfileGUI()
 	local profilesapi = {}
-	local instance = Instance
 
 	local window = Instance.new('Frame')
 	window.Name = 'ProfilesUI'
@@ -5474,7 +5473,7 @@ function mainapi:CreateProfileGUI()
 	addRatio(window,{Ratio=1.504})
 	local closewin = addCloseButton(window)
 
-	local icon = instance.new('ImageLabel')
+	local icon = Instance.new('ImageLabel')
 	icon.Parent = window
 	icon.BackgroundTransparency = 1
 	icon.Position = UDim2.fromScale(16,8)
@@ -5484,9 +5483,9 @@ function mainapi:CreateProfileGUI()
 	icon.ScaleType = 'Fit'
 	icon.ImageColor3 = Color3.fromRGB(251,251,251)
 	icon.ImageTransparency = 0.5
-	addRatio(icon,{Ratio=0.667}) -- 67 67 67 67 677777777777777777777777 AAAAAAAAAAAA
+	addRatio(icon,{Ratio=0.667})
 
-	local Divider = instance.new('Frame')
+	local Divider = Instance.new('Frame')
 	Divider.Parent = icon
 
 	local modal = Instance.new('TextButton')
@@ -5496,8 +5495,6 @@ function mainapi:CreateProfileGUI()
 	modal.Positon = UDim2.new(0,0,0,0)
 	modal.Size = UDim2.new(0,0,0,0)
 	modal.Text = ''
-	addRatio(modal,{Ratio=179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368}) -- = to nan for some reason but ai
-	addTextSize(modal,{Max=8})
 
 	local title = Instance.new('TextLabel')
 	title.BackgroundTransparency = 1
