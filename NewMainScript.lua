@@ -174,6 +174,5 @@ if not shared.VapeDeveloper then
 	end
 	writefile('ReVape/profiles/commit.txt', commit)
 end
-getgenv().metadata = {user=getgenv().username,pass=getgenv().password,key=getgenv().key}
 
 return loadstring(downloadFile('ReVape/main.lua'), 'main')(ARGS)
