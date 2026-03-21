@@ -1,10 +1,6 @@
 
 local ARGS = ... or {}
-if not ARGS.loader_key and shared.key then
-	ARGS.loader_key = shared.key 
-else
-	ARGS.loader_key = 'nigger-key-here'
-end
+
 if getgenv().username and ARGS.Username == nil then
 	ARGS.Username = getgenv().username
 	ARGS.Password = getgenv().password
