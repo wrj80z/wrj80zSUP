@@ -5528,7 +5528,7 @@ function mainapi:CreateProfileGUI()
 	title.TextSize = 13
 	title.TextScaled = true
 	title.TextXAlignment = 'Left'
-	title.Font = uipallet.Font
+	title.FontFace = uipallet.Font
 	title.Parent = window
 	addRatio(title,{Ratio=34.9})
 	addTextSize(title,{Max=13})
@@ -5548,7 +5548,7 @@ function mainapi:CreateProfileGUI()
 	LoadingScreen.Size = UDim2.fromScale(0.52,0.2)
 	LoadingScreen.Visible = false
 	LoadingScreen.Text = 'LOADING...'
-	LoadingScreen.Font = uipallet.Font
+	LoadingScreen.FontFace = uipallet.Font
 	LoadingScreen.TextScaled = true
 	LoadingScreen.TextSize = 18
 	addRatio(LoadingScreen,{Ratio=3.688})
@@ -5570,7 +5570,7 @@ function mainapi:CreateProfileGUI()
 	Search.ClearTextOnFocus = false
 	Search.Position = UDim2.fromOffset(9,0)
 	Search.Size = UDim2.fromScale(0.98,1)
-	Search.Font = uipallet.Font
+	Search.FontFace = uipallet.Font
 	Search.PlaceholderText = 'Search Profile / Username'
 	Search.Text = ''
 	Search.TextColor3 = Color3.fromRGB(200,200,200)
