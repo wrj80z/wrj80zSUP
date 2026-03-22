@@ -5457,7 +5457,22 @@ function mainapi:CreateLegit()
 end
 
 function mainapi:CreateProfileGUI()
-	local profilesapi = {}
+	local profilesapi = {sortfuncs={},currentSort='new',configs={}}
+
+	profilesapi.sortfuncs = {
+		oldest = function(a, b)
+			return a.time < b.time
+		end,
+		newest = function(a, b)
+			return a.time > b.time
+		end,
+		public = function(a, b)
+			return a.visibility < b.visibility
+		end,
+		private = function(a, b)
+			return a.visibility > b.visibility
+		end
+	}
 
 	local window = Instance.new('Frame')
 	window.Name = 'ProfilesUI'
@@ -5473,6 +5488,7 @@ function mainapi:CreateProfileGUI()
 	local closewin = addCloseButton(window)
 
 	local icon = Instance.new('ImageLabel')
+	icon.Name = 'ProfileIcon'
 	icon.Parent = window
 	icon.BackgroundTransparency = 1
 	icon.Position = UDim2.fromScale(16,8)
@@ -5485,17 +5501,25 @@ function mainapi:CreateProfileGUI()
 	addRatio(icon,{Ratio=0.667})
 
 	local Divider = Instance.new('Frame')
+	Divider.Name = 'Divider'
 	Divider.Parent = icon
+	Divider.Position = UDim2.fromOffset(0,39)
+	Divider.Size = UDim2.fromScale(1,0.002)
+	Divider.BackgroundColor3 = Color3.fromRGB(36,34,36)
+	Divider.BorderSizePixel = 0
+	addRatio(Divider,{Ratio=751})
 
 	local modal = Instance.new('TextButton')
+	modal.Name = 'modal'
 	modal.Parent = window
 	modal.BackgroundTransparency = 1
 	modal.Modal = true
-	modal.Positon = UDim2.new(0,0,0,0)
+	modal.Position = UDim2.new(0,0,0,0)
 	modal.Size = UDim2.new(0,0,0,0)
 	modal.Text = ''
 
 	local title = Instance.new('TextLabel')
+	title.Name = 'Title'
 	title.BackgroundTransparency = 1
 	title.Position = UDim2.fromScale(47,12)
 	title.Size = UDim2.new(.929,0,0.04,0)
@@ -5504,11 +5528,69 @@ function mainapi:CreateProfileGUI()
 	title.TextSize = 13
 	title.TextScaled = true
 	title.TextXAlignment = 'Left'
-	title.Font = Enum.Font.Arial
+	title.Font = uipallet.Font
 	title.Parent = window
 	addRatio(title,{Ratio=34.9})
 	addTextSize(title,{Max=13})
 
+	local mainframe = Instance.new('Frame')
+	mainframe.Name = 'MainWindow'
+	mainframe.Parent = window
+	mainframe.BackgroundTransparency = 1
+	mainframe.Size = UDim2.fromOffset(0.879,0.929)
+	addRatio(mainframe,{Ratio=1.422})
+
+	local LoadingScreen = Instance.new('TextLabel')
+	LoadingScreen.Name = 'loading-screen'
+	LoadingScreen.BackgroundTransparency = 1
+	LoadingScreen.Parent = mainframe
+	LoadingScreen.Position = UDim2.fromScale(204,218)
+	LoadingScreen.Size = UDim2.fromScale(0.52,0.2)
+	LoadingScreen.Visible = false
+	LoadingScreen.Text = 'LOADING...'
+	LoadingScreen.Font = uipallet.Font
+	LoadingScreen.TextScaled = true
+	LoadingScreen.TextSize = 18
+	addRatio(LoadingScreen,{Ratio=3.688})
+	addTextSize(LoadingScreen,{Max=18})
+
+	local serframe = Instance.new('Frame')
+	serframe.Name = 'Search'
+	serframe.BackgroundColor3 = Color3.fromRGB(34,33,34)
+	serframe.Position = UDim2.fromOffset(146,49)
+	serframe.Size = UDim2.fromScale(0.756,0.067)
+	serframe.Parent = mainframe
+	addRatio(serframe,{Ratio=16.097})
+	addCorner(serframe,UDim.new(0, 4))
+	addStroke(serframe,{SM='Border',Color=Color3.fromRGB(48,48,48),Transparency=0.3})
+
+	local Search = Instance.new('TextBox')
+	Search.Parent = serframe
+	Search.BackgroundTransparency = 1
+	Search.ClearTextOnFocus = false
+	Search.Position = UDim2.fromOffset(9,0)
+	Search.Size = UDim2.fromScale(0.98,1)
+	Search.Font = uipallet.Font
+	Search.PlaceholderText = 'Search Profile / Username'
+	Search.Text = ''
+	Search.TextColor3 = Color3.fromRGB(200,200,200)
+	Search.PlaceholderColor3 = Color3.fromRGB(178,178,178)
+	Search.TextSize = 12
+	Search.TextScaled = true
+	Search.TextXAlignment = 'Left'
+	addRatio(Search,{Ratio=15.774})
+	addPadding(Search,{Left=UDim.new(0.025, 0)})
+	addTextSize(Search,{Max=12})
+
+	local sericon = Instance.new('ImageLabel')
+	sericon.Name = 'icon'
+	sericon.Parent = serframe
+	sericon.BackgroundTransparency = 1
+	sericon.Position = UDim2.fromOffset(455,8)
+	sericon.Size = UDim2.fromScale(0.029,0.452)
+	sericon.Image = getcustomasset('ReVape/assets/new/search.png')
+	sericon.ImageColor3 = Color3.fromRGB(120,115,120)
+	addRatio(sericon,{Ratio=0.975})
 
 end
 
