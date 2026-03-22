@@ -5473,6 +5473,16 @@ function mainapi:CreateProfileGUI()
 			return a.visibility > b.visibility
 		end
 	}
+	local GUI = Instance.new('ScreenGui')
+	GUI.IgnoreGuiInset = true
+	GUI.Name = 'ProfilesGUI'
+	GUI.ZIndexBehavior = 'Global'
+	if mainapi.ThreadFix then
+		GUI.Parent = cloneref(game:GetService('CoreGui'))--(gethui and gethui()) or cloneref(game:GetService('CoreGui'))
+	else
+		GUI.Parent = cloneref(game:GetService('Players')).LocalPlayer.PlayerGui
+		GUI.ResetOnSpawn = false
+	end
 
 	local window = Instance.new('Frame')
 	window.Name = 'ProfilesUI'
@@ -5480,7 +5490,7 @@ function mainapi:CreateProfileGUI()
 	window.Position = UDim2.fromOffset(845,408)
 	window.AnchorPoint = Vector2.new(0.5, 0.5)
 	window.BackgroundColor3 = uipallet.Main
-	window.Parent = scaledgui
+	window.Parent = GUI
 	addBlur(window)
 	addCorner(window)
 	makeDraggable(window)
