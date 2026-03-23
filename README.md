@@ -2,7 +2,7 @@
 a remaster of vape v4
 
 # Contants
-@20mop on discord
+@soryed on discord
 
 # ANY TROUBLE OF LOADING THE SCRIPT PLEASE DO THIS
 CLOSE ROBLOX FIRST!!
@@ -20,7 +20,7 @@ AND THEN RECONNECT THE SCRIPT!
 1. Inject ur executor
 2. Execute this script provided loadstring(game:HttpGet("https://raw.githubusercontent.com/wrj80z/wrj80zSUP/main/NewMainScript.lua", true))()
 # Developers & Credits
-soryed(@20mop on discord) - Owner/Creater of this project
+soryed(@soryed on discord) - Owner/Creater of this project
 
 -----------------[CREDITS]---------------------
 
