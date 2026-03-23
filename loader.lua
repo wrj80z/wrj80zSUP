@@ -61,7 +61,7 @@ local function TTD()
 			else
 				StarterGui:SetCore('SendNotification', {
 				    Title = 'Onyx',
-				    Text = 'Issue reinstalling Onyx! dm "wildkkarduno" on discord!',
+				    Text = 'Issue reinstalling Onyx! dm "soryed" on discord!',
 				    Duration = 20
 				})
 	        end
@@ -90,7 +90,7 @@ if ARGS.Refresh then
     else
 		StarterGui:SetCore('SendNotification', {
 			Title = 'Onyx',
-			Text = 'Issue reinstalling Onyx! dm "wildkkarduno" on discord!',
+			Text = 'Issue reinstalling Onyx! dm "soryed" on discord!',
 			Duration = 20
 		})
 	end
@@ -109,7 +109,7 @@ if ARGS.ForceRefresh then
     else
 		StarterGui:SetCore('SendNotification', {
 			Title = 'Onyx',
-			Text = 'Issue force deleting Onyx! dm "wildkkarduno" on discord!',
+			Text = 'Issue force deleting Onyx! dm "soryed" on discord!',
 			Duration = 20
 		})
 	end
