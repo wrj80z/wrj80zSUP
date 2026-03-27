@@ -11740,7 +11740,6 @@ run(function()
 	local Options
     HitFix = vape.Categories.Blatant:CreateModule({
         Name = 'HitFix',
-		IsPrem = true,
         Function = function(callback)
 
             local function getPing()
