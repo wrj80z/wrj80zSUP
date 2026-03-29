@@ -90,7 +90,7 @@ local function finishLoading()
 				teleportScript = 'shared.VapeCustomProfile = "'..shared.VapeCustomProfile..'"\n'..teleportScript
 			end
 			teleportScript = teleportScript:gsub('sharedData', compileTable(ARGS))
-			vape:Save()
+			--vape:Save()
 			queue_on_teleport(teleportScript)
 		end
 	end))
