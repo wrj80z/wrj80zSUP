@@ -90,7 +90,7 @@ local function finishLoading()
 				teleportScript = 'shared.VapeCustomProfile = "'..shared.VapeCustomProfile..'"\n'..teleportScript
 			end
 			teleportScript = teleportScript:gsub('sharedData', compileTable(ARGS))
-			--vape:Save()
+			vape:Save()
 			queue_on_teleport(teleportScript)
 		end
 	end))
@@ -101,7 +101,7 @@ local function finishLoading()
 			task.wait(0.5)
 			vape:CreateNotification('Finished Loading', vape.VapeButton and 'Press the button in the top right to open GUI' or 'Press '..table.concat(vape.Keybind, ' + '):upper()..' to open GUI', 5)
 			task.wait(0.5)
-			vape:CreateNotification('Onyx', `Initalized as {getgenv().username} with {getgenv().role}`, 5, 'info')
+			vape:CreateNotification('Onyx', 'Initialized as ' .. (getgenv().username or 'Guest') .. ' with ' .. (getgenv().role or 'User'), 5, 'info')
 		end
 	end
 end
