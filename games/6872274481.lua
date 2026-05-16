@@ -114,7 +114,7 @@ local store = {
 	queueType = 'bedwars_test',
 	tools = {}
 }
-getgenv().store = store
+shared.store = store
 local Reach = {}
 local HitBoxes = {}
 local InfiniteFly
@@ -906,7 +906,7 @@ run(function()
 		end
 	})
 
-	getgenv().BWStore = bedwars.Store:getState()
+	shared.bedwars = bedwars
 
 	local remoteNames = {
 		AfkStatus = safeGetProto(Knit.Controllers.AfkController.KnitStart, 1),
